@@ -1,0 +1,364 @@
+{
+  "geradoEm": "2026-10-27T17:52:48.436Z",
+  "modo": "oficial",
+  "conjuntos": [
+    {
+      "conjunto": "orcamento",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Orçamento da Despesa — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/orcamento-despesa",
+        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603417-dicionario-de-dados-orcamento-da-despesa"
+      },
+      "arquivos": [
+        {
+          "nome": "orcamento-2026.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/orcamento-despesa/2026_OrcamentoDespesa.zip",
+          "periodo": "2026",
+          "baixadoEm": "2026-10-27T17:50:54.574Z",
+          "bytes": 817070,
+          "linhasLidas": 25348,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-27T17:50:54.584Z",
+      "avisos": [],
+      "linhasAgregadas": 5237
+    },
+    {
+      "conjunto": "execucao",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Execução da Despesa — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/despesas-execucao",
+        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603453-dicionario-de-dados-execucao-da-despesa"
+      },
+      "arquivos": [
+        {
+          "nome": "execucao-202601.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202601_Despesas.zip",
+          "periodo": "202601",
+          "baixadoEm": "2026-10-27T17:51:13.942Z",
+          "bytes": 5185650,
+          "linhasLidas": 48519,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202602.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202602_Despesas.zip",
+          "periodo": "202602",
+          "baixadoEm": "2026-10-27T17:51:16.425Z",
+          "bytes": 5864685,
+          "linhasLidas": 54564,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202603.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202603_Despesas.zip",
+          "periodo": "202603",
+          "baixadoEm": "2026-10-27T17:51:19.226Z",
+          "bytes": 6746989,
+          "linhasLidas": 62101,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202604.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202604_Despesas.zip",
+          "periodo": "202604",
+          "baixadoEm": "2026-10-27T17:51:22.085Z",
+          "bytes": 6932116,
+          "linhasLidas": 64022,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202605.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202605_Despesas.zip",
+          "periodo": "202605",
+          "baixadoEm": "2026-10-27T17:51:25.153Z",
+          "bytes": 7328048,
+          "linhasLidas": 67691,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202606.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202606_Despesas.zip",
+          "periodo": "202606",
+          "baixadoEm": "2026-10-27T17:51:28.224Z",
+          "bytes": 7190637,
+          "linhasLidas": 66067,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202607.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202607_Despesas.zip",
+          "periodo": "202607",
+          "baixadoEm": "2026-10-27T17:51:31.193Z",
+          "bytes": 7099186,
+          "linhasLidas": 66083,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202608.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202608_Despesas.zip",
+          "periodo": "202608",
+          "baixadoEm": "2026-10-27T17:51:34.178Z",
+          "bytes": 7182272,
+          "linhasLidas": 66525,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202609.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202609_Despesas.zip",
+          "periodo": "202609",
+          "baixadoEm": "2026-10-27T17:51:37.187Z",
+          "bytes": 6657847,
+          "linhasLidas": 67732,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202610.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202610_Despesas.zip",
+          "periodo": "202610",
+          "baixadoEm": "2026-10-27T17:51:39.961Z",
+          "bytes": 6698582,
+          "linhasLidas": 62787,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "processadoEm": "2026-10-27T17:51:40.117Z",
+      "avisos": [
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (420692).",
+        "220 linhas com nome de município sem correspondência na malha do IBGE."
+      ],
+      "linhasAgregadas": 77761
+    },
+    {
+      "conjunto": "transferencias",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Recursos Transferidos — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/transferencias",
+        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603420-dicionario-de-dados-recursos-transferidos"
+      },
+      "arquivos": [],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-27T17:52:00.931Z",
+      "avisos": [
+        "Falha no processamento: [transferencias] Nenhum CSV com a estrutura esperada em transferencias-202601.zip."
+      ],
+      "linhasAgregadas": 0
+    },
+    {
+      "conjunto": "emendas",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Emendas Parlamentares — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
+        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
+      },
+      "arquivos": [],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-27T17:52:14.415Z",
+      "avisos": [
+        "Falha no processamento: [emendas] Nenhum CSV com a estrutura esperada em emendas-UNICO.zip."
+      ],
+      "linhasAgregadas": 0
+    },
+    {
+      "conjunto": "orcamento",
+      "ano": 2025,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Orçamento da Despesa — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/orcamento-despesa",
+        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603417-dicionario-de-dados-orcamento-da-despesa"
+      },
+      "arquivos": [
+        {
+          "nome": "orcamento-2025.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/orcamento-despesa/2025_OrcamentoDespesa.zip",
+          "periodo": "2025",
+          "baixadoEm": "2026-10-27T17:52:16.224Z",
+          "bytes": 809621,
+          "linhasLidas": 26160,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-27T17:52:16.234Z",
+      "avisos": [
+        "Consistência: empenhado da execução mensal (3.495.475.207.681,75) difere 32.6% do empenhado no arquivo de orçamento (5.187.756.042.570,96). Verifique meses faltantes ou datas de extração diferentes."
+      ],
+      "linhasAgregadas": 5256
+    },
+    {
+      "conjunto": "execucao",
+      "ano": 2025,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Execução da Despesa — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/despesas-execucao",
+        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603453-dicionario-de-dados-execucao-da-despesa"
+      },
+      "arquivos": [
+        {
+          "nome": "execucao-202501.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202501_Despesas.zip",
+          "periodo": "202501",
+          "baixadoEm": "2026-10-27T17:52:30.215Z",
+          "bytes": 5171682,
+          "linhasLidas": 48873,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202502.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202502_Despesas.zip",
+          "periodo": "202502",
+          "baixadoEm": "2026-10-27T17:52:32.741Z",
+          "bytes": 5933338,
+          "linhasLidas": 55539,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202503.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202503_Despesas.zip",
+          "periodo": "202503",
+          "baixadoEm": "2026-10-27T17:52:35.313Z",
+          "bytes": 6119027,
+          "linhasLidas": 57465,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202504.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202504_Despesas.zip",
+          "periodo": "202504",
+          "baixadoEm": "2026-10-27T17:52:37.975Z",
+          "bytes": 6361682,
+          "linhasLidas": 59507,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202505.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202505_Despesas.zip",
+          "periodo": "202505",
+          "baixadoEm": "2026-10-27T17:52:40.735Z",
+          "bytes": 6631491,
+          "linhasLidas": 61737,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202506.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202506_Despesas.zip",
+          "periodo": "202506",
+          "baixadoEm": "2026-10-27T17:52:43.605Z",
+          "bytes": 6899890,
+          "linhasLidas": 64342,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "processadoEm": "2026-10-27T17:52:43.708Z",
+      "avisos": [
+        "Período 202507 indisponível para download.",
+        "Período 202508 indisponível para download.",
+        "Período 202509 indisponível para download.",
+        "Período 202510 indisponível para download.",
+        "Período 202511 indisponível para download.",
+        "Período 202512 indisponível para download.",
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (233371).",
+        "306 linhas com nome de município sem correspondência na malha do IBGE.",
+        "Consistência: empenhado da execução mensal (3.495.475.207.681,75) difere 32.6% do empenhado no arquivo de orçamento (5.187.756.042.570,96). Verifique meses faltantes ou datas de extração diferentes."
+      ],
+      "linhasAgregadas": 45061
+    },
+    {
+      "conjunto": "transferencias",
+      "ano": 2025,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Recursos Transferidos — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/transferencias",
+        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603420-dicionario-de-dados-recursos-transferidos"
+      },
+      "arquivos": [],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-27T17:52:47.969Z",
+      "avisos": [
+        "Período 202501 indisponível para download.",
+        "Período 202502 indisponível para download.",
+        "Período 202503 indisponível para download.",
+        "Período 202504 indisponível para download.",
+        "Período 202505 indisponível para download.",
+        "Período 202506 indisponível para download.",
+        "Período 202507 indisponível para download.",
+        "Período 202508 indisponível para download.",
+        "Período 202509 indisponível para download.",
+        "Período 202510 indisponível para download.",
+        "Período 202511 indisponível para download.",
+        "Período 202512 indisponível para download.",
+        "Nenhum arquivo processado."
+      ],
+      "linhasAgregadas": 0
+    },
+    {
+      "conjunto": "emendas",
+      "ano": 2025,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Emendas Parlamentares — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
+        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
+      },
+      "arquivos": [],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-27T17:52:48.406Z",
+      "avisos": [
+        "Período UNICO indisponível para download.",
+        "Nenhum arquivo processado."
+      ],
+      "linhasAgregadas": 0
+    }
+  ]
+}
