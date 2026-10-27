@@ -61,6 +61,12 @@ DADOS_DEMONSTRACAO=true npm run dev
 
 Nesse modo há uma faixa de aviso permanente, cada valor leva o selo “Demonstração” e os nomes têm o prefixo `[DEMO]`.
 
+### Modelo navegável (uma página, sem servidor)
+
+```bash
+npm run demo && npm run modelo     # gera prototipo/brasil-transparente-modelo.html
+```
+
 ## Verificações
 
 ```bash

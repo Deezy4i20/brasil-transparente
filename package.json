@@ -13,7 +13,8 @@
     "etl": "tsx scripts/etl/index.ts",
     "malhas": "tsx scripts/geo/build-malhas.ts",
     "demo": "tsx scripts/gerar-demo.ts",
-    "verificar:api": "tsx scripts/verificar-api.ts"
+    "verificar:api": "tsx scripts/verificar-api.ts",
+    "modelo": "tsx scripts/exportar-modelo.ts"
   },
   "engines": {
     "node": ">=20"

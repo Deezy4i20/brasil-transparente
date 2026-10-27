@@ -1,0 +1,605 @@
+<title>Brasil Transparente</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: cabeçalho institucional escuro; painel em grade (indicadores → mapa + painel lateral → rankings); uma coluna no celular */
+:root {
+  --plano: #f3f5f8; --sup: #ffffff; --sup-2: #f7f9fb; --borda: #e1e6ed;
+  --tinta: #0b1220; --tinta-2: #46505f; --tinta-3: #6b7482;
+  --topo: #0b1220; --topo-tinta: #ffffff;
+  --marinho: #0b2a5b; --marinho-claro: #e8eef8; --link: #12397a;
+  --s1: #cde2fb; --s2: #9ec5f4; --s3: #5598e7; --s4: #256abf; --s5: #0d366b; --sem: #eceef2; --vizinho: #eef1f5;
+  --barra: #2a78d6; --e1: #86b6ef; --e2: #5598e7; --e3: #256abf; --e4: #104281;
+  --demo-bg: #fff6e0; --demo-borda: #fab219; --demo-tinta: #5c3d00;
+  --aviso: #b8501f; --dica-bg: #0b1220; --dica-tinta: #ffffff; --grade: #e6e8ee;
+  --fonte: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --plano: #0c1118; --sup: #141b25; --sup-2: #19212d; --borda: #26303d;
+  --tinta: #eef1f5; --tinta-2: #b9c1cc; --tinta-3: #8b94a1;
+  --topo: #070b11; --topo-tinta: #ffffff;
+  --marinho: #9fc0f0; --marinho-claro: #1b2a40; --link: #8db6f2;
+  --s1: #1c3a63; --s2: #24508a; --s3: #3a74c4; --s4: #6da7ec; --s5: #b7d3f6; --sem: #1d2530; --vizinho: #18202b;
+  --barra: #3987e5; --e1: #1f4777; --e2: #2f68b3; --e3: #5598e7; --e4: #9ec5f4;
+  --demo-bg: #2e2410; --demo-borda: #c98500; --demo-tinta: #f6d896;
+  --aviso: #ec835a; --dica-bg: #eef1f5; --dica-tinta: #0b1220; --grade: #222b37;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --plano: #0c1118; --sup: #141b25; --sup-2: #19212d; --borda: #26303d;
+  --tinta: #eef1f5; --tinta-2: #b9c1cc; --tinta-3: #8b94a1;
+  --topo: #070b11; --topo-tinta: #ffffff;
+  --marinho: #9fc0f0; --marinho-claro: #1b2a40; --link: #8db6f2;
+  --s1: #1c3a63; --s2: #24508a; --s3: #3a74c4; --s4: #6da7ec; --s5: #b7d3f6; --sem: #1d2530; --vizinho: #18202b;
+  --barra: #3987e5; --e1: #1f4777; --e2: #2f68b3; --e3: #5598e7; --e4: #9ec5f4;
+  --demo-bg: #2e2410; --demo-borda: #c98500; --demo-tinta: #f6d896;
+  --aviso: #ec835a; --dica-bg: #eef1f5; --dica-tinta: #0b1220; --grade: #222b37;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--plano); color: var(--tinta); font: 14.5px/1.5 var(--fonte); margin: 0; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--topo); }
+.g { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1400px; margin: 0 auto; }
+a { color: var(--link); }
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--barra); outline-offset: 2px; border-radius: 4px; }
+.num { font-variant-numeric: tabular-nums; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+
+/* Cabeçalho */
+header { background: var(--topo); color: var(--topo-tinta); }
+.topo { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding-block: 12px; }
+.marca { display: flex; gap: 10px; align-items: center; color: inherit; text-decoration: none; }
+.marca .ic { width: 32px; height: 32px; border-radius: 7px; background: rgba(255,255,255,.1); display: grid; place-items: center; }
+.marca b { display: block; font-size: 15px; }
+.marca small { display: block; font-size: 11.5px; opacity: .6; }
+.busca { flex: 1 1 260px; min-width: 0; position: relative; max-width: 560px; }
+.busca input { width: 100%; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16); color: #fff; border-radius: 7px; padding: 7px 10px 7px 32px; }
+.busca input::placeholder { color: rgba(255,255,255,.5); }
+.busca svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); opacity: .55; }
+.res-busca { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--sup); color: var(--tinta); border: 1px solid var(--borda); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.18); z-index: 40; max-height: 360px; overflow: auto; }
+.res-busca h4 { margin: 0; padding: 8px 12px 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--tinta-3); }
+.res-busca button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 6px 12px; cursor: pointer; }
+.res-busca button:hover, .res-busca button:focus-visible { background: var(--sup-2); }
+.periodo { display: flex; gap: 6px; align-items: center; }
+.periodo select { background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16); color: #fff; border-radius: 6px; padding: 4px 6px; }
+.periodo option { color: #0b1220; }
+.status { font-size: 12px; opacity: .8; display: flex; gap: 6px; align-items: center; }
+.status i { width: 8px; height: 8px; border-radius: 50%; background: #fab219; display: inline-block; }
+nav.mods { border-top: 1px solid rgba(255,255,255,.1); }
+nav.mods ul { display: flex; gap: 2px; list-style: none; margin: 0 auto; padding: 0; overflow-x: auto; scrollbar-width: none; }
+nav.mods a { display: block; padding: 8px 10px; color: rgba(255,255,255,.7); text-decoration: none; font-size: 13.5px; border-bottom: 2px solid transparent; white-space: nowrap; }
+nav.mods a[aria-current="page"] { color: #fff; border-color: #fff; font-weight: 600; }
+.demo { background: var(--demo-bg); color: var(--demo-tinta); border-bottom: 1px solid var(--demo-borda); font-size: 13px; }
+.demo .wrap { padding-block: 8px; }
+
+main { padding-block: 20px 40px; display: grid; gap: 18px; }
+.cartao { background: var(--sup); border: 1px solid var(--borda); border-radius: 10px; padding: 16px; min-width: 0; }
+.rotulo { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--tinta-3); display: flex; gap: 6px; align-items: center; }
+.titulo-pag h1 { font-size: 22px; }
+.titulo-pag p { margin: 2px 0 0; color: var(--tinta-2); max-width: 70ch; }
+.sec-tit { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 8px; margin-bottom: 12px; }
+.sec-tit h2 { font-size: 16.5px; }
+.sec-tit p { margin: 2px 0 0; font-size: 13px; color: var(--tinta-3); max-width: 75ch; }
+.muted { color: var(--tinta-3); font-size: 12.5px; }
+
+/* Filtros */
+.filtros { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; }
+.filtros label { font-size: 12px; font-weight: 600; color: var(--tinta-2); display: grid; gap: 3px; }
+.filtros select { background: var(--sup); border: 1px solid var(--borda); border-radius: 6px; padding: 5px 8px; min-width: 150px; max-width: 100%; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; width: 100%; }
+.chip { display: inline-flex; align-items: center; gap: 4px; background: var(--marinho-claro); color: var(--marinho); border-radius: 999px; padding: 2px 4px 2px 10px; font-size: 12.5px; }
+.chip button { border: 0; background: none; cursor: pointer; width: 20px; height: 20px; border-radius: 50%; color: inherit; }
+.limpar { border: 0; background: none; text-decoration: underline; cursor: pointer; font-size: 12.5px; color: var(--tinta-2); }
+
+/* Indicadores */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.kpi { display: flex; flex-direction: column; gap: 5px; }
+.kpi .v { font-size: 26px; font-weight: 650; letter-spacing: -.01em; line-height: 1.15; }
+.kpi .var { font-size: 12px; color: var(--tinta-2); }
+.kpi p { margin: 0; font-size: 12.5px; color: var(--tinta-2); line-height: 1.4; }
+.kpi .ind { color: var(--tinta-3); }
+details.fonte { font-size: 12px; color: var(--tinta-3); margin-top: auto; padding-top: 4px; }
+details.fonte summary { cursor: pointer; display: inline-flex; gap: 6px; align-items: center; list-style: none; }
+details.fonte summary::-webkit-details-marker { display: none; }
+details.fonte summary span.u { text-decoration: underline dotted; text-underline-offset: 2px; }
+details.fonte div { margin-top: 6px; background: var(--sup-2); border: 1px solid var(--borda); border-radius: 6px; padding: 8px 10px; color: var(--tinta-2); display: grid; gap: 3px; }
+.selo { font-size: 10.5px; font-weight: 700; border-radius: 999px; padding: 1px 7px; background: var(--demo-bg); color: var(--demo-tinta); border: 1px solid var(--demo-borda); }
+.selo.calc { background: var(--marinho-claro); color: var(--marinho); border-color: transparent; }
+.ajuda { display: inline-grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; border: 1px solid var(--tinta-3); color: var(--tinta-3); font-size: 10px; font-weight: 700; cursor: help; text-transform: none; letter-spacing: 0; position: relative; }
+.ajuda:hover::after, .ajuda:focus::after { content: attr(data-dica); position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 240px; background: var(--dica-bg); color: var(--dica-tinta); padding: 8px 10px; border-radius: 6px; font-weight: 400; font-size: 12.5px; line-height: 1.4; z-index: 30; text-align: left; }
+
+/* Mapa */
+.grade-mapa { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr); gap: 16px; }
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--sup-2); border: 1px solid var(--borda); border-radius: 7px; padding: 2px; }
+.seg button { border: 0; background: none; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 12.5px; color: var(--tinta-2); }
+.seg button[aria-checked="true"] { background: var(--sup); color: var(--tinta); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.ctrl { display: flex; flex-wrap: wrap; gap: 8px; }
+.legenda { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: var(--tinta-2); margin: 10px 0 8px; }
+.legenda span { display: inline-flex; gap: 5px; align-items: center; }
+.legenda i { width: 16px; height: 10px; border-radius: 2px; display: inline-block; border: 1px solid var(--borda); }
+.mapa { position: relative; background: var(--sup-2); border-radius: 8px; overflow: hidden; }
+.mapa svg { display: block; width: 100%; height: auto; touch-action: none; }
+.mapa path.uf { cursor: pointer; stroke: var(--sup); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.mapa path.uf.sel { stroke: var(--tinta); stroke-width: 2.2; }
+.mapa path.uf:focus-visible { stroke: var(--barra); stroke-width: 3; outline: none; }
+.mapa path.mun { stroke: var(--sup); stroke-width: .5; vector-effect: non-scaling-stroke; }
+.zoom { position: absolute; right: 8px; top: 8px; display: grid; gap: 4px; }
+.zoom button, .botao { background: var(--sup); border: 1px solid var(--borda); border-radius: 6px; cursor: pointer; padding: 5px 10px; font-size: 12.5px; }
+.zoom button { width: 32px; height: 32px; padding: 0; font-size: 16px; }
+.dica { position: absolute; pointer-events: none; background: var(--dica-bg); color: var(--dica-tinta); border-radius: 6px; padding: 7px 10px; font-size: 12.5px; transform: translate(-50%, calc(-100% - 12px)); white-space: nowrap; z-index: 20; }
+.dica b { display: block; }
+
+/* Listas de barras */
+ol.barras { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+ol.barras li { font-size: 13.5px; }
+ol.barras .l1 { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+ol.barras .n { color: var(--tinta-3); width: 18px; text-align: right; flex: none; }
+ol.barras .nome { display: flex; gap: 8px; min-width: 0; }
+ol.barras .nome span:last-child { overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+ol.barras .val { font-weight: 600; flex: none; }
+ol.barras .sub { margin-left: 26px; font-size: 12px; color: var(--tinta-3); }
+ol.barras .trilho { margin: 4px 0 0 26px; height: 6px; background: var(--sup-2); border-radius: 99px; }
+ol.barras .trilho div { height: 6px; background: var(--barra); border-radius: 99px; }
+ol.barras button.lnk { border: 0; background: none; padding: 0; color: inherit; cursor: pointer; text-align: left; }
+ol.barras button.lnk:hover { text-decoration: underline; }
+
+.estagios { display: grid; gap: 10px; }
+.estagios .l1 { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--tinta-2); }
+.estagios .l1 b { color: var(--tinta); }
+.estagios .t { height: 10px; background: var(--sup-2); border-radius: 99px; margin-top: 4px; }
+.estagios .t div { height: 10px; border-radius: 99px; }
+
+.metricas { display: grid; gap: 8px; }
+.metricas button { text-align: left; border: 1px solid var(--borda); background: var(--sup); border-radius: 7px; padding: 8px 12px; cursor: pointer; display: grid; gap: 2px; }
+.metricas button[aria-pressed="true"] { border-color: var(--marinho); background: var(--marinho-claro); }
+.metricas .a { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--tinta-2); }
+.metricas .a b { font-size: 16px; color: var(--tinta); }
+.metricas .b { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--tinta-3); }
+.bloco { border-top: 1px solid var(--borda); padding-top: 14px; display: grid; gap: 10px; }
+.painel-uf { display: grid; gap: 16px; }
+.fechar { width: 32px; height: 32px; padding: 0; }
+
+.rank { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.vazio { border: 1px dashed var(--borda); border-radius: 8px; padding: 14px; font-size: 13px; color: var(--tinta-2); }
+
+/* Tabelas */
+.tab-wrap { overflow-x: auto; border: 1px solid var(--borda); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th { text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--tinta-3); padding: 8px 12px; border-bottom: 1px solid var(--borda); background: var(--sup-2); white-space: nowrap; }
+th button { border: 0; background: none; font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit; cursor: pointer; padding: 0; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--borda); vertical-align: top; }
+td.v, th.v { text-align: right; font-variant-numeric: tabular-nums; }
+tr.sel td { background: var(--marinho-claro); }
+.pag { display: flex; justify-content: flex-end; gap: 8px; align-items: center; margin-top: 8px; font-size: 12.5px; }
+.campo { background: var(--sup); border: 1px solid var(--borda); border-radius: 6px; padding: 6px 10px; width: 100%; max-width: 360px; }
+
+.cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.cat { border: 1px solid var(--borda); border-radius: 8px; padding: 12px; display: grid; gap: 6px; }
+.cat .a { display: flex; justify-content: space-between; gap: 8px; }
+.cat .trilho { height: 6px; background: var(--sup-2); border-radius: 99px; }
+.cat .trilho div { height: 6px; background: var(--barra); border-radius: 99px; }
+
+dl.gloss { display: grid; gap: 12px; margin: 0; }
+dl.gloss div { background: var(--sup); border: 1px solid var(--borda); border-radius: 10px; padding: 14px 16px; }
+dl.gloss dt { font-weight: 650; font-size: 15.5px; }
+dl.gloss dd { margin: 4px 0 0; color: var(--tinta-2); max-width: 75ch; }
+
+footer { border-top: 1px solid var(--borda); background: var(--sup); font-size: 12.5px; color: var(--tinta-3); }
+footer .wrap { padding-block: 18px; display: grid; gap: 4px; }
+
+@media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rank, .cats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 900px) { .grade-mapa { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .kpis, .rank, .cats { grid-template-columns: minmax(0, 1fr); } .kpi .v { font-size: 23px; } .filtros select { min-width: 0; width: 100%; } .filtros label { flex: 1 1 140px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header>
+  <div class="g"><div class="wrap topo">
+    <a class="marca" href="#painel" aria-label="Brasil Transparente — painel">
+      <span class="ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 22h18M6 18V11M10 18V11M14 18V11M18 18V11M12 2l8 5H4z"/></svg></span>
+      <span><b>Brasil Transparente</b><small>Gastos públicos federais, com fonte</small></span>
+    </a>
+    <div class="busca" role="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <label for="busca" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Buscar</label>
+      <input id="busca" autocomplete="off" placeholder="Buscar órgão, estado, programa, autor de emenda…" maxlength="80">
+      <div class="res-busca" id="res-busca" hidden></div>
+    </div>
+    <div class="periodo">
+      <label for="sel-ano" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ano</label><select id="sel-ano"></select>
+      <label for="sel-mi" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Mês inicial</label><select id="sel-mi"></select>
+      <span aria-hidden="true" style="opacity:.5">–</span>
+      <label for="sel-mf" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Mês final</label><select id="sel-mf"></select>
+    </div>
+    <div class="status"><i></i> Modelo inicial · demonstração</div>
+  </div></div>
+  <nav class="mods g" aria-label="Módulos"><ul class="wrap" id="nav"></ul></nav>
+</header>
+<div class="demo g" role="note"><div class="wrap"><b>Modelo inicial com dados de demonstração.</b> Todos os valores são <b>fictícios</b> e servem para avaliar a navegação e o visual. O software real lê os arquivos oficiais do Portal da Transparência e mostra a fonte de cada número.</div></div>
+<main class="g"><div class="wrap" id="app" style="display:grid;gap:18px"></div></main>
+<footer class="g"><div class="wrap">
+  <span>Fontes previstas: Portal da Transparência do Governo Federal (CGU) e IBGE. Projeto independente, sem vínculo com órgãos públicos.</span>
+  <span>A plataforma organiza e compara dados oficiais e não presume irregularidades: receber ou gastar recursos públicos não é indício de ilegalidade.</span>
+</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script>
+const D = /*__DADOS__*/null;
+const MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const REGIOES = ["Norte","Nordeste","Centro-Oeste","Sudeste","Sul"];
+const POP_BR = D.ufs.reduce((s,u)=>s+u.populacao,0);
+const METRICAS = {
+  transferencias: { rot: "Transferências recebidas", curto: "Transferências", desc: "Recursos federais transferidos a estados, municípios, entidades e cidadãos, pela UF do favorecido (destino da transferência)." },
+  execucao: { rot: "Despesa paga com localidade indicada", curto: "Despesa localizada", desc: "Valor pago de despesas cujo plano de trabalho indica a UF. Despesas nacionais ficam como “localização não identificada”, nunca na sede do órgão." },
+  emendas: { rot: "Emendas parlamentares pagas", curto: "Emendas", desc: "Valor pago de emendas parlamentares, pela UF de destino informada na emenda." },
+};
+const GLOSS = [
+  ["orcamento","Orçamento atualizado","O limite de gastos aprovado para o ano, já com os ajustes feitos ao longo dele. É autorização para gastar, não dinheiro gasto."],
+  ["empenho","Empenho","O governo reserva parte do orçamento para uma despesa específica. É a primeira etapa do gasto."],
+  ["liquidacao","Liquidação","Verificação de que o bem foi entregue ou o serviço prestado. Só depois disso o pagamento pode ser feito."],
+  ["pagamento","Pagamento","O dinheiro sai do caixa para o credor. Empenhado, liquidado e pago são etapas do mesmo gasto e nunca devem ser somados."],
+  ["saldo","Saldo disponível para empenho","Orçamento atualizado menos o valor empenhado. Não considera bloqueios (contingenciamento)."],
+  ["restos","Restos a pagar","Despesas empenhadas que ficaram sem pagamento no fim do ano e passam para o seguinte."],
+  ["transferencia","Transferência","Recurso federal repassado a estados, municípios, entidades ou cidadãos. Aparece pelo local de quem recebe."],
+  ["emenda","Emenda parlamentar","Indicação de deputados e senadores para direcionar parte do orçamento. Autoria, destino, execução e recebimento são etapas diferentes."],
+  ["funcao","Função (área de atuação)","A grande área de governo da despesa, como Saúde ou Educação, pela classificação funcional oficial."],
+  ["programa","Programa e ação","Programas reúnem ações orçamentárias. Uma ação não é uma obra individual: pode financiar centenas de iniciativas."],
+  ["percapita","Valor por habitante","Valor dividido pela população do Censo 2022 (IBGE). Mais gasto por habitante não significa, por si só, melhor resultado."],
+  ["ni","Localização não identificada","Registros sem estado confiável na fonte. Não são atribuídos ao estado da sede do órgão."],
+  ["contrato","Contrato","Instrumento que formaliza obrigações entre o governo e um fornecedor, com objeto, valor e vigência."],
+];
+const dica = id => (GLOSS.find(g=>g[0]===id)||[])[2]||"";
+const CATS = [["Saúde",["10"]],["Educação",["12"]],["Segurança pública",["06"]],["Infraestrutura e transportes",["26"]],["Urbanismo, habitação e saneamento",["15","16","17"]],["Previdência e assistência social",["09","08"]],["Administração pública",["04"]],["Defesa nacional",["05"]],["Ciência e tecnologia",["19"]],["Meio ambiente",["18"]],["Cultura e esporte",["13","27"]],["Agricultura",["20","21"]],["Trabalho",["11"]],["Encargos especiais (inclui dívida)",["28"],"Inclui juros e amortização da dívida, mas também transferências constitucionais a estados e municípios."]];
+
+/* ---------- estado (hash) */
+const E = { view: "painel", ano: D.anos[D.anos.length-1], mi: 1, mf: 12, uf: null, regiao: null, funcao: null, metrica: "transferencias", modo: "absoluto", tabela: false, munis: false, ordem: {}, pag: 1, q: "" };
+function lerHash(){ const v = location.hash.replace("#",""); E.view = ["painel","orgaos","areas","emendas","glossario","sobre"].includes(v) ? v : "painel"; }
+lerHash();
+
+/* ---------- formatação */
+const nf1 = new Intl.NumberFormat("pt-BR",{maximumFractionDigits:1});
+const brl = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
+function comp(v){ if(v==null||!isFinite(v)) return "—"; const a=Math.abs(v), s=v<0?"−":""; if(a>=1e12) return `${s}R$ ${nf1.format(a/1e12)} tri`; if(a>=1e9) return `${s}R$ ${nf1.format(a/1e9)} bi`; if(a>=1e6) return `${s}R$ ${nf1.format(a/1e6)} mi`; if(a>=1e3) return `${s}R$ ${nf1.format(a/1e3)} mil`; return `${s}R$ ${nf1.format(a)}`; }
+const cheio = v => v==null||!isFinite(v) ? "—" : brl.format(v);
+const pct = v => v==null||!isFinite(v) ? "—" : `${nf1.format(v*100)}%`;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const ajuda = id => `<span class="ajuda" tabindex="0" role="note" aria-label="${esc(dica(id))}" data-dica="${esc(dica(id))}">?</span>`;
+
+/* ---------- consultas (mesma lógica do motor do software: filtra, soma cada medida separadamente) */
+const A = ano => D.porAno[ano];
+function ufsFiltro(){ if(E.uf) return [D.ufs.findIndex(u=>u.sigla===E.uf)]; if(E.regiao) return D.ufs.map((u,i)=>u.regiao===E.regiao?i:-2).filter(i=>i>=0); return null; }
+const fIdx = () => E.funcao==null ? null : D.dic.funcao.findIndex(f=>f.cod===E.funcao);
+function mesesEf(ano){ const m = A(ano)?.meses||[]; if(!m.length) return [E.mi,E.mf]; const a=Math.max(E.mi,Math.min(...m)), b=Math.min(E.mf,Math.max(...m)); return a<=b?[a,b]:null; }
+function soma(rows, filtro, cols){ const t = cols.map(()=>0); for(const r of rows){ if(!filtro(r)) continue; cols.forEach((c,j)=>t[j]+=Math.round(r[c]*100)); } return t.map(x=>x/100); }
+function agrupa(rows, filtro, chave, col){ const m = new Map(); for(const r of rows){ if(!filtro(r)) continue; const k=chave(r); m.set(k,(m.get(k)||0)+Math.round(r[col]*100)); } return [...m].map(([k,v])=>({k,v:v/100})).sort((a,b)=>b.v-a.v); }
+
+// filtros por conjunto. exe: [mes,uf,orgao,funcao,programa,emp,liq,pago]; tra: [mes,uf,funcao,tipo,valor]; orc: [orgao,funcao,programa,atual,emp]; emendas: [cod,num,autor,uf,mun,funcao,emp,pago]
+function fExe(ano, ignorarUf, mm){ const m=mm||mesesEf(ano), u=ignorarUf?null:ufsFiltro(), f=fIdx(); return r => m && r[0]>=m[0] && r[0]<=m[1] && (!u||u.includes(r[1])) && (f==null||r[3]===f); }
+function fTra(ano, ignorarUf, mm){ const m=mm||mesesEf(ano), u=ignorarUf?null:ufsFiltro(), f=fIdx(); return r => m && r[0]>=m[0] && r[0]<=m[1] && (!u||u.includes(r[1])) && (f==null||r[2]===f); }
+function fOrc(){ const f=fIdx(); return r => f==null||r[1]===f; }
+function fEme(ignorarUf){ const u=ignorarUf?null:ufsFiltro(), f=fIdx(); return r => (!u||u.includes(r[3])) && (f==null||r[5]===f); }
+
+function porUF(ano, metrica){
+  const a = A(ano); if(!a) return null;
+  let g;
+  if(metrica==="transferencias") g = agrupa(a.tra, fTra(ano,true), r=>r[1], 4);
+  else if(metrica==="execucao") g = agrupa(a.exe, fExe(ano,true), r=>r[1], 7);
+  else g = agrupa(a.emendas, fEme(true), r=>r[3], 7);
+  const mp = new Map(g.map(x=>[x.k,x.v]));
+  const ufs = D.ufs.map((u,i)=>({ i, sigla:u.sigla, nome:u.nome, regiao:u.regiao, cod:u.cod, pop:u.populacao, valor:mp.get(i)||0, pc:(mp.get(i)||0)/u.populacao }));
+  const ch = E.modo==="per_capita"?"pc":"valor";
+  [...ufs].sort((x,y)=>y[ch]-x[ch]).forEach((u,n)=>u.pos=n+1);
+  return { ufs, ni: mp.get(-1)||0 };
+}
+
+function indicadores(){
+  const ano=E.ano, a=A(ano), ant=A(ano-1), terr = !!(E.uf||E.regiao), m = mesesEf(ano);
+  const per = m ? (m[0]===1&&m[1]===12? String(ano) : `${MESES[m[0]-1]}–${MESES[m[1]-1]}/${ano}`) : `${ano} (sem dados)`;
+  const out = [];
+  const varr = (x,y) => (m && y ? (x-y)/Math.abs(y) : null); // mesmos meses nos dois anos
+  const [atual, emp] = soma(a.orc, fOrc(), [3,4]);
+  const [atualA, empA] = ant ? soma(ant.orc, fOrc(), [3,4]) : [null,null];
+  const indisp = "O arquivo de orçamento não é dividido por estado; não há valor estadual equivalente.";
+  out.push({ t:"Orçamento atualizado", g:"orcamento", v: terr?null:atual, vr: terr?null:varr(atual,atualA), per:String(ano), exp:"Limite de gastos autorizado para o ano. Não é dinheiro gasto.", ind: terr?indisp:null, fonte:"Arquivo Orçamento da Despesa (anual). O filtro de meses não se aplica." });
+  out.push({ t:"Saldo disponível para empenho", g:"saldo", v: terr?null:atual-emp, vr:null, per:String(ano), exp:"Orçamento atualizado ainda não comprometido. Calculado pela plataforma.", ind: terr?indisp:null, calc:true, fonte:"Orçamento atualizado − empenhado, do mesmo arquivo. Sem variação: é uma fotografia da data de extração." });
+  const [e,l,p] = soma(a.exe, fExe(ano), [5,6,7]);
+  const [eA,lA,pA] = ant ? soma(ant.exe, fExe(ano-1, false, m), [5,6,7]) : [null,null,null];
+  const lim = terr ? " Com filtro de estado, só entram despesas com UF indicada no plano de trabalho." : "";
+  out.push({ t:"Empenhado", g:"empenho", v:e, vr:varr(e,eA), per, exp:"Valor comprometido: reservado para despesas específicas.", fonte:"Arquivos mensais de Execução da Despesa, coluna Valor Empenhado."+lim });
+  out.push({ t:"Liquidado", g:"liquidacao", v:l, vr:varr(l,lA), per, exp:"Despesas cuja entrega do bem ou serviço foi verificada.", fonte:"Execução da Despesa, coluna Valor Liquidado."+lim });
+  out.push({ t:"Pago", g:"pagamento", v:p, vr:varr(p,pA), per, exp:"Dinheiro que efetivamente saiu do caixa (sem restos a pagar de anos anteriores).", fonte:"Execução da Despesa, coluna Valor Pago."+lim });
+  const [t] = soma(a.tra, fTra(ano), [4]); const [tA] = ant ? soma(ant.tra, fTra(ano-1, false, m), [4]) : [null];
+  out.push({ t:"Recursos transferidos", g:"transferencia", v:t, vr:varr(t,tA), per, exp:"Repasses federais a estados, municípios, entidades e cidadãos. Também aparecem em “Pago”: não some.", fonte:"Arquivos mensais de Recursos Transferidos, coluna Valor Transferido." });
+  out.push({ t:"Contratos ativos identificados", g:"contrato", v:null, ind:"Ainda não integrado em lote. Entra com o arquivo Contratos (compras); por enquanto, consulta por órgão na API." });
+  out.push({ t:"Registros analisados", v: a.exe.length + a.tra.length + a.emendas.length, int:true, vr:null, per:String(ano), exp:"Linhas agregadas usadas neste painel no ano.", calc:true, fonte:"Contagem de linhas dos conjuntos carregados." });
+  return out;
+}
+
+/* ---------- componentes */
+function barras(itens, fmt, onclick){
+  if(!itens.length) return `<p class="muted">Sem registros para os filtros.</p>`;
+  const max = Math.max(...itens.map(i=>Math.abs(i.v)),1);
+  return `<ol class="barras">${itens.map((it,n)=>`<li><div class="l1"><span class="nome"><span class="n num">${n+1}</span>${onclick?`<button class="lnk" data-acao="${esc(onclick(it))}">${esc(it.nome)}</button>`:`<span title="${esc(it.nome)}">${esc(it.nome)}</span>`}</span><span class="val num">${fmt(it.v)}</span></div>${it.sub?`<div class="sub">${esc(it.sub)}</div>`:""}<div class="trilho" aria-hidden="true"><div style="width:${Math.max(1,Math.abs(it.v)/max*100)}%"></div></div></li>`).join("")}</ol>`;
+}
+function fonte(txt, calc){ return `<details class="fonte"><summary><span class="u">Fonte e metodologia</span><span class="selo${calc?" calc":""}">${calc?"Calculado · demo":"Demonstração"}</span></summary><div>${txt}<span>Período: ${perTxt()} · Valores fictícios do modelo.</span></div></details>`; }
+function perTxt(){ const m=mesesEf(E.ano); return m?(m[0]===1&&m[1]===12?String(E.ano):`${MESES[m[0]-1]}–${MESES[m[1]-1]}/${E.ano}`):String(E.ano); }
+function graficoBarras(dados, rot){
+  const W=520,H=170,pl=44,pb=22,pt=8; const max=Math.max(...dados.map(d=>d.v||0),1);
+  const ticks=d3.ticks(0,max,4); const top=ticks[ticks.length-1]>max?ticks[ticks.length-1]:max;
+  const bw=(W-pl)/dados.length; const y=v=>pt+(H-pb-pt)*(1-v/top);
+  return `<figure style="margin:0"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(rot)}" style="width:100%;height:auto">${ticks.map(t=>`<line x1="${pl}" x2="${W}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grade)"/><text x="${pl-6}" y="${y(t)+4}" text-anchor="end" font-size="10.5" fill="var(--tinta-3)">${comp(t).replace("R$ ","")}</text>`).join("")}${dados.map((d,i)=>`<rect x="${pl+i*bw+bw*.18}" y="${y(d.v||0)}" width="${bw*.64}" height="${Math.max(0,H-pb-y(d.v||0))}" rx="3" fill="var(--barra)"><title>${esc(d.r)}: ${cheio(d.v)}</title></rect><text x="${pl+i*bw+bw/2}" y="${H-6}" text-anchor="middle" font-size="10.5" fill="var(--tinta-3)">${esc(d.r)}</text>`).join("")}</svg></figure>`;
+}
+
+/* ---------- mapa */
+const RAMPA = ["--s1","--s2","--s3","--s4","--s5"];
+const cor = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function quebras(vals){ const v=vals.filter(x=>x>0).sort((a,b)=>a-b); if(!v.length) return []; const q=[]; for(let i=1;i<5;i++) q.push(v[Math.min(v.length-1,Math.floor(i/5*v.length))]); return q; }
+function classe(v,q){ if(!(v>0)||!q.length) return "--sem"; let i=0; while(i<q.length&&v>=q[i]) i++; return RAMPA[i]; }
+const ufsGeo = topojson.feature(D.topoUfs, Object.values(D.topoUfs.objects)[0]);
+const L=860, AL=760;
+const proj = d3.geoMercator().fitExtent([[10,10],[L-10,AL-10]], ufsGeo);
+const path = d3.geoPath(proj);
+let zoomB = null, svgSel = null, transformAtual = d3.zoomIdentity;
+
+function desenharMapa(){
+  const cont = document.getElementById("mapa"); if(!cont) return;
+  const t = porUF(E.ano, E.metrica); const ch = E.modo==="per_capita"?"pc":"valor";
+  const q = quebras(t.ufs.map(u=>u[ch])); const porCod = new Map(t.ufs.map(u=>[u.cod,u]));
+  const fmt = v => E.modo==="per_capita" ? `${cheio(v)}/hab.` : comp(v);
+  const sel = E.uf ? D.ufs.find(u=>u.sigla===E.uf) : null;
+  let munData=null, qm=[];
+  if(sel && E.munis){
+    const a=A(E.ano), ui=D.ufs.indexOf(sel), f=fIdx();
+    const rows = E.metrica==="transferencias"? a.traMun : E.metrica==="execucao" ? a.exeMun : a.emendas.map(r=>[r[3],null,r[5],r[7],r[4]]);
+    munData = new Map(); let semId=0;
+    if(E.metrica==="emendas"){ for(const r of a.emendas){ if(r[3]!==ui||(f!=null&&r[5]!==f)) continue; const cod = Object.keys(D.nomesMun).find(k=>D.nomesMun[k]===r[4] && String(k).startsWith(String(sel.cod))); if(cod) munData.set(Number(cod),(munData.get(Number(cod))||0)+r[7]); else semId+=r[7]; } }
+    else for(const r of rows){ if(r[0]!==ui||(f!=null&&r[2]!==f)) continue; if(r[1]===-1) semId+=r[3]; else munData.set(r[1],(munData.get(r[1])||0)+r[3]); }
+    munData.semId=semId; qm = quebras([...munData.values()]);
+  }
+  const leg = (qq, f) => qq.length ? RAMPA.map((c,i)=>`<span><i style="background:var(${c})"></i>${i===0?`até ${f(qq[0])}`:i===4?`≥ ${f(qq[3])}`:`${f(qq[i-1])}–${f(qq[i])}`}</span>`).join("")+`<span><i style="background:var(--sem)"></i>sem registro</span>` : "";
+  document.getElementById("legenda").innerHTML = munData ? leg(qm, comp) : leg(q, fmt);
+
+  if(E.tabela){
+    cont.innerHTML = `<div class="tab-wrap" style="max-height:560px"><table><caption style="position:absolute;width:1px;height:1px;overflow:hidden">${esc(METRICAS[E.metrica].rot)} por estado</caption><thead><tr><th>#</th><th>Estado</th><th class="v">Valor</th><th class="v">Por hab.</th></tr></thead><tbody>${[...t.ufs].sort((a,b)=>a.pos-b.pos).map(u=>`<tr class="${u.sigla===E.uf?"sel":""}"><td class="num">${u.pos}</td><td><a href="#painel" data-uf="${u.sigla}">${esc(u.nome)}</a></td><td class="v">${comp(u.valor)}</td><td class="v">${cheio(u.pc)}</td></tr>`).join("")}<tr><td></td><td class="muted">Localização não identificada</td><td class="v muted">${comp(t.ni)}</td><td class="v muted">—</td></tr></tbody></table></div>`;
+    cont.querySelectorAll("[data-uf]").forEach(a=>a.addEventListener("click",ev=>{ev.preventDefault(); selecionarUF(a.dataset.uf);}));
+  } else {
+    cont.innerHTML = `<div class="mapa"><svg viewBox="0 0 ${L} ${AL}" role="group" aria-label="Mapa do Brasil: ${esc(METRICAS[E.metrica].rot)} por estado. Tab percorre os estados, Enter seleciona."><g id="gmap"></g></svg><div class="zoom"><button aria-label="Aproximar" id="zin">+</button><button aria-label="Afastar" id="zout">−</button><button aria-label="Ver Brasil inteiro" id="zreset">↺</button></div><div class="dica" id="dica" hidden></div></div>`;
+    svgSel = d3.select(cont).select("svg"); const g = svgSel.select("#gmap");
+    const dicaEl = document.getElementById("dica");
+    const mostrar = (ev, html) => { const b = cont.querySelector(".mapa").getBoundingClientRect(); let x,y; if(ev.clientX!==undefined){x=ev.clientX-b.left;y=ev.clientY-b.top;} else {const r=ev.target.getBoundingClientRect(); x=r.left+r.width/2-b.left; y=r.top-b.top;} x=Math.max(90,Math.min(b.width-90,x)); dicaEl.style.left=x+"px"; dicaEl.style.top=y+"px"; dicaEl.innerHTML=html; dicaEl.hidden=false; };
+    g.selectAll("path.uf").data(ufsGeo.features).join("path")
+      .attr("class", d => "uf" + (sel && d.properties.cod===sel.cod ? " sel":""))
+      .attr("d", path)
+      .attr("fill", d => { const u=porCod.get(d.properties.cod); return munData ? (sel&&d.properties.cod===sel.cod? cor("--sup") : cor("--vizinho")) : cor(classe(u?u[ch]:0,q)); })
+      .attr("fill-opacity", d => (!munData && E.regiao && porCod.get(d.properties.cod)?.regiao!==E.regiao) ? .35 : 1)
+      .attr("tabindex", 0).attr("role","button")
+      .attr("aria-label", d => { const u=porCod.get(d.properties.cod); return u?`${u.nome}: ${fmt(u[ch])}, ${u.pos}º lugar`:"sem dados"; })
+      .on("mousemove focus", (ev,d) => { if(munData) return; const u=porCod.get(d.properties.cod); if(u) mostrar(ev, `<b>${esc(u.nome)}</b><span class="num">${esc(METRICAS[E.metrica].curto)}: ${comp(u.valor)}</span><br><span class="num">Por habitante: ${cheio(u.pc)}</span><br>${u.pos}º de 27`); })
+      .on("mouseleave blur", () => dicaEl.hidden=true)
+      .on("click", (ev,d) => { const u=porCod.get(d.properties.cod); if(u) selecionarUF(u.sigla); })
+      .on("keydown", (ev,d) => { if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); const u=porCod.get(d.properties.cod); if(u) selecionarUF(u.sigla);} });
+    if(munData && D.munTopo[sel.cod]){
+      const tp = D.munTopo[sel.cod]; const fc = topojson.feature(tp, Object.values(tp.objects)[0]);
+      g.selectAll("path.mun").data(fc.features).join("path").attr("class","mun").attr("d",path)
+        .attr("fill", d => cor(classe(munData.get(d.properties.cod)||0, qm)))
+        .on("mousemove", (ev,d) => { const v=munData.get(d.properties.cod); mostrar(ev, `<b>${esc(d.properties.nome||D.nomesMun[d.properties.cod]||d.properties.cod)}</b>${v?`${esc(METRICAS[E.metrica].curto)}: ${comp(v)}`:"sem registro"}`); })
+        .on("mouseleave", () => dicaEl.hidden=true);
+    }
+    zoomB = d3.zoom().scaleExtent([1,40]).on("zoom", ev => { transformAtual=ev.transform; g.attr("transform", ev.transform); });
+    svgSel.call(zoomB).on("dblclick.zoom", null);
+    if(sel && munData){ const f=ufsGeo.features.find(x=>x.properties.cod===sel.cod); const [[x0,y0],[x1,y1]]=path.bounds(f); const k=Math.min(30,.85/Math.max((x1-x0)/L,(y1-y0)/AL)); svgSel.call(zoomB.transform, d3.zoomIdentity.translate(L/2,AL/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2)); }
+    document.getElementById("zin").onclick = () => svgSel.transition().duration(250).call(zoomB.scaleBy, 1.6);
+    document.getElementById("zout").onclick = () => svgSel.transition().duration(250).call(zoomB.scaleBy, 1/1.6);
+    document.getElementById("zreset").onclick = () => { if(E.uf){ E.uf=null; E.munis=false; render(); } else svgSel.transition().call(zoomB.transform, d3.zoomIdentity); };
+  }
+  document.getElementById("nota-ni").innerHTML = `Fora do mapa, <b>localização não identificada</b>: <span class="num"><b>${comp(t.ni)}</b></span>${munData?` · no estado, sem município identificado: <b class="num">${comp(munData.semId)}</b>`:""}. Despesas sem estado confiável não vão para a sede do órgão.`;
+}
+function selecionarUF(s){ E.uf = E.uf===s ? null : s; E.regiao=null; E.munis = false; render(); document.getElementById("lateral")?.scrollIntoView({block:"nearest"}); }
+
+/* ---------- painel do estado */
+function painelEstado(){
+  const u = D.ufs.find(x=>x.sigla===E.uf); const ui = D.ufs.indexOf(u); const a=A(E.ano); const f=fIdx();
+  const mets = Object.keys(METRICAS).map(k=>{ const t=porUF(E.ano,k); const x=t.ufs[ui]; const tot=t.ufs.reduce((s,y)=>s+y.valor,0); return {k, x, pcBR: tot/POP_BR}; });
+  const fe = r => fExe(E.ano)(r), ft = r => fTra(E.ano)(r);
+  const nomeF = i => D.dic.funcao[i]?.nome, nomeO = i => D.dic.orgao[i]?.nome, nomeP = i => D.dic.programa[i]?.nome;
+  let areas, progs, mensal = null;
+  if(E.metrica==="transferencias"){ areas = agrupa(a.tra, ft, r=>r[2], 4); progs=null; mensal = MESES.map((m,i)=>({r:m, v: soma(a.tra, r=>r[0]===i+1 && r[1]===ui && (f==null||r[2]===f), [4])[0]})).filter((d,i)=>a.meses.includes(i+1)); }
+  else if(E.metrica==="execucao"){ areas = agrupa(a.exe, fe, r=>r[3], 7); progs = agrupa(a.exe, fe, r=>r[4], 7); mensal = MESES.map((m,i)=>({r:m, v: soma(a.exe, r=>r[0]===i+1 && r[1]===ui && (f==null||r[3]===f), [7])[0]})).filter((d,i)=>a.meses.includes(i+1)); }
+  else { areas = agrupa(a.emendas, fEme(), r=>r[5], 7); }
+  const orgaos = agrupa(a.exe, fe, r=>r[2], 7);
+  const tipos = agrupa(a.tra, ft, r=>r[3], 4);
+  const favs = a.favorecidos.filter(r=>r[0]===ui).sort((x,y)=>y[3]-x[3]).slice(0,6);
+  const emds = a.emendas.filter(r=>r[3]===ui && (f==null||r[5]===f)).sort((x,y)=>y[7]-x[7]).slice(0,6);
+  const anual = D.anos.map(ano=>{ const t=porUF(ano,E.metrica); return {r:String(ano), v:t?t.ufs[ui].valor:null}; });
+  return `<div class="painel-uf">
+    <div style="display:flex;justify-content:space-between;gap:8px"><div><div class="rotulo">${u.regiao}</div><h2 style="font-size:22px">${esc(u.nome)}</h2><div class="muted">População: ${u.populacao.toLocaleString("pt-BR")} (Censo 2022)</div></div><button class="botao fechar" aria-label="Fechar painel do estado" data-acao="fechar">✕</button></div>
+    <div><div class="rotulo" style="margin-bottom:8px">Recursos federais identificados</div><div class="metricas">${mets.map(m=>`<button aria-pressed="${m.k===E.metrica}" data-metrica="${m.k}"><span class="a"><span>${METRICAS[m.k].rot}</span><b class="num">${comp(m.x.valor)}</b></span><span class="b num"><span>${cheio(m.x.pc)}/hab. · Brasil ${cheio(m.pcBR)}/hab.</span><span>${m.x.pos}º de 27</span></span></button>`).join("")}</div><p class="muted" style="margin:6px 0 0">As três linhas usam fontes e critérios de localização diferentes e se sobrepõem: não as some.</p></div>
+    <div class="bloco"><div class="rotulo">Principais áreas · ${METRICAS[E.metrica].curto.toLowerCase()} ${ajuda("funcao")}</div>${barras(areas.slice(0,6).map(x=>({nome:nomeF(x.k),v:x.v,cod:D.dic.funcao[x.k].cod})), comp, it=>`funcao:${it.cod}`)}</div>
+    <div class="bloco"><div class="rotulo">Órgãos com despesa localizada no estado</div>${barras(orgaos.slice(0,6).map(x=>({nome:nomeO(x.k),v:x.v})), comp)}<p class="muted" style="margin:0">Valor pago de despesas cujo plano de trabalho indica este estado, não a sede do órgão.</p></div>
+    <div class="bloco"><div class="rotulo">Transferências recebidas, por tipo ${ajuda("transferencia")}</div>${barras(tipos.map(x=>({nome:D.dic.tipo[x.k].nome,v:x.v})), comp)}</div>
+    ${progs?`<div class="bloco"><div class="rotulo">Programas ${ajuda("programa")}</div>${barras(progs.slice(0,6).map(x=>({nome:nomeP(x.k),v:x.v,sub:`Programa ${D.dic.programa[x.k].cod}`})), comp)}</div>`:""}
+    <div class="bloco"><div class="rotulo">Principais favorecidos de transferências</div>${barras(favs.map(r=>({nome:r[1],v:r[3],sub:r[2]})), comp)}<p class="muted" style="margin:0">Pessoas físicas não são listadas. Receber recursos públicos não indica irregularidade.</p></div>
+    <div class="bloco"><div class="rotulo">Emendas com destino ao estado ${ajuda("emenda")}</div>${barras(emds.map(r=>({nome:`Emenda ${r[1]} · ${D.dic.autor[r[2]].nome}`,v:r[7],sub:`${r[4]} · empenhado ${comp(r[6])}`})), comp)}</div>
+    ${mensal?`<div class="bloco"><div class="rotulo">Histórico mensal · ${METRICAS[E.metrica].curto.toLowerCase()}, ${E.ano}</div>${graficoBarras(mensal, `${METRICAS[E.metrica].rot} por mês em ${u.nome}`)}</div>`:""}
+    <div class="bloco"><div class="rotulo">Histórico anual</div>${graficoBarras(anual, `${METRICAS[E.metrica].rot} por ano em ${u.nome}`)}<p class="muted" style="margin:0">Ano corrente com o acumulado até o último mês publicado.</p></div>
+    <div class="bloco"><div class="rotulo">Convênios no estado</div><div class="vazio">No software, esta seção consulta ao vivo a API do Portal (endpoint /convenios) quando o token está configurado no servidor.</div></div>
+  </div>`;
+}
+
+function resumoNacional(){
+  const k = indicadores(); const v = id => k.find(x=>x.g===id)?.v;
+  const est = [["Orçamento atualizado",v("orcamento"),"--e1","orcamento"],["Empenhado",v("empenho"),"--e2","empenho"],["Liquidado",v("liquidacao"),"--e3","liquidacao"],["Pago",v("pagamento"),"--e4","pagamento"]];
+  const max = Math.max(...est.map(e=>e[1]||0),1), base=v("orcamento");
+  const t = porUF(E.ano,E.metrica); const ch=E.modo==="per_capita"?"pc":"valor";
+  return `<div style="display:grid;gap:18px"><div><div class="sec-tit"><div><h2>Do orçamento ao pagamento ${ajuda("empenho")}</h2><p>Governo federal · ${perTxt()}</p></div></div><div class="estagios">${est.map(([n,val,c,g])=>`<div><div class="l1"><span>${n} ${ajuda(g)}</span><b class="num">${val==null?"não disponível":comp(val)}${val!=null&&base&&n!=="Orçamento atualizado"?` <span class="muted" style="font-weight:400">${pct(val/base)} do orçamento</span>`:""}</b></div><div class="t">${val!=null?`<div style="width:${val/max*100}%;background:var(${c})"></div>`:""}</div></div>`).join("")}<p class="muted" style="margin:0">São etapas do mesmo gasto: cada barra está contida na anterior. Não some os valores.</p></div></div>
+  <div class="bloco"><div class="sec-tit"><div><h2>Estados · ${METRICAS[E.metrica].curto.toLowerCase()}</h2><p>${E.modo==="per_capita"?"Por habitante (Censo 2022)":"Valor total"}</p></div></div>${barras([...t.ufs].sort((a,b)=>a.pos-b.pos).slice(0,8).map(u=>({nome:u.nome,v:u[ch],sigla:u.sigla})), E.modo==="per_capita"?(x=>`${cheio(x)}/hab.`):comp, it=>`uf:${it.sigla}`)}<p class="muted" style="margin:0">Clique num estado no mapa ou na lista para ver o detalhamento.</p></div></div>`;
+}
+
+/* ---------- views */
+function filtrosHTML(campos=["regiao","uf","funcao"]){
+  const ops = { regiao: REGIOES.map(r=>[r,r]), uf: [...D.ufs].sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR")).map(u=>[u.sigla,u.nome]), funcao: [...D.dic.funcao].sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR")).map(f=>[f.cod,`${f.nome}`]) };
+  const rot = { regiao:"Região", uf:"Estado", funcao:"Área de atuação" };
+  const ativos = campos.filter(c=>E[c]).map(c=>`<span class="chip">${rot[c]}: <b>${esc(ops[c].find(o=>o[0]===E[c])?.[1]||E[c])}</b><button aria-label="Remover filtro ${rot[c]}" data-rm="${c}">✕</button></span>`);
+  if(E.mi!==1||E.mf!==12) ativos.push(`<span class="chip">Período: <b>${MESES[E.mi-1]}–${MESES[E.mf-1]}</b><button aria-label="Remover filtro de período" data-rm="periodo">✕</button></span>`);
+  return `<section class="cartao" aria-label="Filtros"><div class="filtros">${campos.map(c=>`<label for="f-${c}">${rot[c]}<select id="f-${c}" data-filtro="${c}"><option value="">Todos</option>${ops[c].map(([v,n])=>`<option value="${esc(v)}" ${E[c]===v?"selected":""}>${esc(n)}</option>`).join("")}</select></label>`).join("")}<div class="chips">${ativos.length?ativos.join("")+`<button class="limpar" data-rm="tudo">Limpar todos</button>`:`<span class="muted">Nenhum filtro ativo. Os filtros valem para todos os módulos; quando uma fonte não tem a informação, o número avisa.</span>`}</div></div></section>`;
+}
+
+function viewPainel(){
+  const k = indicadores();
+  return `<div class="titulo-pag"><h1>Painel dos gastos federais · ${perTxt()}</h1><p>Quanto o governo federal pode gastar, quanto comprometeu e quanto pagou, e para onde foi o dinheiro.</p></div>
+  ${filtrosHTML()}
+  <section class="kpis" aria-label="Indicadores principais">${k.map(i=>`<article class="cartao kpi"><h3 class="rotulo">${i.t} ${i.g?ajuda(i.g):""}</h3><div class="v num" title="${i.v!=null&&!i.int?cheio(i.v):""}">${i.v==null?"—":i.int?i.v.toLocaleString("pt-BR"):comp(i.v)}</div>${i.ind?`<p class="ind">${i.ind}</p>`:`<div class="var num">${i.vr==null?"sem base comparável":`${i.vr>=0?"↗ +":"↘ −"}${pct(Math.abs(i.vr))} <span class="muted">vs. mesmo período do ano anterior</span>`}</div><p>${i.exp}</p><p class="muted">Período: ${i.per}</p>${fonte(i.fonte,i.calc)}`}</article>`).join("")}</section>
+  <section class="grade-mapa">
+    <div class="cartao"><div class="sec-tit"><div><h2>Para onde vai o dinheiro · ${METRICAS[E.metrica].rot.toLowerCase()}</h2><p>${METRICAS[E.metrica].desc}</p></div></div>
+      <div class="ctrl"><div class="seg" role="radiogroup" aria-label="O que o mapa mostra">${Object.keys(METRICAS).map(m=>`<button role="radio" aria-checked="${E.metrica===m}" data-metrica="${m}">${METRICAS[m].curto}</button>`).join("")}</div><div class="seg" role="radiogroup" aria-label="Escala"><button role="radio" aria-checked="${E.modo==="absoluto"}" data-modo="absoluto">Total</button><button role="radio" aria-checked="${E.modo==="per_capita"}" data-modo="per_capita">Por habitante</button></div><button class="botao" data-acao="tabela" aria-pressed="${E.tabela}">${E.tabela?"Ver mapa":"Ver como tabela"}</button>${E.uf&&!E.tabela?`<button class="botao" data-acao="munis" aria-pressed="${E.munis}">${E.munis?"Ver estados":"Ver municípios de "+E.uf}</button>`:""}</div>
+      <div class="legenda" id="legenda"></div><div id="mapa"></div><p class="muted" id="nota-ni" style="margin:8px 0 0"></p>${fonte(METRICAS[E.metrica].desc + (E.modo==="per_capita"?" Por habitante: população do Censo 2022 (IBGE).":""), E.modo==="per_capita")}
+    </div>
+    <aside class="cartao" id="lateral" aria-label="${E.uf?"Painel do estado":"Resumo nacional"}">${E.uf?painelEstado():resumoNacional()}</aside>
+  </section>
+  ${rankings()}`;
+}
+
+function rankings(){
+  const a=A(E.ano);
+  const org = agrupa(a.exe, fExe(E.ano), r=>r[2], 7).slice(0,8).map(x=>({nome:D.dic.orgao[x.k].nome,v:x.v}));
+  const are = agrupa(a.exe, fExe(E.ano), r=>r[3], 7).slice(0,8).map(x=>({nome:D.dic.funcao[x.k].nome,v:x.v,cod:D.dic.funcao[x.k].cod}));
+  const terr = !!(E.uf||E.regiao);
+  const prg = terr?[]:agrupa(a.orc, fOrc(), r=>r[2], 3).slice(0,8).map(x=>({nome:D.dic.programa[x.k].nome,v:x.v,sub:`Programa ${D.dic.programa[x.k].cod}`}));
+  const u = ufsFiltro();
+  const fav = a.favorecidos.filter(r=>!u||u.includes(r[0])).sort((x,y)=>y[3]-x[3]).slice(0,8).map(r=>({nome:r[1],v:r[3],sub:r[2]}));
+  const em = a.emendas.filter(fEme()).sort((x,y)=>y[7]-x[7]).slice(0,6).map(r=>({nome:`Emenda ${r[1]} · ${D.dic.autor[r[2]].nome}`,v:r[7],sub:`${r[4]} (${D.ufs[r[3]]?.sigla||"NI"})`}));
+  const c = (t, g, corpo, lnk) => `<div class="cartao"><div class="sec-tit"><h2>${t} ${g?ajuda(g):""}</h2>${lnk?`<a href="#${lnk}">Ver todos</a>`:""}</div>${corpo}</div>`;
+  return `<section><h2 style="font-size:18px;margin-bottom:12px">Rankings nacionais</h2><div class="rank">
+    ${c("Órgãos que mais pagaram","",barras(org,comp),"orgaos")}
+    ${c("Áreas com maior volume pago","funcao",barras(are,comp,it=>`funcao:${it.cod}`),"areas")}
+    ${c("Programas com maior orçamento","programa",terr?`<p class="muted">Orçamento não é dividido por estado: ranking indisponível neste recorte.</p>`:barras(prg,comp))}
+    ${c("Favorecidos de transferências","",barras(fav,comp))}
+    ${c("Emendas com maior valor pago","emenda",barras(em,comp),"emendas")}
+    ${c("Contratos com maiores valores","contrato",`<div class="vazio"><b>Ainda não integrado em lote.</b> Depende do arquivo Contratos dos dados abertos, na próxima etapa. No software, já é possível consultar contratos por órgão na API, com alertas que mostram a regra que os gerou.</div>`)}
+  </div></section>`;
+}
+
+function tabela(id, cols, linhas, ordemPad, porPag=20){
+  const o = E.ordem[id] || {k:ordemPad, d:true};
+  const q = norm(E.q||"");
+  let ls = q ? linhas.filter(l=>cols.some(c=>!c.n && norm(l[c.k]??"").includes(q))) : linhas;
+  ls = [...ls].sort((a,b)=>{ const x=a[o.k], y=b[o.k]; const r = typeof x==="number"||typeof y==="number" ? (x??-Infinity)-(y??-Infinity) : String(x).localeCompare(String(y),"pt-BR"); return o.d?-r:r; });
+  const pags = Math.max(1,Math.ceil(ls.length/porPag)); const p=Math.min(E.pag,pags);
+  return `<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;margin-bottom:8px"><label style="flex:1 1 220px;max-width:360px"><span style="position:absolute;width:1px;height:1px;overflow:hidden">Buscar</span><input class="campo" id="q-${id}" placeholder="Buscar na tabela…" value="${esc(E.q||"")}" data-busca-tab></label><span class="muted">${ls.length.toLocaleString("pt-BR")} registro(s)</span></div>
+  <div class="tab-wrap"><table><thead><tr>${cols.map(c=>`<th class="${c.n?"v":""}" aria-sort="${o.k===c.k?(o.d?"descending":"ascending"):"none"}"><button data-ord="${id}:${c.k}">${c.t}${o.k===c.k?(o.d?" ↓":" ↑"):""}</button></th>`).join("")}</tr></thead><tbody>${ls.slice((p-1)*porPag,p*porPag).map(l=>`<tr>${cols.map(c=>`<td class="${c.n?"v":""}">${c.f?c.f(l[c.k],l):esc(l[c.k]??"")}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="${cols.length}" class="muted" style="text-align:center;padding:20px">Nenhum registro.</td></tr>`}</tbody></table></div>
+  ${pags>1?`<nav class="pag" aria-label="Paginação"><button class="botao" data-pag="${p-1}" ${p===1?"disabled":""}>Anterior</button><span class="num">${p} de ${pags}</span><button class="botao" data-pag="${p+1}" ${p===pags?"disabled":""}>Próxima</button></nav>`:""}`;
+}
+const mo = v => v==null?`<span class="muted">não disp.</span>`:`<span class="num" title="${cheio(v)}">${comp(v)}</span>`;
+
+function viewOrgaos(){
+  const a=A(E.ano), terr=!!(E.uf||E.regiao);
+  const e = new Map(); for(const r of a.exe){ if(!fExe(E.ano)(r)) continue; const x=e.get(r[2])||[0,0,0]; x[0]+=r[5];x[1]+=r[6];x[2]+=r[7]; e.set(r[2],x); }
+  const o = new Map(); if(!terr) for(const r of a.orc){ if(!fOrc()(r)) continue; o.set(r[0],(o.get(r[0])||0)+r[3]); }
+  const ids = new Set([...e.keys(),...o.keys()]);
+  const linhas=[...ids].map(i=>{ const x=e.get(i)||[0,0,0]; const at=terr?null:(o.get(i)||0); return {nome:D.dic.orgao[i].nome, cod:D.dic.orgao[i].cod, at, emp:x[0], liq:x[1], pago:x[2], ex: at? x[2]/at : null}; });
+  return `<div class="titulo-pag"><h1>Quem gasta · ${perTxt()}</h1><p>Órgãos superiores do Poder Executivo federal, com orçamento autorizado e as etapas da execução lado a lado. No software, cada órgão abre unidades, programas, ações e natureza da despesa.</p></div>${filtrosHTML()}
+  <section class="cartao"><div class="sec-tit"><div><h2>Órgãos superiores</h2><p>% executado = pago ÷ orçamento atualizado (calculado). ${terr?"Com filtro de estado, o orçamento não é exibido (não é regionalizado).":""}</p></div></div>
+  ${tabela("org",[{k:"nome",t:"Órgão"},{k:"cod",t:"Código"},{k:"at",t:"Orç. atualizado",n:1,f:mo},{k:"emp",t:"Empenhado",n:1,f:mo},{k:"liq",t:"Liquidado",n:1,f:mo},{k:"pago",t:"Pago",n:1,f:mo},{k:"ex",t:"% exec.",n:1,f:v=>v==null?"—":pct(v)}],linhas,"pago")}${fonte("Orçamento da Despesa (anual) e Execução da Despesa (mensal), agrupados por órgão superior. Colunas de arquivos distintos, nunca somadas.")}</section>`;
+}
+
+function viewAreas(){
+  const a=A(E.ano), terr=!!(E.uf||E.regiao), fF=E.funcao; E.funcao=null;
+  const e = new Map(); for(const r of a.exe){ if(!fExe(E.ano)(r)) continue; const x=e.get(r[3])||[0,0,0]; x[0]+=r[5];x[1]+=r[6];x[2]+=r[7]; e.set(r[3],x); }
+  const o = new Map(); if(!terr) for(const r of a.orc) o.set(r[1],(o.get(r[1])||0)+r[3]);
+  E.funcao=fF;
+  const linhas=[...new Set([...e.keys(),...o.keys()])].map(i=>({cod:D.dic.funcao[i].cod,nome:D.dic.funcao[i].nome,at:terr?null:(o.get(i)||0),emp:(e.get(i)||[0])[0],liq:(e.get(i)||[0,0])[1],pago:(e.get(i)||[0,0,0])[2]}));
+  const cats = CATS.map(([n,fs,nota])=>{ const ps=linhas.filter(l=>fs.includes(l.cod)); return {n,nota,ps,pago:ps.reduce((s,l)=>s+l.pago,0)}; }).filter(c=>c.ps.length);
+  const max=Math.max(...cats.map(c=>c.pago),1);
+  return `<div class="titulo-pag"><h1>Com o que se gasta · ${perTxt()}</h1><p>Gastos por área de atuação, pela classificação funcional oficial. As categorias agrupam funções oficiais só por correspondência direta de código; as funções originais continuam visíveis.</p></div>${filtrosHTML(["regiao","uf"])}
+  <section class="cartao"><div class="sec-tit"><div><h2>Categorias ${ajuda("funcao")}</h2><p>Valor pago no período.</p></div></div><div class="cats">${cats.map(c=>`<div class="cat"><div class="a"><b>${c.n}</b><b class="num">${comp(c.pago)}</b></div><div class="trilho"><div style="width:${c.pago/max*100}%"></div></div><span class="muted">Funções oficiais: ${c.ps.map(p=>`${p.cod} ${esc(p.nome)}`).join(", ")}</span>${c.nota?`<span class="muted" style="color:var(--aviso)">${c.nota}</span>`:""}</div>`).join("")}</div></section>
+  <section class="cartao"><div class="sec-tit"><h2>Funções oficiais (classificação original)</h2></div>${tabela("fun",[{k:"nome",t:"Função"},{k:"cod",t:"Código"},{k:"at",t:"Orç. atualizado",n:1,f:mo},{k:"emp",t:"Empenhado",n:1,f:mo},{k:"liq",t:"Liquidado",n:1,f:mo},{k:"pago",t:"Pago",n:1,f:mo}],linhas,"pago",30)}${fonte("Classificação funcional oficial. Execução mensal e orçamento anual lado a lado.")}</section>`;
+}
+
+function viewEmendas(){
+  const a=A(E.ano);
+  const ls = a.emendas.filter(fEme()).map(r=>({num:r[1],cod:r[0],autor:D.dic.autor[r[2]].nome,dest:`${r[4]}${D.ufs[r[3]]?` (${D.ufs[r[3]].sigla})`:""}`,area:D.dic.funcao[r[5]].nome,emp:r[6],pago:r[7]}));
+  const s = ls.reduce((x,l)=>[x[0]+l.emp,x[1]+l.pago],[0,0]);
+  return `<div class="titulo-pag"><h1>Emendas parlamentares · ${E.ano}</h1><p>Autoria, indicação de destino, execução (empenho, liquidação, pagamento) e recebimento são etapas distintas, com responsáveis diferentes.</p></div>${filtrosHTML()}
+  <section class="cartao"><p class="muted" style="margin:0 0 10px">${ls.length.toLocaleString("pt-BR")} emendas · empenhado ${comp(s[0])} · pago ${comp(s[1])}</p>${tabela("eme",[{k:"num",t:"Emenda",f:(v,l)=>`<b>${esc(v)}</b><br><span class="muted">${esc(l.cod)}</span>`},{k:"autor",t:"Autor"},{k:"dest",t:"Destino"},{k:"area",t:"Área"},{k:"emp",t:"Empenhado",n:1,f:mo},{k:"pago",t:"Pago",n:1,f:mo}],ls,"pago",25)}${fonte("Arquivo Emendas Parlamentares (por emenda). Emendas sem município específico aparecem como “Município não identificado”.")}</section>`;
+}
+
+function viewGlossario(){ return `<div class="titulo-pag"><h1>Glossário</h1><p>Os termos da contabilidade pública em linguagem simples. O principal: empenhado, liquidado e pago são etapas do mesmo gasto e nunca devem ser somados.</p></div><dl class="gloss">${GLOSS.map(g=>`<div id="g-${g[0]}"><dt>${g[1]}</dt><dd>${g[2]}</dd></div>`).join("")}</dl>`; }
+
+function viewSobre(){
+  return `<div class="titulo-pag"><h1>Sobre este modelo</h1><p>Uma versão navegável do software Brasil Transparente, gerada a partir do mesmo motor de cálculo, para avaliar a experiência antes de carregar os dados oficiais.</p></div>
+  <section class="cartao" style="display:grid;gap:10px;max-width:900px"><h2 style="font-size:16.5px">O que é real e o que é demonstração</h2>
+  <ul style="margin:0;padding-left:18px;display:grid;gap:6px;color:var(--tinta-2)"><li><b>Fictícios:</b> todos os valores, nomes de programas e ações, favorecidos e autores de emendas (marcados com [DEMO]).</li><li><b>Reais:</b> limites de estados e municípios (malhas do IBGE), população do Censo 2022, nomes das funções de governo (classificação oficial), as regras de cálculo e de localização.</li><li><b>No software:</b> o ETL lê os arquivos oficiais (Orçamento da Despesa, Execução da Despesa, Recursos Transferidos, Emendas Parlamentares), registra a fonte, data e linhas descartadas de cada arquivo, e consulta a API do Portal ao vivo para contratos e convênios.</li></ul>
+  <h2 style="font-size:16.5px">Regras aplicadas</h2><ul style="margin:0;padding-left:18px;display:grid;gap:6px;color:var(--tinta-2)"><li>Orçamento, empenhado, liquidado e pago aparecem lado a lado, nunca somados.</li><li>Transferências, despesa localizada e emendas são três leituras territoriais separadas.</li><li>Nenhuma despesa vai para o estado da sede do órgão; sem estado confiável, fica como “localização não identificada”.</li><li>Quando um filtro não se aplica a uma fonte (o orçamento não é dividido por estado), o número mostra “não disponível”.</li><li>A variação compara exatamente os mesmos meses do ano anterior.</li></ul>
+  <p class="muted" style="margin:0">Gerado em ${new Date(D.geradoEm).toLocaleString("pt-BR")} a partir de data/demo.</p></section>`;
+}
+
+/* ---------- busca global */
+function buscar(q){
+  const n=norm(q); if(n.length<2) return [];
+  const g=[];
+  const ufs=D.ufs.filter(u=>norm(u.nome).includes(n)||u.sigla.toLowerCase()===n).slice(0,5).map(u=>({t:u.nome,s:u.regiao,a:`uf:${u.sigla}`})); if(ufs.length) g.push(["Estados",ufs]);
+  const org=D.dic.orgao.filter(o=>norm(o.nome).includes(n)).slice(0,5).map(o=>({t:o.nome,s:`SIAFI ${o.cod}`,a:"view:orgaos"})); if(org.length) g.push(["Órgãos",org]);
+  const fun=D.dic.funcao.filter(o=>norm(o.nome).includes(n)).slice(0,5).map(o=>({t:o.nome,s:`Função ${o.cod}`,a:`funcao:${o.cod}`})); if(fun.length) g.push(["Áreas de atuação",fun]);
+  const prg=D.dic.programa.filter(o=>norm(o.nome).includes(n)).slice(0,5).map(o=>({t:o.nome,s:`Programa ${o.cod}`,a:"view:orgaos"})); if(prg.length) g.push(["Programas",prg]);
+  const aut=D.dic.autor.filter(o=>norm(o.nome).includes(n)).slice(0,5).map(o=>({t:o.nome,s:"Autor de emendas",a:`emenda:${o.nome}`})); if(aut.length) g.push(["Emendas parlamentares",aut]);
+  const mun=Object.entries(D.nomesMun).filter(([k,v])=>norm(v).includes(n)).slice(0,5).map(([k,v])=>{const u=D.ufs.find(x=>String(k).startsWith(String(x.cod)));return {t:v,s:u?.sigla,a:`mun:${u?.sigla}`};}); if(mun.length) g.push(["Municípios",mun]);
+  return g;
+}
+
+/* ---------- render e eventos */
+function render(){
+  document.getElementById("nav").innerHTML = [["painel","Painel"],["orgaos","Quem gasta"],["areas","Com o que se gasta"],["emendas","Emendas"],["glossario","Glossário"],["sobre","Sobre o modelo"]].map(([v,t])=>`<li><a href="#${v}" ${E.view===v?'aria-current="page"':""}>${t}</a></li>`).join("");
+  const app=document.getElementById("app");
+  app.innerHTML = {painel:viewPainel,orgaos:viewOrgaos,areas:viewAreas,emendas:viewEmendas,glossario:viewGlossario,sobre:viewSobre}[E.view]();
+  if(E.view==="painel") desenharMapa();
+}
+function acao(a){
+  const [t,v]=[a.slice(0,a.indexOf(":")),a.slice(a.indexOf(":")+1)];
+  if(t==="uf"){ E.uf=v; E.regiao=null; E.munis=false; irPara("painel"); }
+  else if(t==="mun"){ E.uf=v; E.regiao=null; E.munis=true; irPara("painel"); }
+  else if(t==="funcao"){ E.funcao=v; render(); }
+  else if(t==="emenda"){ E.q=v; E.pag=1; irPara("emendas"); }
+  else if(t==="view"){ irPara(v); }
+}
+function irPara(v){ if(E.view===v){ render(); return; } if(v!=="emendas") E.q=""; location.hash=v; }
+window.addEventListener("hashchange",()=>{ lerHash(); E.pag=1; render(); window.scrollTo(0,0); });
+
+document.addEventListener("click", ev => {
+  const b = ev.target.closest("button, a"); if(!b) return;
+  if(b.dataset.metrica){ E.metrica=b.dataset.metrica; E.munis=E.munis&&!!E.uf; render(); }
+  else if(b.dataset.modo){ E.modo=b.dataset.modo; render(); }
+  else if(b.dataset.acao==="tabela"){ E.tabela=!E.tabela; render(); }
+  else if(b.dataset.acao==="munis"){ E.munis=!E.munis; render(); }
+  else if(b.dataset.acao==="fechar"){ E.uf=null; E.munis=false; render(); }
+  else if(b.dataset.acao){ acao(b.dataset.acao); document.getElementById("res-busca").hidden=true; }
+  else if(b.dataset.rm){ const r=b.dataset.rm; if(r==="tudo"){E.uf=E.regiao=E.funcao=null;E.mi=1;E.mf=12;E.munis=false;} else if(r==="periodo"){E.mi=1;E.mf=12;} else E[r]=null; sincPeriodo(); render(); }
+  else if(b.dataset.ord){ const [id,k]=b.dataset.ord.split(":"); const o=E.ordem[id]; E.ordem[id]={k,d:o&&o.k===k?!o.d:true}; render(); }
+  else if(b.dataset.pag){ E.pag=Number(b.dataset.pag); render(); }
+});
+document.addEventListener("change", ev => {
+  const s=ev.target; if(!s.dataset.filtro) return; const c=s.dataset.filtro;
+  E[c]=s.value||null; if(c==="uf"){E.regiao=null;E.munis=false;} if(c==="regiao") E.uf=null; E.pag=1; render();
+});
+document.addEventListener("input", ev => {
+  if(ev.target.dataset.buscaTab===undefined) return; const id=ev.target.id, pos=ev.target.selectionStart;
+  E.q=ev.target.value; E.pag=1; render(); const el=document.getElementById(id); if(el){el.focus(); el.setSelectionRange(pos,pos);}
+});
+const bi=document.getElementById("busca"), rb=document.getElementById("res-busca");
+bi.addEventListener("input",()=>{ const g=buscar(bi.value); rb.hidden=!g.length; rb.innerHTML=g.map(([t,it])=>`<h4>${t}</h4>${it.map(i=>`<button data-acao="${esc(i.a)}">${esc(i.t)}${i.s?` <span class="muted">· ${esc(i.s)}</span>`:""}</button>`).join("")}`).join(""); });
+bi.addEventListener("keydown",e=>{ if(e.key==="Escape"){rb.hidden=true;} if(e.key==="Enter"){ rb.querySelector("button")?.click(); bi.value=""; } });
+document.addEventListener("click",e=>{ if(!e.target.closest(".busca")) rb.hidden=true; });
+
+const sa=document.getElementById("sel-ano"), smi=document.getElementById("sel-mi"), smf=document.getElementById("sel-mf");
+sa.innerHTML=[...D.anos].reverse().map(a=>`<option>${a}</option>`).join("");
+smi.innerHTML=smf.innerHTML=MESES.map((m,i)=>`<option value="${i+1}">${m}</option>`).join("");
+function sincPeriodo(){ sa.value=E.ano; smi.value=E.mi; smf.value=E.mf; }
+sincPeriodo();
+sa.onchange=()=>{E.ano=Number(sa.value);render();};
+smi.onchange=()=>{E.mi=Number(smi.value); if(E.mi>E.mf){E.mf=E.mi;} sincPeriodo(); render();};
+smf.onchange=()=>{E.mf=Number(smf.value); if(E.mf<E.mi){E.mi=E.mf;} sincPeriodo(); render();};
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>render());
+new MutationObserver(()=>render()).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+render();
+</script>
