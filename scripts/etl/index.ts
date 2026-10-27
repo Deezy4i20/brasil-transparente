@@ -56,22 +56,43 @@ export function lerArgs(argv: string[]): Opcoes {
   return { ano, conjuntos, meses, arquivos, saida: get("--saida") ?? join(process.cwd(), "data", "agregados") };
 }
 
+const pausa = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const PAUSA_ENTRE_DOWNLOADS = Number(process.env.ETL_PAUSA_MS ?? 4000);
+
 async function baixar(urls: string[], destino: string): Promise<{ url: string; bytes: number } | null> {
+  // O Portal recusa (405/429) quando recebe muitos downloads seguidos: espera e tenta de novo.
+  for (let tentativa = 0; tentativa < 4; tentativa++) {
+    if (tentativa > 0) {
+      const espera = 30_000 * 2 ** (tentativa - 1);
+      console.warn(`    aguardando ${espera / 1000}s antes de tentar de novo…`);
+      await pausa(espera);
+    }
+    const r = await baixarUmaVez(urls, destino);
+    if (r !== "bloqueado") return r;
+  }
+  return null;
+}
+
+async function baixarUmaVez(urls: string[], destino: string): Promise<{ url: string; bytes: number } | null | "bloqueado"> {
+  await pausa(PAUSA_ENTRE_DOWNLOADS);
+  let bloqueado = false;
   for (const url of urls) {
     try {
       const r = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(15 * 60_000) });
       const tipo = r.headers.get("content-type") ?? "";
       if (!r.ok || !r.body || tipo.includes("text/html")) {
         console.warn(`    ${r.status} ${url}`);
+        if ([403, 405, 429, 503].includes(r.status)) bloqueado = true;
         continue;
       }
       await pipeline(Readable.fromWeb(r.body as never), createWriteStream(destino));
       return { url: r.url || url, bytes: statSync(destino).size };
     } catch (e) {
       console.warn(`    falhou ${url}: ${(e as Error).message}`);
+      bloqueado = true;
     }
   }
-  return null;
+  return bloqueado ? "bloqueado" : null;
 }
 
 async function processarArquivo(p: Processador, caminho: string): Promise<void> {
@@ -121,7 +142,7 @@ export async function executarETL(o: Opcoes): Promise<ManifestoConjunto[]> {
       const msg = `[${c}] ${(e as Error).message}`;
       console.error(`  ✗ ${msg}`);
       falhas.push(msg);
-      resultados.push(manifesto(c, o.ano, FONTES[c], [], [], [`Falha no processamento: ${(e as Error).message.split("\n")[0]}`], 0));
+      resultados.push(manifesto(c, o.ano, FONTES[c], [], [], [`Falha no processamento: ${(e as Error).message.slice(0, 4000)}`], 0));
     }
   }
 

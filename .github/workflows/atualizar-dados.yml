@@ -12,6 +12,10 @@ on:
         description: "Anos a processar (separados por espaço)"
         default: "ATUAL ANTERIOR"
         required: false
+      conjuntos:
+        description: "Conjuntos (orcamento,execucao,transferencias,emendas) — vazio = todos"
+        default: ""
+        required: false
       malhas:
         description: "Regerar as malhas do IBGE (true/false)"
         default: "false"
@@ -48,6 +52,7 @@ jobs:
       - name: Baixar e processar os arquivos oficiais
         env:
           ANOS: ${{ github.event.inputs.anos || 'ATUAL ANTERIOR' }}
+          CONJUNTOS: ${{ github.event.inputs.conjuntos }}
         run: |
           ATUAL=$(TZ=America/Sao_Paulo date +%Y)
           ANOS="${ANOS//ATUAL/$ATUAL}"
@@ -56,14 +61,15 @@ jobs:
           for ANO in $ANOS; do
             echo "::group::Ano $ANO"
             set +e
-            npm run etl -- --ano "$ANO" 2>&1 | tee -a etl.log
+            EXTRA=""; [ -n "$CONJUNTOS" ] && EXTRA="--conjuntos $CONJUNTOS"
+            npm run etl -- --ano "$ANO" $EXTRA 2>&1 | tee -a etl.log
             ST=${PIPESTATUS[0]}
             set -e
             [ "$ST" = "0" ] || FALHOU=1
             echo "::endgroup::"
           done
           # Publica o final do log como anotação (legível pela API do GitHub)
-          RESUMO=$(grep -E "▶|baixando|falhou|✓|✗|ignorado|lendo|Erro|Colunas|indisponível|[0-9]{3} https" etl.log | tail -70 | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')
+          RESUMO=$(grep -E "▶|baixando|falhou|✓|✗|ignorado|lendo|Erro|Colunas|indisponível|aguardando|[0-9]{3} https" etl.log | tail -90 | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')
           if [ "$FALHOU" = "1" ]; then echo "::error title=ETL::$RESUMO"; else echo "::notice title=ETL::$RESUMO"; fi
           echo "FALHOU=$FALHOU" >> "$GITHUB_ENV"
 
