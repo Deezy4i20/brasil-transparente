@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-27T23:01:09.950Z",
+  "geradoEm": "2026-10-27T23:05:52.218Z",
   "modo": "oficial",
   "conjuntos": [
     {
@@ -692,22 +692,23 @@
           "nome": "convenios-20261016.zip",
           "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/convenios/20261016_Convenios.zip",
           "periodo": "20261016",
-          "baixadoEm": "2026-10-27T23:01:09.762Z",
+          "baixadoEm": "2026-10-27T23:05:51.961Z",
           "bytes": 67467278,
           "linhasLidas": 623483,
-          "linhasDescartadas": 546658,
+          "linhasDescartadas": 547544,
           "motivosDescarte": {
-            "vigência terminou antes do período considerado": 546658
+            "vigência terminou antes do período considerado": 546658,
+            "convênio anulado ou cancelado": 886
           }
         }
       ],
       "mesesDisponiveis": [],
-      "processadoEm": "2026-10-27T23:01:09.762Z",
+      "processadoEm": "2026-10-27T23:05:51.961Z",
       "avisos": [
-        "Mantidos 76.825 convênios com fim de vigência a partir de 2025-01-01 (ou sem data de fim).",
-        "2.726 convênios sem município identificado na malha do IBGE (aparecem só na lista do estado)."
+        "Mantidos 75.939 convênios com fim de vigência a partir de 2025-01-01 (ou sem data de fim).",
+        "2.685 convênios sem município identificado na malha do IBGE (aparecem só na lista do estado)."
       ],
-      "linhasAgregadas": 76825
+      "linhasAgregadas": 75939
     }
   ]
 }
