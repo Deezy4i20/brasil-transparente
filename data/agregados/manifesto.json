@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-27T17:56:54.242Z",
+  "geradoEm": "2026-10-27T18:01:30.121Z",
   "modo": "oficial",
   "conjuntos": [
     {
@@ -335,13 +335,126 @@
         "url": "https://portaldatransparencia.gov.br/download-de-dados/transferencias",
         "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603420-dicionario-de-dados-recursos-transferidos"
       },
-      "arquivos": [],
-      "mesesDisponiveis": [],
-      "processadoEm": "2026-10-27T17:56:35.488Z",
-      "avisos": [
-        "Falha no processamento: [transferencias] Nenhum CSV com a estrutura esperada em transferencias-202601.zip.\nColunas esperadas (normalizadas): anoMes (anomes), tipo (tipotransferencia), tipoFav (tipofavorecido), uf (uf), codMunSiafi (codigomunicipiosiafi), nomeMun (nomemunicipio), codOrgao (codigoorgaosiafi), nomeOrgao (nomeorgao), codFuncao (codigofuncao), nomeFuncao (nomefuncao), codPrograma (codigoprograma), nomePrograma (nomeprograma), codAcao (codigoacao), nomeAcao (nomeacao), codFav (codigofavorecido), nomeFav (nomefavorecido), valor (valortransferido)\nColunas encontradas: 202601_Transferencias.csv: anomes, tipotransferencia, tipofavorecido, uf, codigomunicipiosiafi, nomemunicipio, codigoorgaosiafi, nomeorgao, codigounidadegestora, nomeunidadegestora, codigofuncao, nomefuncao, codigosubfuncao, nomesubfuncao, codigoprograma, nomeprograma, acao, nomeacao, linguagemcidada, codigogrupodespesa, nomegrupodespesa, codigomodalidadeaplicacaodespesa, nomemodalidadeaplicacaodespesa, codigoelementodespesa, nomeelementodespesa, codigoplanoorcamentario, nomeplanoorcamentario, codigosubtitulo, nomesubtitulo, codigolocalizador, nomelocalizador, siglalocalizador, descricaocomplementarlocalizador, codigofavorecido, nomefavorecido, valortransferido"
+      "arquivos": [
+        {
+          "nome": "transferencias-202601.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202601_Transferencias.zip",
+          "periodo": "202601",
+          "baixadoEm": "2026-10-27T17:59:44.813Z",
+          "bytes": 2484884,
+          "linhasLidas": 122528,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202602.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202602_Transferencias.zip",
+          "periodo": "202602",
+          "baixadoEm": "2026-10-27T17:59:50.642Z",
+          "bytes": 2242067,
+          "linhasLidas": 106663,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202603.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202603_Transferencias.zip",
+          "periodo": "202603",
+          "baixadoEm": "2026-10-27T17:59:57.236Z",
+          "bytes": 2643462,
+          "linhasLidas": 119844,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202604.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202604_Transferencias.zip",
+          "periodo": "202604",
+          "baixadoEm": "2026-10-27T18:00:07.356Z",
+          "bytes": 4233395,
+          "linhasLidas": 180836,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202605.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202605_Transferencias.zip",
+          "periodo": "202605",
+          "baixadoEm": "2026-10-27T18:00:21.471Z",
+          "bytes": 5929237,
+          "linhasLidas": 241394,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202606.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202606_Transferencias.zip",
+          "periodo": "202606",
+          "baixadoEm": "2026-10-27T18:00:29.432Z",
+          "bytes": 3338212,
+          "linhasLidas": 142515,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202607.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202607_Transferencias.zip",
+          "periodo": "202607",
+          "baixadoEm": "2026-10-27T18:00:37.263Z",
+          "bytes": 3094867,
+          "linhasLidas": 142644,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202608.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202608_Transferencias.zip",
+          "periodo": "202608",
+          "baixadoEm": "2026-10-27T18:00:45.248Z",
+          "bytes": 3248894,
+          "linhasLidas": 144357,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202609.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202609_Transferencias.zip",
+          "periodo": "202609",
+          "baixadoEm": "2026-10-27T18:00:58.354Z",
+          "bytes": 6198610,
+          "linhasLidas": 235146,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202610.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202610_Transferencias.zip",
+          "periodo": "202610",
+          "baixadoEm": "2026-10-27T18:01:07.110Z",
+          "bytes": 3972035,
+          "linhasLidas": 155791,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
       ],
-      "linhasAgregadas": 0
+      "mesesDisponiveis": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "processadoEm": "2026-10-27T18:01:07.774Z",
+      "avisos": [
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (379), MU (6).",
+        "22210 linhas com nome de município sem correspondência na malha do IBGE."
+      ],
+      "linhasAgregadas": 459153
     },
     {
       "conjunto": "emendas",
@@ -352,13 +465,26 @@
         "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
         "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
       },
-      "arquivos": [],
-      "mesesDisponiveis": [],
-      "processadoEm": "2026-10-27T17:56:54.163Z",
-      "avisos": [
-        "Falha no processamento: [emendas] Nenhum CSV com a estrutura esperada em emendas-UNICO.zip.\nColunas esperadas (normalizadas): codigo (codigodaemenda), ano (anodaemenda), tipo (tipodaemenda), codAutor (codigodoautordaemenda), nomeAutor (nomedoautordaemenda), numero (numerodaemenda), localidade (localidadedogasto), codMun (codigomunicipioibge), nomeMun (municipio), uf (uf), codFuncao (codigofuncao), nomeFuncao (nomefuncao), codPrograma (codigoprograma), nomePrograma (nomeprograma), codAcao (codigoacao), nomeAcao (nomeacao), empenhado (valorempenhado), liquidado (valorliquidado), pago (valorpago), rapInscrito (valorrestosapagarinscritos), rapCancelado (valorrestosapagarcancelados), rapPago (valorrestosapagarpagos)\nColunas encontradas: EmendasParlamentares.csv: codigodaemenda, anodaemenda, tipodeemenda, codigodoautordaemenda, nomedoautordaemenda, numerodaemenda, localidadedeaplicacaodorecurso, codigomunicipioibge, municipio, codigoufibge, uf, regiao, codigofuncao, nomefuncao, codigosubfuncao, nomesubfuncao, codigoprograma, nomeprograma, codigoacao, nomeacao, codigoplanoorcamentario, nomeplanoorcamentario, valorempenhado, valorliquidado, valorpago, valorrestosapagarinscritos, valorrestosapagarcancelados, valorrestosapagarpagos | EmendasParlamentares_Convenios.csv: codigodaemenda, codigofuncao, nomefuncao, codigosubfuncao, nomesubfuncao, localidadedogasto, tipodeemenda, datapublicacaoconvenio, convenente, objetoconvenio, numeroconvenio, valorconvenio | EmendasParlamentares_PorFavorecido.csv: codigodaemenda, codigodoautordaemenda, nomedoautordaemenda, numerodaemenda, tipodeemenda, anomes, codigodofavorecido, favorecido, naturezajuridica, tipofavorecido, uffavorecido, municipiofavorecido, valorrecebido"
+      "arquivos": [
+        {
+          "nome": "emendas-UNICO.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/emendas-parlamentares/EmendasParlamentares.zip",
+          "periodo": "UNICO",
+          "baixadoEm": "2026-10-27T18:01:30.042Z",
+          "bytes": 32530367,
+          "linhasLidas": 94747,
+          "linhasDescartadas": 88993,
+          "motivosDescarte": {
+            "ano da emenda diferente do solicitado": 88993
+          }
+        }
       ],
-      "linhasAgregadas": 0
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-27T18:01:30.053Z",
+      "avisos": [
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": Sem informação (585), Múltiplo (59)."
+      ],
+      "linhasAgregadas": 5754
     }
   ]
 }
