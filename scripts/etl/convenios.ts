@@ -147,6 +147,8 @@ export async function processarConvenios(caminhos: string[], desde: string, idx:
           if (fim && fim < desde) return desc("vigência terminou antes do período considerado");
           const numero = v("numero");
           if (!numero) return desc("sem número do convênio");
+          // Instrumentos anulados/cancelados/excluídos não serão executados: ficam fora da lista e dos totais.
+          if (/ANULAD|CANCELAD|EXCLU[IÍ]D/i.test(v("situacao"))) return desc("convênio anulado ou cancelado");
           const uf = resolverUF(v("uf"));
           const ufCod = uf?.sigla ?? "NI";
           let munCod: string | null = null;

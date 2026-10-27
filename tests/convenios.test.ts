@@ -30,6 +30,7 @@ describe("convênios", () => {
       linha("900002", "BA", "SALVADOR", "Construção de creche", "13927801000149", "MUNICIPIO DE SALVADOR", "2.000.000,00", "0,00", "01/01/2027", "31/12/2028"),
       linha("900003", "BA", "SALVADOR", "Obra antiga", "13927801000149", "MUNICIPIO DE SALVADOR", "5.000,00", "5.000,00", "01/01/2015", "31/12/2016"),
       linha("900004", "SP", "MUNICIPIO QUE NAO EXISTE", "Reforma", "12345678901", "FULANO DE TAL", "3.000,00", "0,00", "01/01/2026", "31/12/2026"),
+      linha("900005", "BA", "SALVADOR", "Anulado", "13927801000149", "MUNICIPIO DE SALVADOR", "9.000,00", "0,00", "01/01/2026", "31/12/2026").map((x, i) => (i === 4 ? "CONVÊNIO ANULADO" : x)),
     ]);
     const ob = csv("Convenios_OrdensBancarias.csv", [["NÚMERO CONVÊNIO", "NÚMERO ORIGINAL", "DATA EMISSÃO OB", "NÚMERO DA ORDEM BANCÁRIA", "VALOR LIBERADO"], ["900001", "", "01/04/2025", "2025OB1", "250.000,00"]]);
     let arq = principal;
@@ -41,9 +42,9 @@ describe("convênios", () => {
     }
     const saida = join(dir, "agregados");
     const { res, resumo } = await executarConvenios({ arquivos: [arq], desde: "2025-01-01", saida });
-    expect(res.lidas).toBe(4);
+    expect(res.lidas).toBe(5);
     expect(res.mantidas).toBe(3);
-    expect(res.descartes).toEqual({ "vigência terminou antes do período considerado": 1 });
+    expect(res.descartes).toEqual({ "vigência terminou antes do período considerado": 1, "convênio anulado ou cancelado": 1 });
 
     const ba = JSON.parse(readFileSync(join(saida, "convenios", "BA.json"), "utf8"));
     const i = (k: (typeof COLUNAS_SAIDA)[number]) => COLUNAS_SAIDA.indexOf(k);
@@ -61,7 +62,7 @@ describe("convênios", () => {
     // Referência = data do arquivo (2026-10-20): pavimentação vigente, creche futura (começa em 2027).
     expect(resumo.porMunicipio["2927408"]).toEqual([2, 3_000_000, 250_000, 1, 1]);
     const m = JSON.parse(readFileSync(join(saida, "manifesto.json"), "utf8"));
-    expect(m.conjuntos.find((c: { conjunto: string }) => c.conjunto === "convenios").arquivos[0].linhasLidas).toBe(4);
+    expect(m.conjuntos.find((c: { conjunto: string }) => c.conjunto === "convenios").arquivos[0].linhasLidas).toBe(5);
   });
 
   it("classifica futuro e vigente pela data de referência", () => {

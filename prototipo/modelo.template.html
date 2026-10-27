@@ -383,7 +383,7 @@ function valoresMun(ui, metrica = E.metrica, ano = E.ano){
 }
 /* Convênios (projetos): resumo embutido, listas por UF carregadas sob demanda. */
 const CONV = {}; // uf → Promise<{referencia, itens}>
-function carregarConvenios(uf){ if(!CONV[uf]) CONV[uf] = fetch(`dados/convenios/${uf}.json`).then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }); return CONV[uf]; }
+function carregarConvenios(uf){ if(!CONV[uf]) CONV[uf] = fetch(`dados/convenios/${uf}.json`).then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(d=>({ ...d, itens: d.itens.filter(c=>!/ANULAD|CANCELAD|EXCLU/i.test(c[3]||"")) })); return CONV[uf]; }
 const HOJE = new Date().toISOString().slice(0,10);
 const CI = { numero:0, mun:1, munNome:2, situacao:3, objeto:4, orgaoSup:5, concedente:6, convenente:7, tipoConv:8, instrumento:9, valor:10, liberado:11, contrapartida:12, inicio:13, fim:14, ultima:15 };
 function statusProj(c){ if(c[CI.inicio] && c[CI.inicio] > HOJE) return "futuro"; if(!c[CI.fim] || c[CI.fim] >= HOJE) return "andamento"; return "encerrado"; }
