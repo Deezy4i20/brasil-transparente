@@ -39,6 +39,9 @@ export function lerArgs(argv: string[]): Opcoes {
   const conjuntos = (get("--conjuntos")?.split(",") ?? [...CONJUNTOS_ETL]) as ConjuntoETL[];
   for (const c of conjuntos) if (!CONJUNTOS_ETL.includes(c)) throw new Error(`Conjunto desconhecido: ${c}`);
   let meses = Array.from({ length: 12 }, (_, i) => i + 1);
+  // No ano corrente, não tenta baixar meses que ainda não terminaram de ser publicados no futuro.
+  const hoje = new Date();
+  if (ano === hoje.getFullYear()) meses = meses.filter((x) => x <= hoje.getMonth() + 1);
   const m = get("--meses");
   if (m) {
     const [a, b] = m.split("-").map(Number);

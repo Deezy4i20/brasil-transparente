@@ -4,6 +4,4 @@ node_modules
 .env.local
 *.tsbuildinfo
 next-env.d.ts
-data/agregados/*
-!data/agregados/.gitkeep
 data/demo

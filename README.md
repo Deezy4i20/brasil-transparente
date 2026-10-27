@@ -79,6 +79,15 @@ npm run malhas         # regenera as malhas do IBGE (usa a API oficial quando ac
 
 ## Hospedagem
 
+### Recomendado: GitHub + Vercel, com atualização automática
+
+1. Envie este projeto para um repositório no GitHub.
+2. A rotina `.github/workflows/atualizar-dados.yml` roda todo dia às 06:15 (Brasília): baixa os arquivos oficiais do ano atual e do anterior, roda os testes, processa e salva `data/agregados` no repositório. Para rodar na hora: aba **Actions → Atualizar dados oficiais → Run workflow**. Para mudar a frequência, edite a linha `cron`.
+3. Na Vercel, importe o repositório (Add New → Project). Sem configuração extra. A cada atualização de dados, a Vercel republica o site sozinha.
+4. Opcional: em Vercel → Settings → Environment Variables, adicione `PORTAL_TRANSPARENCIA_TOKEN` para ativar contratos e convênios ao vivo.
+
+### Outras opções
+
 - **Vercel / Netlify**: funciona; gere `data/agregados` no build ou num job e inclua no deploy (o `next.config.mjs` já inclui `data/` no trace do servidor). Configure `PORTAL_TRANSPARENCIA_TOKEN` nas variáveis de ambiente.
 - **VPS / Docker**: `npm run build && npm start`, com o ETL num cron diário.
 
