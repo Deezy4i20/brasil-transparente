@@ -161,6 +161,23 @@ ol.barras button.lnk:hover { text-decoration: underline; }
 .painel-uf { display: grid; gap: 16px; }
 .fechar { width: 32px; height: 32px; padding: 0; }
 
+.pill { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill.futuro { background: var(--marinho-claro); color: var(--marinho); }
+.pill.andamento { background: color-mix(in srgb, var(--barra) 16%, transparent); color: var(--tinta); }
+.pill.encerrado { background: var(--sup-2); color: var(--tinta-3); border: 1px solid var(--borda); }
+.projs { display: grid; gap: 10px; }
+.proj { border: 1px solid var(--borda); border-radius: 8px; padding: 10px 12px; display: grid; gap: 4px; font-size: 13px; }
+.proj .t { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.proj .obj { font-weight: 600; font-size: 13.5px; }
+.proj .meta { color: var(--tinta-2); font-size: 12.5px; }
+.proj .vals { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--tinta-2); }
+.proj .vals b { color: var(--tinta); }
+.resumo-proj { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+.resumo-proj div { background: var(--sup-2); border-radius: 8px; padding: 10px 12px; }
+.resumo-proj b { display: block; font-size: 18px; }
+.dica-zoom { font-size: 12px; color: var(--tinta-3); margin: 6px 0 0; }
+.voltar { border: 0; background: none; color: var(--link); cursor: pointer; padding: 0; font-size: 12.5px; text-decoration: underline; }
+@media (max-width: 700px) { .resumo-proj { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 .rank { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .vazio { border: 1px dashed var(--borda); border-radius: 8px; padding: 14px; font-size: 13px; color: var(--tinta-2); }
 
@@ -204,7 +221,7 @@ footer .wrap { padding-block: 18px; display: grid; gap: 4px; }
     <div class="busca" role="search">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <label for="busca" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Buscar</label>
-      <input id="busca" autocomplete="off" placeholder="Buscar órgão, estado, programa, autor de emenda…" maxlength="80">
+      <input id="busca" autocomplete="off" placeholder="Buscar cidade, estado, órgão, programa, autor de emenda…" maxlength="80">
       <div class="res-busca" id="res-busca" hidden></div>
     </div>
     <div class="periodo">
@@ -255,8 +272,8 @@ const dica = id => (GLOSS.find(g=>g[0]===id)||[])[2]||"";
 const CATS = [["Saúde",["10"]],["Educação",["12"]],["Segurança pública",["06"]],["Infraestrutura e transportes",["26"]],["Urbanismo, habitação e saneamento",["15","16","17"]],["Previdência e assistência social",["09","08"]],["Administração pública",["04"]],["Defesa nacional",["05"]],["Ciência e tecnologia",["19"]],["Meio ambiente",["18"]],["Cultura e esporte",["13","27"]],["Agricultura",["20","21"]],["Trabalho",["11"]],["Encargos especiais (inclui dívida)",["28"],"Inclui juros e amortização da dívida, mas também transferências constitucionais a estados e municípios."]];
 
 /* ---------- estado (hash) */
-const E = { view: "painel", ano: D.anos[D.anos.length-1], mi: 1, mf: 12, uf: null, regiao: null, funcao: null, metrica: "transferencias", modo: "absoluto", tabela: false, munis: false, ordem: {}, pag: 1, q: "" };
-function lerHash(){ const v = location.hash.replace("#",""); E.view = ["painel","orgaos","areas","emendas","glossario","sobre"].includes(v) ? v : "painel"; }
+const E = { view: "painel", ano: D.anos[D.anos.length-1], mi: 1, mf: 12, uf: null, regiao: null, funcao: null, metrica: "transferencias", modo: "absoluto", tabela: false, munis: false, mun: null, ordem: {}, pag: 1, q: "", proj: { mun: "", sit: "", q: "", ord: "valor" } };
+function lerHash(){ const v = location.hash.replace("#",""); E.view = ["painel","orgaos","areas","emendas","projetos","glossario","sobre"].includes(v) ? v : "painel"; }
 lerHash();
 
 /* ---------- formatação */
@@ -349,6 +366,40 @@ function graficoBarras(dados, rot){
   return `<figure style="margin:0"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(rot)}" style="width:100%;height:auto">${ticks.map(t=>`<line x1="${pl}" x2="${W}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grade)"/><text x="${pl-6}" y="${y(t)+4}" text-anchor="end" font-size="10.5" fill="var(--tinta-3)">${comp(t).replace("R$ ","")}</text>`).join("")}${dados.map((d,i)=>`<rect x="${pl+i*bw+bw*.18}" y="${y(d.v||0)}" width="${bw*.64}" height="${Math.max(0,H-pb-y(d.v||0))}" rx="3" fill="var(--barra)"><title>${esc(d.r)}: ${cheio(d.v)}</title></rect><text x="${pl+i*bw+bw/2}" y="${H-6}" text-anchor="middle" font-size="10.5" fill="var(--tinta-3)">${esc(d.r)}</text>`).join("")}</svg></figure>`;
 }
 
+/* ---------- municípios */
+const munGeo = {};
+function featuresMun(codUf){ if(!munGeo[codUf] && D.munTopo[codUf]){ const tp=D.munTopo[codUf]; munGeo[codUf]=topojson.feature(tp,Object.values(tp.objects)[0]).features; } return munGeo[codUf]||[]; }
+const MUN = {}; // código IBGE → { nome, uf, ui }
+D.ufs.forEach((u,ui)=>{ for(const f of featuresMun(u.cod)) MUN[f.properties.cod] = { nome: f.properties.nome || D.nomesMun[f.properties.cod] || String(f.properties.cod), uf: u.sigla, ui }; });
+/** Valores por município de uma UF para a leitura do mapa. Respeita o filtro de área. */
+function valoresMun(ui, metrica = E.metrica, ano = E.ano){
+  const a=A(ano), f=fIdx(), mapa=new Map(); let semId=0;
+  if(!a) return { mapa, semId, ind:true };
+  const conj = metrica==="transferencias"?"tra":metrica==="execucao"?"exe":"emendas";
+  if(!disp(ano,conj)) return { mapa, semId, ind:true };
+  if(metrica==="emendas"){ for(const r of a.emendas){ if(r[3]!==ui||(f!=null&&r[5]!==f)) continue; if(r[8]>0) mapa.set(r[8],(mapa.get(r[8])||0)+r[7]); else semId+=r[7]; } }
+  else { const rows = metrica==="transferencias"?a.traMun:a.exeMun; for(const r of rows){ if(r[0]!==ui||(f!=null&&r[2]!==f)) continue; if(r[1]===-1) semId+=r[3]; else mapa.set(r[1],(mapa.get(r[1])||0)+r[3]); } }
+  return { mapa, semId };
+}
+/* Convênios (projetos): resumo embutido, listas por UF carregadas sob demanda. */
+const CONV = {}; // uf → Promise<{referencia, itens}>
+function carregarConvenios(uf){ if(!CONV[uf]) CONV[uf] = fetch(`dados/convenios/${uf}.json`).then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }); return CONV[uf]; }
+const HOJE = new Date().toISOString().slice(0,10);
+const CI = { numero:0, mun:1, munNome:2, situacao:3, objeto:4, orgaoSup:5, concedente:6, convenente:7, tipoConv:8, instrumento:9, valor:10, liberado:11, contrapartida:12, inicio:13, fim:14, ultima:15 };
+function statusProj(c){ if(c[CI.inicio] && c[CI.inicio] > HOJE) return "futuro"; if(!c[CI.fim] || c[CI.fim] >= HOJE) return "andamento"; return "encerrado"; }
+const ROT_STATUS = { futuro: "Futuro (ainda não começou)", andamento: "Em andamento", encerrado: "Vigência encerrada" };
+const dataBR = iso => iso ? iso.split("-").reverse().join("/") : "—";
+const aLiberar = c => (c[CI.valor]!=null && c[CI.liberado]!=null) ? Math.max(0, c[CI.valor]-c[CI.liberado]) : null;
+function cartaoProjeto(c, comMun){
+  const st = statusProj(c), al = aLiberar(c);
+  return `<div class="proj"><div class="t"><span class="obj">${esc(c[CI.objeto]||"Objeto não informado")}</span><span class="pill ${st}">${ROT_STATUS[st]}</span></div>
+  <div class="meta"><b>Quem executa:</b> ${esc(c[CI.convenente]||"—")}${c[CI.tipoConv]?` <span class="muted">(${esc(c[CI.tipoConv])})</span>`:""}</div>
+  <div class="meta"><b>Quem financia:</b> ${esc(c[CI.concedente]||"—")}${c[CI.orgaoSup]&&c[CI.orgaoSup]!==c[CI.concedente]?` · ${esc(c[CI.orgaoSup])}`:""}</div>
+  <div class="vals num"><span>Pactuado <b>${comp(c[CI.valor])}</b></span><span>Liberado <b>${comp(c[CI.liberado])}</b></span><span>A liberar <b>${comp(al)}</b></span>${c[CI.contrapartida]?`<span>Contrapartida <b>${comp(c[CI.contrapartida])}</b></span>`:""}</div>
+  <div class="meta muted">${comMun?`${esc(c[CI.munNome]||"Município não identificado")} · `:""}${esc(c[CI.instrumento]||"Instrumento")} nº ${esc(c[CI.numero])} · vigência ${dataBR(c[CI.inicio])} a ${dataBR(c[CI.fim])} · situação oficial: ${esc(c[CI.situacao]||"—")}</div></div>`;
+}
+const NOTA_PROJ = `Projetos = convênios, contratos de repasse e instrumentos parecidos publicados no Portal da Transparência: recursos federais repassados para alguém executar um objeto (obra, compra, serviço). “A liberar” = valor pactuado − valor já liberado. O avanço físico da obra não é publicado nesta fonte.`;
+
 /* ---------- mapa */
 const RAMPA = ["--s1","--s2","--s3","--s4","--s5"];
 const cor = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -358,7 +409,8 @@ const ufsGeo = topojson.feature(D.topoUfs, Object.values(D.topoUfs.objects)[0]);
 const L=860, AL=760;
 const proj = d3.geoMercator().fitExtent([[10,10],[L-10,AL-10]], ufsGeo);
 const path = d3.geoPath(proj);
-let zoomB = null, svgSel = null, transformAtual = d3.zoomIdentity;
+let zoomB = null, svgSel = null, transformAtual = d3.zoomIdentity, ultimoTransform = null;
+const LIMIAR_MUN = 2.6;
 
 function desenharMapa(){
   const cont = document.getElementById("mapa"); if(!cont) return;
@@ -368,14 +420,7 @@ function desenharMapa(){
   const fmt = v => E.modo==="per_capita" ? `${cheio(v)}/hab.` : comp(v);
   const sel = E.uf ? D.ufs.find(u=>u.sigla===E.uf) : null;
   let munData=null, qm=[];
-  if(sel && E.munis){
-    const a=A(E.ano), ui=D.ufs.indexOf(sel), f=fIdx();
-    const rows = E.metrica==="transferencias"? a.traMun : E.metrica==="execucao" ? a.exeMun : a.emendas.map(r=>[r[3],null,r[5],r[7],r[4]]);
-    munData = new Map(); let semId=0;
-    if(E.metrica==="emendas"){ for(const r of a.emendas){ if(r[3]!==ui||(f!=null&&r[5]!==f)) continue; const cod = Object.keys(D.nomesMun).find(k=>D.nomesMun[k]===r[4] && String(k).startsWith(String(sel.cod))); if(cod) munData.set(Number(cod),(munData.get(Number(cod))||0)+r[7]); else semId+=r[7]; } }
-    else for(const r of rows){ if(r[0]!==ui||(f!=null&&r[2]!==f)) continue; if(r[1]===-1) semId+=r[3]; else munData.set(r[1],(munData.get(r[1])||0)+r[3]); }
-    munData.semId=semId; qm = quebras([...munData.values()]);
-  }
+  if(sel && E.munis){ const v = valoresMun(D.ufs.indexOf(sel)); munData = v.mapa; munData.semId = v.semId; qm = quebras([...munData.values()]); }
   const leg = (qq, f) => qq.length ? RAMPA.map((c,i)=>`<span><i style="background:var(${c})"></i>${i===0?`até ${f(qq[0])}`:i===4?`≥ ${f(qq[3])}`:`${f(qq[i-1])}–${f(qq[i])}`}</span>`).join("")+`<span><i style="background:var(--sem)"></i>sem registro</span>` : "";
   document.getElementById("legenda").innerHTML = munData ? leg(qm, comp) : leg(q, fmt);
 
@@ -398,23 +443,53 @@ function desenharMapa(){
       .on("mouseleave blur", () => dicaEl.hidden=true)
       .on("click", (ev,d) => { const u=porCod.get(d.properties.cod); if(u) selecionarUF(u.sigla); })
       .on("keydown", (ev,d) => { if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); const u=porCod.get(d.properties.cod); if(u) selecionarUF(u.sigla);} });
-    if(munData && D.munTopo[sel.cod]){
-      const tp = D.munTopo[sel.cod]; const fc = topojson.feature(tp, Object.values(tp.objects)[0]);
-      g.selectAll("path.mun").data(fc.features).join("path").attr("class","mun").attr("d",path)
-        .attr("fill", d => cor(classe(munData.get(d.properties.cod)||0, qm)))
-        .on("mousemove", (ev,d) => { const v=munData.get(d.properties.cod); mostrar(ev, `<b>${esc(d.properties.nome||D.nomesMun[d.properties.cod]||d.properties.cod)}</b>${v?`${esc(METRICAS[E.metrica].curto)}: ${comp(v)}`:"sem registro"}`); })
-        .on("mouseleave", () => dicaEl.hidden=true);
-    }
-    zoomB = d3.zoom().scaleExtent([1,40]).on("zoom", ev => { transformAtual=ev.transform; g.attr("transform", ev.transform); });
+    /** Desenha os municípios das UFs indicadas, com cor pela leitura atual. */
+    const camadaMun = (codsUf) => {
+      const feats = [], vals = new Map(); let semId = 0;
+      for(const cu of codsUf){ const ui = D.ufs.findIndex(u=>u.cod===cu); const v = valoresMun(ui); v.mapa.forEach((x,k)=>vals.set(k,x)); semId += v.semId; feats.push(...featuresMun(cu)); }
+      const qq = quebras([...vals.values()]);
+      g.selectAll("path.uf").attr("fill", d => codsUf.includes(d.properties.cod) ? cor("--sem") : (munData ? cor("--vizinho") : cor(classe(porCod.get(d.properties.cod)?.[ch]||0,q)))).attr("fill-opacity", d => codsUf.includes(d.properties.cod) || munData ? 1 : .55);
+      g.selectAll("path.mun").data(feats, d=>d.properties.cod).join("path").attr("class","mun").attr("d",path)
+        .attr("fill", d => cor(classe(vals.get(d.properties.cod)||0, qq)))
+        .attr("stroke", d => d.properties.cod===E.mun ? cor("--tinta") : null).attr("stroke-width", d => d.properties.cod===E.mun ? 2.5 : null)
+        .attr("tabindex", 0).attr("role","button").attr("aria-label", d => `${MUN[d.properties.cod]?.nome||d.properties.cod}: ${comp(vals.get(d.properties.cod)||0)}`)
+        .style("cursor","pointer")
+        .on("mousemove focus", (ev,d) => { const v=vals.get(d.properties.cod); const pr=D.convResumo?.porMunicipio?.[d.properties.cod]; const m=MUN[d.properties.cod]; mostrar(ev, `<b>${esc(m?.nome||d.properties.cod)} (${m?.uf||""})</b>${esc(METRICAS[E.metrica].curto)}: ${v?comp(v):"sem registro"}${pr?`<br>${pr[0]} projeto(s) · ${pr[3]} futuro(s)`:""}<br><span style="opacity:.75">Clique para ver a cidade</span>`); })
+        .on("mouseleave blur", () => dicaEl.hidden=true)
+        .on("click", (ev,d) => selecionarMun(d.properties.cod))
+        .on("keydown", (ev,d) => { if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); selecionarMun(d.properties.cod);} });
+      document.getElementById("legenda").innerHTML = leg(qq, comp);
+      document.getElementById("dica-zoom").textContent = `Mostrando municípios de ${codsUf.map(c=>D.ufs.find(u=>u.cod===c)?.sigla).join(", ")}. Clique numa cidade para ver gastos e projetos.`;
+      return semId;
+    };
+    const limparMun = () => { g.selectAll("path.mun").remove(); g.selectAll("path.uf").attr("fill", d => cor(classe(porCod.get(d.properties.cod)?.[ch]||0,q))).attr("fill-opacity", d => (E.regiao && porCod.get(d.properties.cod)?.regiao!==E.regiao) ? .35 : 1); document.getElementById("legenda").innerHTML = leg(q, fmt); document.getElementById("dica-zoom").textContent = "Aproxime o mapa (+ ou rolagem) para ver os municípios."; };
+    const fixoUF = sel && munData;
+    const atualizarCamada = (t) => {
+      if(fixoUF) return;
+      if(t.k < LIMIAR_MUN){ limparMun(); return; }
+      const x0=-t.x/t.k, y0=-t.y/t.k, x1=(L-t.x)/t.k, y1=(AL-t.y)/t.k;
+      const cx=(x0+x1)/2, cy=(y0+y1)/2;
+      const vis = ufsGeo.features.filter(f=>{ const [[a,b],[c,d]]=path.bounds(f); return c>=x0&&a<=x1&&d>=y0&&b<=y1; })
+        .map(f=>{ const [[a,b],[c,d]]=path.bounds(f); return { cod:f.properties.cod, dist: Math.hypot((a+c)/2-cx,(b+d)/2-cy) }; })
+        .sort((p,q)=>p.dist-q.dist).slice(0,6).map(x=>x.cod);
+      camadaMun(vis);
+    };
+    if(fixoUF) camadaMun([sel.cod]);
+    zoomB = d3.zoom().scaleExtent([1,60])
+      .on("zoom", ev => { transformAtual=ev.transform; g.attr("transform", ev.transform); })
+      .on("end", ev => { ultimoTransform = ev.transform; atualizarCamada(ev.transform); });
     svgSel.call(zoomB).on("dblclick.zoom", null);
-    if(sel && munData){ const f=ufsGeo.features.find(x=>x.properties.cod===sel.cod); const [[x0,y0],[x1,y1]]=path.bounds(f); const k=Math.min(30,.85/Math.max((x1-x0)/L,(y1-y0)/AL)); svgSel.call(zoomB.transform, d3.zoomIdentity.translate(L/2,AL/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2)); }
+    if(fixoUF && !E.mun){ const f=ufsGeo.features.find(x=>x.properties.cod===sel.cod); const [[x0,y0],[x1,y1]]=path.bounds(f); const k=Math.min(30,.85/Math.max((x1-x0)/L,(y1-y0)/AL)); svgSel.call(zoomB.transform, d3.zoomIdentity.translate(L/2,AL/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2)); }
+    else if(E.mun && !ultimoTransform){ const f=featuresMun(D.ufs.find(u=>u.sigla===MUN[E.mun]?.uf)?.cod).find(x=>x.properties.cod===E.mun); if(f){ const [[x0,y0],[x1,y1]]=path.bounds(f); const k=Math.min(40,Math.max(LIMIAR_MUN+.5,.25/Math.max((x1-x0)/L,(y1-y0)/AL))); svgSel.call(zoomB.transform, d3.zoomIdentity.translate(L/2,AL/2).scale(k).translate(-(x0+x1)/2,-(y0+y1)/2)); } }
+    else if(ultimoTransform) svgSel.call(zoomB.transform, ultimoTransform);
     document.getElementById("zin").onclick = () => svgSel.transition().duration(250).call(zoomB.scaleBy, 1.6);
     document.getElementById("zout").onclick = () => svgSel.transition().duration(250).call(zoomB.scaleBy, 1/1.6);
-    document.getElementById("zreset").onclick = () => { if(E.uf){ E.uf=null; E.munis=false; render(); } else svgSel.transition().call(zoomB.transform, d3.zoomIdentity); };
+    document.getElementById("zreset").onclick = () => { ultimoTransform = null; if(E.uf||E.mun){ E.uf=null; E.mun=null; E.munis=false; render(); } else svgSel.transition().call(zoomB.transform, d3.zoomIdentity); };
   }
   document.getElementById("nota-ni").innerHTML = `Fora do mapa, <b>localização não identificada</b>: <span class="num"><b>${comp(t.ni)}</b></span>${munData?` · no estado, sem município identificado: <b class="num">${comp(munData.semId)}</b>`:""}. Despesas sem estado confiável não vão para a sede do órgão.`;
 }
-function selecionarUF(s){ E.uf = E.uf===s ? null : s; E.regiao=null; E.munis = false; render(); document.getElementById("lateral")?.scrollIntoView({block:"nearest"}); }
+function selecionarMun(cod){ const m = MUN[cod]; if(!m) return; E.mun = cod; E.uf = m.uf; E.regiao = null; render(); document.getElementById("lateral")?.scrollIntoView({block:"nearest", behavior:"smooth"}); }
+function selecionarUF(s){ E.uf = E.uf===s ? null : s; E.mun = null; E.regiao=null; E.munis = false; ultimoTransform = null; render(); document.getElementById("lateral")?.scrollIntoView({block:"nearest"}); }
 
 /* ---------- painel do estado */
 function painelEstado(){
@@ -455,6 +530,72 @@ function resumoNacional(){
   <div class="bloco"><div class="sec-tit"><div><h2>Estados · ${METRICAS[E.metrica].curto.toLowerCase()}</h2><p>${E.modo==="per_capita"?"Por habitante (Censo 2022)":"Valor total"}</p></div></div>${barras([...t.ufs].sort((a,b)=>a.pos-b.pos).slice(0,8).map(u=>({nome:u.nome,v:u[ch],sigla:u.sigla})), E.modo==="per_capita"?(x=>`${cheio(x)}/hab.`):comp, it=>`uf:${it.sigla}`)}<p class="muted" style="margin:0">Clique num estado no mapa ou na lista para ver o detalhamento.</p></div></div>`;
 }
 
+/* ---------- painel da cidade */
+function painelMunicipio(){
+  const cod = E.mun, m = MUN[cod]; if(!m) return resumoNacional();
+  const u = D.ufs[m.ui], a = A(E.ano), f = fIdx();
+  const mets = Object.keys(METRICAS).map(k => { const v = valoresMun(m.ui, k); const ord = [...v.mapa.entries()].sort((x,y)=>y[1]-x[1]); const pos = ord.findIndex(x=>x[0]===cod); return { k, ind: !!v.ind, valor: v.mapa.get(cod)||0, pos: pos>=0?pos+1:null, total: v.mapa.size }; });
+  const areas = disp(E.ano,"tra") ? agrupa(a.traMun, r => r[1]===cod && (f==null||r[2]===f), r=>r[2], 3) : [];
+  const emds = a.emendas.filter(r => r[8]===cod && (f==null||r[5]===f)).sort((x,y)=>y[7]-x[7]).slice(0,8);
+  const pr = D.convResumo?.porMunicipio?.[cod];
+  return `<div class="painel-uf">
+    <div style="display:flex;justify-content:space-between;gap:8px"><div><button class="voltar" data-acao="voltar-uf">← ${esc(u.nome)}</button><h2 style="font-size:22px">${esc(m.nome)}</h2><div class="muted">Município de ${esc(u.nome)} · código IBGE ${cod}</div></div><button class="botao fechar" aria-label="Fechar painel da cidade" data-acao="fechar">✕</button></div>
+    <div><div class="rotulo" style="margin-bottom:8px">Recursos federais identificados na cidade · ${E.ano}</div><div class="metricas">${mets.map(x=>`<button aria-pressed="${x.k===E.metrica}" data-metrica="${x.k}" ${x.ind?"disabled":""}><span class="a"><span>${METRICAS[x.k].rot}</span><b class="num">${x.ind?"não disponível":x.valor?comp(x.valor):"—"}</b></span>${x.ind?"":`<span class="b num"><span>${x.pos?`${x.pos}º de ${x.total} cidades de ${u.sigla} com registro`:"sem registro no período"}</span></span>`}</button>`).join("")}</div><p class="muted" style="margin:6px 0 0">Valores do ano todo por município. Fontes e critérios diferentes: não some as linhas.</p></div>
+    <div class="bloco"><div class="rotulo">Projetos na cidade ${ajuda("contrato")}</div>${pr?`<div class="resumo-proj" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div><span class="muted">Projetos</span><b class="num">${pr[0]}</b></div><div><span class="muted">Futuros</span><b class="num">${pr[3]}</b></div><div><span class="muted">Valor pactuado</span><b class="num">${comp(pr[1])}</b></div><div><span class="muted">A liberar</span><b class="num">${comp(Math.max(0,pr[1]-pr[2]))}</b></div></div>`:""}<div id="proj-cidade"><p class="muted">${D.convResumo?"Carregando projetos…":"Projetos ainda não carregados."}</p></div><p class="muted" style="margin:0">${NOTA_PROJ}</p></div>
+    ${areas.length?`<div class="bloco"><div class="rotulo">Transferências recebidas, por área ${ajuda("funcao")}</div>${barras(areas.slice(0,6).map(x=>({nome:D.dic.funcao[x.k]?.nome,v:x.v})), comp)}</div>`:""}
+    <div class="bloco"><div class="rotulo">Emendas com destino à cidade ${ajuda("emenda")}</div>${disp(E.ano,"emendas")?barras(emds.map(r=>({nome:`Emenda ${r[1]} · ${D.dic.autor[r[2]].nome}`,v:r[7],sub:`${D.dic.funcao[r[5]]?.nome||""} · empenhado ${comp(r[6])}`})), comp):`<p class="muted">Emendas não carregadas para ${E.ano}.</p>`}</div>
+  </div>`;
+}
+async function preencherProjetosCidade(){
+  const el = document.getElementById("proj-cidade"); if(!el || !E.mun || !D.convResumo) return;
+  const m = MUN[E.mun];
+  try {
+    const dados = await carregarConvenios(m.uf);
+    if(!document.getElementById("proj-cidade")) return;
+    const itens = dados.itens.filter(c => String(c[CI.mun]) === String(E.mun));
+    const ordem = { futuro:0, andamento:1, encerrado:2 };
+    itens.sort((x,y)=> ordem[statusProj(x)]-ordem[statusProj(y)] || (y[CI.valor]||0)-(x[CI.valor]||0));
+    el.innerHTML = itens.length ? `<div class="projs">${itens.slice(0,8).map(c=>cartaoProjeto(c,false)).join("")}</div>${itens.length>8?`<p style="margin:8px 0 0"><a href="#projetos" data-acao="projetos-cidade:${E.mun}">Ver todos os ${itens.length} projetos de ${esc(m.nome)} →</a></p>`:""}` : `<p class="muted">Nenhum convênio com vigência recente para esta cidade.</p>`;
+  } catch { el.innerHTML = `<p class="muted">Não foi possível carregar a lista de projetos agora.</p>`; }
+}
+
+/* ---------- projetos */
+function viewProjetos(){
+  const uf = E.uf || "";
+  const opUF = [...D.ufs].sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR")).map(u=>`<option value="${u.sigla}" ${u.sigla===uf?"selected":""}>${esc(u.nome)}</option>`).join("");
+  const resUF = uf && D.convResumo?.porUF?.[uf];
+  return `<div class="titulo-pag"><h1>Projetos financiados com recursos federais</h1><p>Convênios, contratos de repasse e termos de fomento: o que vai ser feito, onde, quem executa, quem financia, quanto já foi liberado e o que ainda falta liberar.</p></div>
+  ${!D.convResumo?`<div class="vazio">Os dados de projetos (arquivo Convênios do Portal da Transparência) ainda não foram carregados.</div>`:`
+  <section class="cartao"><div class="filtros">
+    <label for="p-uf">Estado<select id="p-uf" data-proj="uf"><option value="">Escolha um estado</option>${opUF}</select></label>
+    <label for="p-mun">Cidade<select id="p-mun" data-proj="mun" ${uf?"":"disabled"}><option value="">Todas</option></select></label>
+    <label for="p-sit">Situação<select id="p-sit" data-proj="sit"><option value="">Todas</option><option value="futuro" ${E.proj.sit==="futuro"?"selected":""}>Futuros</option><option value="andamento" ${E.proj.sit==="andamento"?"selected":""}>Em andamento</option><option value="encerrado" ${E.proj.sit==="encerrado"?"selected":""}>Vigência encerrada</option></select></label>
+    <label for="p-ord">Ordenar por<select id="p-ord" data-proj="ord"><option value="valor" ${E.proj.ord==="valor"?"selected":""}>Maior valor</option><option value="liberar" ${E.proj.ord==="liberar"?"selected":""}>Mais a liberar</option><option value="fim" ${E.proj.ord==="fim"?"selected":""}>Fim de vigência mais próximo</option><option value="inicio" ${E.proj.ord==="inicio"?"selected":""}>Início mais recente</option></select></label>
+    <label for="p-q" style="flex:1 1 220px">Buscar (objeto, quem executa, quem financia, nº)<input class="campo" id="p-q" data-proj-q value="${esc(E.proj.q)}" maxlength="80" style="max-width:none"></label>
+  </div></section>
+  ${uf?`<section class="cartao" id="proj-lista"><p class="muted">Carregando projetos de ${esc(D.ufs.find(u=>u.sigla===uf).nome)}…</p></section>`:`<div class="vazio">Escolha um estado para ver os projetos. ${D.convResumo?.porUF?`Há ${Object.values(D.convResumo.porUF).reduce((s,x)=>s+x[0],0).toLocaleString("pt-BR")} projetos com vigência recente no país.`:""}</div>`}
+  <p class="muted">${NOTA_PROJ} Fonte: arquivo Convênios do Portal da Transparência (CGU), extraído em ${dataBR(D.convResumo.referencia)}.</p>`}`;
+}
+async function preencherProjetos(){
+  const el = document.getElementById("proj-lista"); if(!el || !E.uf) return;
+  let dados; try { dados = await carregarConvenios(E.uf); } catch { el.innerHTML = `<p class="muted">Não foi possível carregar os projetos agora.</p>`; return; }
+  if(!document.getElementById("proj-lista")) return;
+  // opções de cidade
+  const sm = document.getElementById("p-mun");
+  const cidades = new Map(); for(const c of dados.itens){ const k = c[CI.mun] ? String(c[CI.mun]) : "NI"; cidades.set(k, (MUN[c[CI.mun]]?.nome) || c[CI.munNome] || "Município não identificado"); }
+  sm.innerHTML = `<option value="">Todas (${cidades.size})</option>` + [...cidades].sort((a,b)=>a[1].localeCompare(b[1],"pt-BR")).map(([k,n])=>`<option value="${k}" ${String(E.proj.mun)===k?"selected":""}>${esc(n)}</option>`).join("");
+  const q = norm(E.proj.q||"");
+  let itens = dados.itens.filter(c => (!E.proj.mun || String(c[CI.mun]||"NI")===String(E.proj.mun)) && (!E.proj.sit || statusProj(c)===E.proj.sit) && (!q || [c[CI.objeto],c[CI.convenente],c[CI.concedente],c[CI.orgaoSup],c[CI.numero],c[CI.munNome]].some(x=>norm(x||"").includes(q))));
+  const ordF = { valor:(x,y)=>(y[CI.valor]||0)-(x[CI.valor]||0), liberar:(x,y)=>(aLiberar(y)||0)-(aLiberar(x)||0), fim:(x,y)=>String(x[CI.fim]||"9").localeCompare(String(y[CI.fim]||"9")), inicio:(x,y)=>String(y[CI.inicio]||"").localeCompare(String(x[CI.inicio]||"")) }[E.proj.ord];
+  itens.sort(ordF);
+  const tot = itens.reduce((s,c)=>{ s.v+=c[CI.valor]||0; s.l+=c[CI.liberado]||0; s.a+=aLiberar(c)||0; if(statusProj(c)==="futuro") s.f++; return s; }, {v:0,l:0,a:0,f:0});
+  const pp = 30, pags = Math.max(1, Math.ceil(itens.length/pp)), p = Math.min(E.pag, pags);
+  el.innerHTML = `<div class="resumo-proj"><div><span class="muted">Projetos</span><b class="num">${itens.length.toLocaleString("pt-BR")}</b></div><div><span class="muted">Futuros</span><b class="num">${tot.f.toLocaleString("pt-BR")}</b></div><div><span class="muted">Valor pactuado</span><b class="num">${comp(tot.v)}</b></div><div><span class="muted">A liberar</span><b class="num">${comp(tot.a)}</b></div></div>
+  <div class="projs" style="margin-top:14px">${itens.slice((p-1)*pp, p*pp).map(c=>cartaoProjeto(c,true)).join("") || `<p class="muted">Nenhum projeto com esses filtros.</p>`}</div>
+  ${pags>1?`<nav class="pag" aria-label="Paginação"><button class="botao" data-pag="${p-1}" ${p===1?"disabled":""}>Anterior</button><span class="num">${p} de ${pags}</span><button class="botao" data-pag="${p+1}" ${p===pags?"disabled":""}>Próxima</button></nav>`:""}
+  <p class="muted" style="margin:10px 0 0">Para conferir um projeto, pesquise o número em <a href="https://portaldatransparencia.gov.br/convenios/consulta" target="_blank" rel="noreferrer">Portal da Transparência → Convênios</a>.</p>`;
+}
+
 /* ---------- views */
 function filtrosHTML(campos=["regiao","uf","funcao"]){
   const ops = { regiao: REGIOES.map(r=>[r,r]), uf: [...D.ufs].sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR")).map(u=>[u.sigla,u.nome]), funcao: [...D.dic.funcao].sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR")).map(f=>[f.cod,`${f.nome}`]) };
@@ -472,9 +613,9 @@ function viewPainel(){
   <section class="grade-mapa">
     <div class="cartao"><div class="sec-tit"><div><h2>Para onde vai o dinheiro · ${METRICAS[E.metrica].rot.toLowerCase()}</h2><p>${METRICAS[E.metrica].desc}</p></div></div>
       <div class="ctrl"><div class="seg" role="radiogroup" aria-label="O que o mapa mostra">${Object.keys(METRICAS).map(m=>{ const c=m==="transferencias"?"tra":m==="execucao"?"exe":"emendas"; const ok=disp(E.ano,c); return `<button role="radio" aria-checked="${E.metrica===m}" data-metrica="${m}" ${ok?"":`disabled title="Ainda não carregado para ${E.ano}"`}>${METRICAS[m].curto}</button>`; }).join("")}</div><div class="seg" role="radiogroup" aria-label="Escala"><button role="radio" aria-checked="${E.modo==="absoluto"}" data-modo="absoluto">Total</button><button role="radio" aria-checked="${E.modo==="per_capita"}" data-modo="per_capita">Por habitante</button></div><button class="botao" data-acao="tabela" aria-pressed="${E.tabela}">${E.tabela?"Ver mapa":"Ver como tabela"}</button>${E.uf&&!E.tabela?`<button class="botao" data-acao="munis" aria-pressed="${E.munis}">${E.munis?"Ver estados":"Ver municípios de "+E.uf}</button>`:""}</div>
-      <div class="legenda" id="legenda"></div><div id="mapa"></div><p class="muted" id="nota-ni" style="margin:8px 0 0"></p>${fonte(METRICAS[E.metrica].desc + (E.modo==="per_capita"?" Por habitante: população do Censo 2022 (IBGE).":""), E.modo==="per_capita")}
+      <div class="legenda" id="legenda"></div><div id="mapa"></div><p class="dica-zoom" id="dica-zoom">Aproxime o mapa (+ ou rolagem) para ver os municípios.</p><p class="muted" id="nota-ni" style="margin:8px 0 0"></p>${fonte(METRICAS[E.metrica].desc + (E.modo==="per_capita"?" Por habitante: população do Censo 2022 (IBGE).":""), E.modo==="per_capita")}
     </div>
-    <aside class="cartao" id="lateral" aria-label="${E.uf?"Painel do estado":"Resumo nacional"}">${E.uf?painelEstado():resumoNacional()}</aside>
+    <aside class="cartao" id="lateral" aria-label="${E.mun?"Painel da cidade":E.uf?"Painel do estado":"Resumo nacional"}">${E.mun?painelMunicipio():E.uf?painelEstado():resumoNacional()}</aside>
   </section>
   ${rankings()}`;
 }
@@ -564,7 +705,7 @@ function buscar(q){
   const fun=D.dic.funcao.filter(o=>norm(o.nome).includes(n)).slice(0,5).map(o=>({t:o.nome,s:`Função ${o.cod}`,a:`funcao:${o.cod}`})); if(fun.length) g.push(["Áreas de atuação",fun]);
   const prg=D.dic.programa.filter(o=>norm(o.nome).includes(n)).slice(0,5).map(o=>({t:o.nome,s:`Programa ${o.cod}`,a:"view:orgaos"})); if(prg.length) g.push(["Programas",prg]);
   const aut=D.dic.autor.filter(o=>norm(o.nome).includes(n)).slice(0,5).map(o=>({t:o.nome,s:"Autor de emendas",a:`emenda:${o.nome}`})); if(aut.length) g.push(["Emendas parlamentares",aut]);
-  const mun=Object.entries(D.nomesMun).filter(([k,v])=>norm(v).includes(n)).slice(0,5).map(([k,v])=>{const u=D.ufs.find(x=>String(k).startsWith(String(x.cod)));return {t:v,s:u?.sigla,a:`mun:${u?.sigla}`};}); if(mun.length) g.push(["Municípios",mun]);
+  const mun=Object.entries(MUN).filter(([k,v])=>norm(v.nome).includes(n)).sort((x,y)=>{ const r=v=>{const t=norm(v.nome); return t===n?0:t.startsWith(n)?1:2;}; return r(x[1])-r(y[1]) || x[1].nome.length-y[1].nome.length; }).slice(0,6).map(([k,v])=>({t:v.nome,s:v.uf,a:`cidade:${k}`})); if(mun.length) g.unshift(["Cidades",mun]);
   return g;
 }
 
@@ -572,10 +713,11 @@ function buscar(q){
 function ajustarMetrica(){ const c = E.metrica==="transferencias"?"tra":E.metrica==="execucao"?"exe":"emendas"; if(!disp(E.ano,c)) E.metrica = disp(E.ano,"tra")?"transferencias":disp(E.ano,"exe")?"execucao":"emendas"; }
 function render(){
   ajustarMetrica();
-  document.getElementById("nav").innerHTML = [["painel","Painel"],["orgaos","Quem gasta"],["areas","Com o que se gasta"],["emendas","Emendas"],["glossario","Glossário"],["sobre","Sobre o modelo"]].map(([v,t])=>`<li><a href="#${v}" ${E.view===v?'aria-current="page"':""}>${t}</a></li>`).join("");
+  document.getElementById("nav").innerHTML = [["painel","Painel"],["projetos","Projetos"],["orgaos","Quem gasta"],["areas","Com o que se gasta"],["emendas","Emendas"],["glossario","Glossário"],["sobre","Sobre"]].map(([v,t])=>`<li><a href="#${v}" ${E.view===v?'aria-current="page"':""}>${t}</a></li>`).join("");
   const app=document.getElementById("app");
-  app.innerHTML = {painel:viewPainel,orgaos:viewOrgaos,areas:viewAreas,emendas:viewEmendas,glossario:viewGlossario,sobre:viewSobre}[E.view]();
-  if(E.view==="painel") desenharMapa();
+  app.innerHTML = {painel:viewPainel,projetos:viewProjetos,orgaos:viewOrgaos,areas:viewAreas,emendas:viewEmendas,glossario:viewGlossario,sobre:viewSobre}[E.view]();
+  if(E.view==="painel"){ desenharMapa(); preencherProjetosCidade(); }
+  if(E.view==="projetos") preencherProjetos();
 }
 function acao(a){
   const [t,v]=[a.slice(0,a.indexOf(":")),a.slice(a.indexOf(":")+1)];
@@ -584,6 +726,8 @@ function acao(a){
   else if(t==="funcao"){ E.funcao=v; render(); }
   else if(t==="emenda"){ E.q=v; E.pag=1; irPara("emendas"); }
   else if(t==="view"){ irPara(v); }
+  else if(t==="cidade"){ const m=MUN[Number(v)]; if(m){ E.mun=Number(v); E.uf=m.uf; E.regiao=null; E.munis=false; ultimoTransform=null; irPara("painel"); } }
+  else if(t==="projetos-cidade"){ const m=MUN[Number(v)]; if(m){ E.uf=m.uf; E.proj.mun=String(v); E.proj.sit=""; E.pag=1; irPara("projetos"); } }
 }
 function irPara(v){ if(E.view===v){ render(); return; } if(v!=="emendas") E.q=""; location.hash=v; }
 window.addEventListener("hashchange",()=>{ lerHash(); E.pag=1; render(); window.scrollTo(0,0); });
@@ -594,7 +738,8 @@ document.addEventListener("click", ev => {
   else if(b.dataset.modo){ E.modo=b.dataset.modo; render(); }
   else if(b.dataset.acao==="tabela"){ E.tabela=!E.tabela; render(); }
   else if(b.dataset.acao==="munis"){ E.munis=!E.munis; render(); }
-  else if(b.dataset.acao==="fechar"){ E.uf=null; E.munis=false; render(); }
+  else if(b.dataset.acao==="fechar"){ E.uf=null; E.mun=null; E.munis=false; ultimoTransform=null; render(); }
+  else if(b.dataset.acao==="voltar-uf"){ E.mun=null; render(); }
   else if(b.dataset.acao){ acao(b.dataset.acao); document.getElementById("res-busca").hidden=true; }
   else if(b.dataset.rm){ const r=b.dataset.rm; if(r==="tudo"){E.uf=E.regiao=E.funcao=null;E.mi=1;E.mf=12;E.munis=false;} else if(r==="periodo"){E.mi=1;E.mf=12;} else E[r]=null; sincPeriodo(); render(); }
   else if(b.dataset.ord){ const [id,k]=b.dataset.ord.split(":"); const o=E.ordem[id]; E.ordem[id]={k,d:o&&o.k===k?!o.d:true}; render(); }
@@ -602,7 +747,17 @@ document.addEventListener("click", ev => {
 });
 document.addEventListener("change", ev => {
   const s=ev.target; if(!s.dataset.filtro) return; const c=s.dataset.filtro;
-  E[c]=s.value||null; if(c==="uf"){E.regiao=null;E.munis=false;} if(c==="regiao") E.uf=null; E.pag=1; render();
+  E[c]=s.value||null; if(c==="uf"){E.regiao=null;E.munis=false;E.mun=null;} if(c==="regiao"){E.uf=null;E.mun=null;} E.pag=1; render();
+});
+document.addEventListener("change", ev => {
+  const s=ev.target; const k=s.dataset.proj; if(!k) return;
+  if(k==="uf"){ E.uf=s.value||null; E.mun=null; E.proj.mun=""; } else E.proj[k]=s.value;
+  E.pag=1; render();
+});
+let tBuscaProj=null;
+document.addEventListener("input", ev => {
+  if(ev.target.dataset.projQ===undefined) return;
+  E.proj.q = ev.target.value; E.pag=1; clearTimeout(tBuscaProj); tBuscaProj=setTimeout(preencherProjetos, 250);
 });
 document.addEventListener("input", ev => {
   if(ev.target.dataset.buscaTab===undefined) return; const id=ev.target.id, pos=ev.target.selectionStart;

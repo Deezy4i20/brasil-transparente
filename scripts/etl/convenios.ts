@@ -28,7 +28,34 @@ import { parseValorBR } from "../../src/lib/dinheiro";
 import { resolverUF, UFS } from "../../src/lib/referencia/ufs";
 import { lerCSV, paraCadaCSV, type Linha } from "./csv";
 import { carregarIndiceMunicipios, localizarMunicipio, type IndiceMunicipios } from "./municipios";
-import { atualizarManifesto, baixar } from "./index";
+import { createWriteStream } from "node:fs";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { atualizarManifesto } from "./index";
+
+/**
+ * Tenta baixar o arquivo de uma data. Uma única tentativa por URL, sem espera longa:
+ * datas que ainda não existem respondem com erro e passamos para a anterior.
+ */
+async function tentarData(urls: string[], destino: string): Promise<{ url: string; status: number } | { status: number; erro: true }> {
+  let ultimo = 0;
+  for (const url of urls) {
+    try {
+      const r = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(15 * 60_000) });
+      ultimo = r.status;
+      const tipo = r.headers.get("content-type") ?? "";
+      if (!r.ok || !r.body || tipo.includes("text/html")) {
+        await r.body?.cancel();
+        continue;
+      }
+      await pipeline(Readable.fromWeb(r.body as never), createWriteStream(destino));
+      return { url: r.url || url, status: r.status };
+    } catch {
+      ultimo = -1;
+    }
+  }
+  return { status: ultimo, erro: true };
+}
 
 export const FONTE_CONVENIOS = {
   nome: "Convênios — Portal da Transparência (CGU)",
@@ -215,15 +242,16 @@ export async function executarConvenios(opts: { arquivos?: string[]; desde?: str
     // O Portal publica o arquivo com a data de geração (AAAAMMDD). Procura o mais recente.
     for (const d of datasCandidatas()) {
       const destino = join(tmp, `convenios-${d}.zip`);
-      console.log(`  procurando arquivo de ${d}…`);
-      const r = await baixar(
+      await new Promise((ok) => setTimeout(ok, 1500));
+      const r = await tentarData(
         [
-          `https://portaldatransparencia.gov.br/download-de-dados/convenios/${d}`,
           `https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/convenios/${d}_Convenios.zip`,
+          `https://portaldatransparencia.gov.br/download-de-dados/convenios/${d}`,
         ],
         destino,
       );
-      if (r) {
+      console.log(`  procurando arquivo de ${d}… ${"erro" in r ? `não encontrado (${r.status})` : "encontrado"}`);
+      if (!("erro" in r)) {
         caminhos = [destino];
         url = r.url;
         periodo = d;

@@ -70,7 +70,8 @@ for (const ano of anos) {
     ? em.linhas.map((l) => {
         const g = (d: string) => em.dicionarios[d][l[em.dimensoes.indexOf(d)]];
         const v = (m: string) => r2(l[em.dimensoes.length + em.medidas.indexOf(m)]);
-        return [g("emenda").cod, g("emenda").nome, di("autor", g("autor")), ufIdx(g("uf").cod), g("municipio").nome, di("funcao", g("funcao")), v("empenhado"), v("pago")];
+        const mu = g("municipio");
+        return [g("emenda").cod, g("emenda").nome, di("autor", g("autor")), ufIdx(g("uf").cod), mu.nome, di("funcao", g("funcao")), v("empenhado"), v("pago"), /^\d{7}$/.test(mu.cod) ? Number(mu.cod) : -1];
       })
     : [];
   for (const c of ["transferencias_municipios", "execucao_municipios"]) {
@@ -108,7 +109,12 @@ for (const u of UFS) {
   if (existsSync(p)) munTopo[u.cod] = JSON.parse(readFileSync(p, "utf8"));
 }
 
+// Convênios (projetos): resumo por município embutido; listas por UF ficam em arquivos separados.
+const dirConv = join(DIR, "convenios");
+const convResumo = existsSync(join(dirConv, "resumo.json")) ? JSON.parse(readFileSync(join(dirConv, "resumo.json"), "utf8")) : null;
+
 const dados = {
+  convResumo,
   modo: oficial ? "oficial" : "demonstracao",
   conjuntos: manifesto.conjuntos
     .sort((a, b) => b.ano - a.ano || a.conjunto.localeCompare(b.conjunto))
@@ -136,6 +142,10 @@ const modelo = readFileSync(join(OUT, "modelo.template.html"), "utf8");
 mkdirSync(OUT, { recursive: true });
 const json = JSON.stringify(dados).replace(/</g, "\\u003c");
 writeFileSync(join(OUT, "brasil-transparente-modelo.html"), modelo.replace("/*__DADOS__*/null", json));
+if (existsSync(dirConv)) {
+  mkdirSync(join(OUT, "dados", "convenios"), { recursive: true });
+  for (const f of readdirSync(dirConv)) writeFileSync(join(OUT, "dados", "convenios", f), readFileSync(join(dirConv, f)));
+}
 console.log(`Modelo gerado: prototipo/brasil-transparente-modelo.html (${(json.length / 1e6).toFixed(1)} MB de dados)`);
 
 // --site: gera também a página completa (com <head>) para publicar no GitHub Pages.
@@ -161,6 +171,10 @@ ${readFileSync(join(OUT, "brasil-transparente-modelo.html"), "utf8")}
 </html>
 `;
   writeFileSync(join(SITE, "index.html"), pagina);
+  if (existsSync(dirConv)) {
+    mkdirSync(join(SITE, "dados", "convenios"), { recursive: true });
+    for (const f of readdirSync(dirConv)) writeFileSync(join(SITE, "dados", "convenios", f), readFileSync(join(dirConv, f)));
+  }
   writeFileSync(join(SITE, ".nojekyll"), "");
   console.log("Site gerado: site/index.html");
 }
