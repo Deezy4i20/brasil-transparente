@@ -211,11 +211,11 @@ footer .wrap { padding-block: 18px; display: grid; gap: 4px; }
       <span aria-hidden="true" style="opacity:.5">–</span>
       <label for="sel-mf" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Mês final</label><select id="sel-mf"></select>
     </div>
-    <div class="status"><i></i> Modelo inicial · demonstração</div>
+    <div class="status" id="status"><i></i> Modelo inicial · demonstração</div>
   </div></div>
   <nav class="mods g" aria-label="Módulos"><ul class="wrap" id="nav"></ul></nav>
 </header>
-<div class="demo g" role="note"><div class="wrap"><b>Modelo inicial com dados de demonstração.</b> Todos os valores são <b>fictícios</b> e servem para avaliar a navegação e o visual. O software real lê os arquivos oficiais do Portal da Transparência e mostra a fonte de cada número.</div></div>
+<div class="demo g" role="note" id="faixa"><div class="wrap"><b>Modelo inicial com dados de demonstração.</b> Todos os valores são <b>fictícios</b> e servem para avaliar a navegação e o visual. O software real lê os arquivos oficiais do Portal da Transparência e mostra a fonte de cada número.</div></div>
 <main class="g"><div class="wrap" id="app" style="display:grid;gap:18px"></div></main>
 <footer class="g"><div class="wrap">
   <span>Fontes previstas: Portal da Transparência do Governo Federal (CGU) e IBGE. Projeto independente, sem vínculo com órgãos públicos.</span>
@@ -323,7 +323,11 @@ function barras(itens, fmt, onclick){
   const max = Math.max(...itens.map(i=>Math.abs(i.v)),1);
   return `<ol class="barras">${itens.map((it,n)=>`<li><div class="l1"><span class="nome"><span class="n num">${n+1}</span>${onclick?`<button class="lnk" data-acao="${esc(onclick(it))}">${esc(it.nome)}</button>`:`<span title="${esc(it.nome)}">${esc(it.nome)}</span>`}</span><span class="val num">${fmt(it.v)}</span></div>${it.sub?`<div class="sub">${esc(it.sub)}</div>`:""}<div class="trilho" aria-hidden="true"><div style="width:${Math.max(1,Math.abs(it.v)/max*100)}%"></div></div></li>`).join("")}</ol>`;
 }
-function fonte(txt, calc){ return `<details class="fonte"><summary><span class="u">Fonte e metodologia</span><span class="selo${calc?" calc":""}">${calc?"Calculado · demo":"Demonstração"}</span></summary><div>${txt}<span>Período: ${perTxt()} · Valores fictícios do modelo.</span></div></details>`; }
+const OFICIAL = D.modo === "oficial";
+function fonte(txt, calc){
+  const selo = OFICIAL ? (calc?"Calculado":"Dado oficial") : (calc?"Calculado · demo":"Demonstração");
+  const rod = OFICIAL ? `Fonte: Portal da Transparência (CGU), dados abertos. Processado em ${new Date(D.geradoEm).toLocaleString("pt-BR")}.` : "Valores fictícios do modelo.";
+  return `<details class="fonte"><summary><span class="u">Fonte e metodologia</span><span class="selo${calc||OFICIAL?" calc":""}">${selo}</span></summary><div>${txt}<span>Período: ${perTxt()} · ${rod}</span></div></details>`; }
 function perTxt(){ const m=mesesEf(E.ano); return m?(m[0]===1&&m[1]===12?String(E.ano):`${MESES[m[0]-1]}–${MESES[m[1]-1]}/${E.ano}`):String(E.ano); }
 function graficoBarras(dados, rot){
   const W=520,H=170,pl=44,pb=22,pt=8; const max=Math.max(...dados.map(d=>d.v||0),1);
@@ -528,11 +532,12 @@ function viewEmendas(){
 function viewGlossario(){ return `<div class="titulo-pag"><h1>Glossário</h1><p>Os termos da contabilidade pública em linguagem simples. O principal: empenhado, liquidado e pago são etapas do mesmo gasto e nunca devem ser somados.</p></div><dl class="gloss">${GLOSS.map(g=>`<div id="g-${g[0]}"><dt>${g[1]}</dt><dd>${g[2]}</dd></div>`).join("")}</dl>`; }
 
 function viewSobre(){
-  return `<div class="titulo-pag"><h1>Sobre este modelo</h1><p>Uma versão navegável do software Brasil Transparente, gerada a partir do mesmo motor de cálculo, para avaliar a experiência antes de carregar os dados oficiais.</p></div>
-  <section class="cartao" style="display:grid;gap:10px;max-width:900px"><h2 style="font-size:16.5px">O que é real e o que é demonstração</h2>
-  <ul style="margin:0;padding-left:18px;display:grid;gap:6px;color:var(--tinta-2)"><li><b>Fictícios:</b> todos os valores, nomes de programas e ações, favorecidos e autores de emendas (marcados com [DEMO]).</li><li><b>Reais:</b> limites de estados e municípios (malhas do IBGE), população do Censo 2022, nomes das funções de governo (classificação oficial), as regras de cálculo e de localização.</li><li><b>No software:</b> o ETL lê os arquivos oficiais (Orçamento da Despesa, Execução da Despesa, Recursos Transferidos, Emendas Parlamentares), registra a fonte, data e linhas descartadas de cada arquivo, e consulta a API do Portal ao vivo para contratos e convênios.</li></ul>
+  return `<div class="titulo-pag"><h1>Sobre este modelo</h1><p>${OFICIAL?"Versão navegável do Brasil Transparente com os dados oficiais do Portal da Transparência, processados pelo mesmo motor de cálculo do software.":"Uma versão navegável do software Brasil Transparente, gerada a partir do mesmo motor de cálculo, para avaliar a experiência antes de carregar os dados oficiais."}</p></div>
+  <section class="cartao" style="display:grid;gap:10px;max-width:900px">${OFICIAL?"":`<h2 style="font-size:16.5px">O que é real e o que é demonstração</h2>`}
+  ${OFICIAL?"":`<ul style="margin:0;padding-left:18px;display:grid;gap:6px;color:var(--tinta-2)"><li><b>Fictícios:</b> todos os valores, nomes de programas e ações, favorecidos e autores de emendas (marcados com [DEMO]).</li><li><b>Reais:</b> limites de estados e municípios (malhas do IBGE), população do Censo 2022, nomes das funções de governo (classificação oficial), as regras de cálculo e de localização.</li><li><b>No software:</b> o ETL lê os arquivos oficiais (Orçamento da Despesa, Execução da Despesa, Recursos Transferidos, Emendas Parlamentares), registra a fonte, data e linhas descartadas de cada arquivo, e consulta a API do Portal ao vivo para contratos e convênios.</li></ul>`}
   <h2 style="font-size:16.5px">Regras aplicadas</h2><ul style="margin:0;padding-left:18px;display:grid;gap:6px;color:var(--tinta-2)"><li>Orçamento, empenhado, liquidado e pago aparecem lado a lado, nunca somados.</li><li>Transferências, despesa localizada e emendas são três leituras territoriais separadas.</li><li>Nenhuma despesa vai para o estado da sede do órgão; sem estado confiável, fica como “localização não identificada”.</li><li>Quando um filtro não se aplica a uma fonte (o orçamento não é dividido por estado), o número mostra “não disponível”.</li><li>A variação compara exatamente os mesmos meses do ano anterior.</li></ul>
-  <p class="muted" style="margin:0">Gerado em ${new Date(D.geradoEm).toLocaleString("pt-BR")} a partir de data/demo.</p></section>`;
+  ${OFICIAL?`<h2 style="font-size:16.5px">Arquivos oficiais processados</h2><div class="tab-wrap"><table><thead><tr><th>Ano</th><th>Conjunto</th><th>Meses</th><th class="v">Linhas lidas</th><th class="v">Descartadas</th><th>Processado em</th></tr></thead><tbody>${D.conjuntos.map(c=>`<tr><td class="num">${c.ano}</td><td><a href="${esc(c.url)}" target="_blank" rel="noreferrer">${esc(c.nome)}</a></td><td class="num">${c.meses.length?c.meses[0]+"–"+c.meses[c.meses.length-1]:"anual"}</td><td class="v">${c.lidas.toLocaleString("pt-BR")}</td><td class="v">${c.descartadas.toLocaleString("pt-BR")}</td><td>${new Date(c.em).toLocaleString("pt-BR")}</td></tr>${c.avisos.map(a=>`<tr><td></td><td colspan="5" class="muted">${esc(a)}</td></tr>`).join("")}`).join("")}</tbody></table></div>`:""}
+  <p class="muted" style="margin:0">Gerado em ${new Date(D.geradoEm).toLocaleString("pt-BR")} a partir de ${OFICIAL?"data/agregados (dados oficiais)":"data/demo"}.</p></section>`;
 }
 
 /* ---------- busca global */
@@ -601,5 +606,10 @@ smi.onchange=()=>{E.mi=Number(smi.value); if(E.mi>E.mf){E.mf=E.mi;} sincPeriodo(
 smf.onchange=()=>{E.mf=Number(smf.value); if(E.mf<E.mi){E.mi=E.mf;} sincPeriodo(); render();};
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>render());
 new MutationObserver(()=>render()).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+if(OFICIAL){
+  document.getElementById("faixa").hidden = true;
+  document.getElementById("status").innerHTML = `<i style="background:#0ca30c"></i> Dados oficiais · atualizados em ${new Date(D.geradoEm).toLocaleDateString("pt-BR")}`;
+  document.querySelector(".titulo-sobre")?.remove();
+}
 render();
 </script>

@@ -101,6 +101,18 @@ for (const u of UFS) {
 
 const dados = {
   modo: oficial ? "oficial" : "demonstracao",
+  conjuntos: manifesto.conjuntos
+    .sort((a, b) => b.ano - a.ano || a.conjunto.localeCompare(b.conjunto))
+    .map((c) => ({
+      ano: c.ano,
+      nome: c.fonte.nome,
+      url: c.fonte.url,
+      meses: c.mesesDisponiveis,
+      lidas: c.arquivos.reduce((s, a) => s + a.linhasLidas, 0),
+      descartadas: c.arquivos.reduce((s, a) => s + a.linhasDescartadas, 0),
+      em: c.processadoEm,
+      avisos: c.avisos,
+    })),
   geradoEm: manifesto.geradoEm,
   anos,
   ufs: UFS,
