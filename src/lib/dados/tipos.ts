@@ -29,7 +29,8 @@ export type NomeConjunto =
   | "transferencias"
   | "transferencias_municipios"
   | "transferencias_favorecidos"
-  | "emendas";
+  | "emendas"
+  | "convenios";
 
 export interface Cubo {
   versao: 1;

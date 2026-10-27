@@ -14,7 +14,8 @@
     "malhas": "tsx scripts/geo/build-malhas.ts",
     "demo": "tsx scripts/gerar-demo.ts",
     "verificar:api": "tsx scripts/verificar-api.ts",
-    "modelo": "tsx scripts/exportar-modelo.ts"
+    "modelo": "tsx scripts/exportar-modelo.ts",
+    "etl:convenios": "tsx scripts/etl/convenios.ts"
   },
   "engines": {
     "node": ">=20"

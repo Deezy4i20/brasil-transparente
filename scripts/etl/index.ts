@@ -59,7 +59,7 @@ export function lerArgs(argv: string[]): Opcoes {
 const pausa = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const PAUSA_ENTRE_DOWNLOADS = Number(process.env.ETL_PAUSA_MS ?? 4000);
 
-async function baixar(urls: string[], destino: string): Promise<{ url: string; bytes: number } | null> {
+export async function baixar(urls: string[], destino: string): Promise<{ url: string; bytes: number } | null> {
   // O Portal recusa (405/429) quando recebe muitos downloads seguidos: espera e tenta de novo.
   for (let tentativa = 0; tentativa < 4; tentativa++) {
     if (tentativa > 0) {
@@ -290,7 +290,7 @@ function manifesto(
   };
 }
 
-async function atualizarManifesto(saida: string, novos: ManifestoConjunto[]): Promise<void> {
+export async function atualizarManifesto(saida: string, novos: ManifestoConjunto[]): Promise<void> {
   const arq = join(saida, "manifesto.json");
   let m: Manifesto = { geradoEm: new Date().toISOString(), modo: "oficial", conjuntos: [] };
   if (existsSync(arq)) m = JSON.parse(await readFile(arq, "utf8"));
