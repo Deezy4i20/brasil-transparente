@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-27T18:28:45.590Z",
+  "geradoEm": "2026-10-27T23:01:09.950Z",
   "modo": "oficial",
   "conjuntos": [
     {
@@ -677,6 +677,37 @@
         "Linhas sem UF identificável classificadas como \"Localização não identificada\": Sem informação (714), Múltiplo (66)."
       ],
       "linhasAgregadas": 6310
+    },
+    {
+      "conjunto": "convenios",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Convênios — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/convenios",
+        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603415-dicionario-de-dados-convenios"
+      },
+      "arquivos": [
+        {
+          "nome": "convenios-20261016.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/convenios/20261016_Convenios.zip",
+          "periodo": "20261016",
+          "baixadoEm": "2026-10-27T23:01:09.762Z",
+          "bytes": 67467278,
+          "linhasLidas": 623483,
+          "linhasDescartadas": 546658,
+          "motivosDescarte": {
+            "vigência terminou antes do período considerado": 546658
+          }
+        }
+      ],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-27T23:01:09.762Z",
+      "avisos": [
+        "Mantidos 76.825 convênios com fim de vigência a partir de 2025-01-01 (ou sem data de fim).",
+        "2.726 convênios sem município identificado na malha do IBGE (aparecem só na lista do estado)."
+      ],
+      "linhasAgregadas": 76825
     }
   ]
 }
