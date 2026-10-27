@@ -78,16 +78,25 @@ for (const ano of anos) {
     for (const it of cb?.dicionarios.municipio ?? []) if (!it.cod.startsWith("NI")) nomesMun[it.cod] = it.nome;
   }
   const fav = ler(ano, "transferencias_favorecidos");
+  const mc = (c: string) => manifesto.conjuntos.find((x) => x.ano === ano && x.conjunto === c);
+  const ok = (c: string) => Boolean(ler(ano, c) && (mc(c)?.arquivos.length ?? 0) > 0);
   porAno[ano] = {
-    meses: manifesto.conjuntos.find((c) => c.ano === ano && c.conjunto === "execucao")?.mesesDisponiveis ?? [],
+    disp: { orc: ok("orcamento"), exe: ok("execucao"), tra: ok("transferencias"), emendas: ok("emendas"), fav: ok("transferencias_favorecidos") || ok("transferencias") },
+    meses: mc("execucao")?.mesesDisponiveis ?? [],
+    mesesTra: mc("transferencias")?.mesesDisponiveis ?? [],
     orc: reagrupar(ler(ano, "orcamento"), ["orgaoSuperior", "funcao", "programa"], ["atualizado", "empenhado"]),
     exe: reagrupar(ler(ano, "execucao"), ["mes", "uf", "orgaoSuperior", "funcao", "programa"], ["empenhado", "liquidado", "pago"]),
     tra: reagrupar(ler(ano, "transferencias"), ["mes", "uf", "funcao", "tipo"], ["valor"]),
     traMun: reagrupar(ler(ano, "transferencias_municipios"), ["uf", "municipio", "funcao"], ["valor"]),
     exeMun: reagrupar(ler(ano, "execucao_municipios"), ["uf", "municipio", "funcao"], ["pago"]),
     emendas,
+    // Só os 40 maiores favorecidos por UF (a lista completa fica no software).
     favorecidos: fav
-      ? fav.linhas.map((l) => [ufIdx(fav.dicionarios.uf[l[0]].cod), fav.dicionarios.favorecido[l[1]].nome, fav.dicionarios.tipoFavorecido[l[2]].nome, r2(l[3])])
+      ? Object.values(
+          fav.linhas
+            .map((l) => [ufIdx(fav.dicionarios.uf[l[0]].cod), fav.dicionarios.favorecido[l[1]].nome, fav.dicionarios.tipoFavorecido[l[2]].nome, r2(l[3])] as [number, string, string, number])
+            .reduce<Record<number, [number, string, string, number][]>>((acc, r) => ((acc[r[0]] ??= []).push(r), acc), {}),
+        ).flatMap((lista) => lista.sort((x, y) => y[3] - x[3]).slice(0, 40))
       : [],
   };
 }

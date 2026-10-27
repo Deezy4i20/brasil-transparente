@@ -151,6 +151,8 @@ ol.barras button.lnk:hover { text-decoration: underline; }
 
 .metricas { display: grid; gap: 8px; }
 .metricas button { text-align: left; border: 1px solid var(--borda); background: var(--sup); border-radius: 7px; padding: 8px 12px; cursor: pointer; display: grid; gap: 2px; }
+.metricas button:disabled { cursor: default; opacity: .7; }
+.seg button:disabled { opacity: .45; cursor: not-allowed; }
 .metricas button[aria-pressed="true"] { border-color: var(--marinho); background: var(--marinho-claro); }
 .metricas .a { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--tinta-2); }
 .metricas .a b { font-size: 16px; color: var(--tinta); }
@@ -271,18 +273,22 @@ const ajuda = id => `<span class="ajuda" tabindex="0" role="note" aria-label="${
 const A = ano => D.porAno[ano];
 function ufsFiltro(){ if(E.uf) return [D.ufs.findIndex(u=>u.sigla===E.uf)]; if(E.regiao) return D.ufs.map((u,i)=>u.regiao===E.regiao?i:-2).filter(i=>i>=0); return null; }
 const fIdx = () => E.funcao==null ? null : D.dic.funcao.findIndex(f=>f.cod===E.funcao);
-function mesesEf(ano){ const m = A(ano)?.meses||[]; if(!m.length) return [E.mi,E.mf]; const a=Math.max(E.mi,Math.min(...m)), b=Math.min(E.mf,Math.max(...m)); return a<=b?[a,b]:null; }
+function disp(ano, c){ const d = A(ano)?.disp; return !d || d[c] !== false; }
+function cobre(ano, m, campo){ const ms = A(ano)?.[campo]||[]; if(!m) return false; for(let x=m[0];x<=m[1];x++) if(!ms.includes(x)) return false; return true; }
+function mesesEf(ano, campo="meses"){ const m = A(ano)?.[campo]||[]; if(!m.length) return [E.mi,E.mf]; const a=Math.max(E.mi,Math.min(...m)), b=Math.min(E.mf,Math.max(...m)); return a<=b?[a,b]:null; }
 function soma(rows, filtro, cols){ const t = cols.map(()=>0); for(const r of rows){ if(!filtro(r)) continue; cols.forEach((c,j)=>t[j]+=Math.round(r[c]*100)); } return t.map(x=>x/100); }
 function agrupa(rows, filtro, chave, col){ const m = new Map(); for(const r of rows){ if(!filtro(r)) continue; const k=chave(r); m.set(k,(m.get(k)||0)+Math.round(r[col]*100)); } return [...m].map(([k,v])=>({k,v:v/100})).sort((a,b)=>b.v-a.v); }
 
 // filtros por conjunto. exe: [mes,uf,orgao,funcao,programa,emp,liq,pago]; tra: [mes,uf,funcao,tipo,valor]; orc: [orgao,funcao,programa,atual,emp]; emendas: [cod,num,autor,uf,mun,funcao,emp,pago]
 function fExe(ano, ignorarUf, mm){ const m=mm||mesesEf(ano), u=ignorarUf?null:ufsFiltro(), f=fIdx(); return r => m && r[0]>=m[0] && r[0]<=m[1] && (!u||u.includes(r[1])) && (f==null||r[3]===f); }
-function fTra(ano, ignorarUf, mm){ const m=mm||mesesEf(ano), u=ignorarUf?null:ufsFiltro(), f=fIdx(); return r => m && r[0]>=m[0] && r[0]<=m[1] && (!u||u.includes(r[1])) && (f==null||r[2]===f); }
+function fTra(ano, ignorarUf, mm){ const m=mm||mesesEf(ano,"mesesTra"), u=ignorarUf?null:ufsFiltro(), f=fIdx(); return r => m && r[0]>=m[0] && r[0]<=m[1] && (!u||u.includes(r[1])) && (f==null||r[2]===f); }
 function fOrc(){ const f=fIdx(); return r => f==null||r[1]===f; }
 function fEme(ignorarUf){ const u=ignorarUf?null:ufsFiltro(), f=fIdx(); return r => (!u||u.includes(r[3])) && (f==null||r[5]===f); }
 
 function porUF(ano, metrica){
   const a = A(ano); if(!a) return null;
+  const conj = metrica==="transferencias"?"tra":metrica==="execucao"?"exe":"emendas";
+  if(!disp(ano, conj)) return { ufs: D.ufs.map((u,i)=>({ i, sigla:u.sigla, nome:u.nome, regiao:u.regiao, cod:u.cod, pop:u.populacao, valor:0, pc:0, pos:"—" })), ni:0, indisponivel:true };
   let g;
   if(metrica==="transferencias") g = agrupa(a.tra, fTra(ano,true), r=>r[1], 4);
   else if(metrica==="execucao") g = agrupa(a.exe, fExe(ano,true), r=>r[1], 7);
@@ -298,22 +304,29 @@ function indicadores(){
   const ano=E.ano, a=A(ano), ant=A(ano-1), terr = !!(E.uf||E.regiao), m = mesesEf(ano);
   const per = m ? (m[0]===1&&m[1]===12? String(ano) : `${MESES[m[0]-1]}–${MESES[m[1]-1]}/${ano}`) : `${ano} (sem dados)`;
   const out = [];
-  const varr = (x,y) => (m && y ? (x-y)/Math.abs(y) : null); // mesmos meses nos dois anos
+  // Variação só quando o ano anterior tem exatamente os mesmos meses carregados.
+  const varr = (x,y,campo="meses") => (m && y && ant && cobre(ano-1, campo==="mesesTra"?mesesEf(ano,"mesesTra"):m, campo) ? (x-y)/Math.abs(y) : null);
+  const naoCarregado = n => `Arquivo de ${n} ainda não carregado para ${ano}.`;
   const [atual, emp] = soma(a.orc, fOrc(), [3,4]);
-  const [atualA, empA] = ant ? soma(ant.orc, fOrc(), [3,4]) : [null,null];
-  const indisp = "O arquivo de orçamento não é dividido por estado; não há valor estadual equivalente.";
-  out.push({ t:"Orçamento atualizado", g:"orcamento", v: terr?null:atual, vr: terr?null:varr(atual,atualA), per:String(ano), exp:"Limite de gastos autorizado para o ano. Não é dinheiro gasto.", ind: terr?indisp:null, fonte:"Arquivo Orçamento da Despesa (anual). O filtro de meses não se aplica." });
-  out.push({ t:"Saldo disponível para empenho", g:"saldo", v: terr?null:atual-emp, vr:null, per:String(ano), exp:"Orçamento atualizado ainda não comprometido. Calculado pela plataforma.", ind: terr?indisp:null, calc:true, fonte:"Orçamento atualizado − empenhado, do mesmo arquivo. Sem variação: é uma fotografia da data de extração." });
+  const [atualA, empA] = ant && disp(ano-1,"orc") ? soma(ant.orc, fOrc(), [3,4]) : [null,null];
+  const indisp = !disp(ano,"orc") ? naoCarregado("orçamento") : "O arquivo de orçamento não é dividido por estado; não há valor estadual equivalente.";
+  const semOrc = terr || !disp(ano,"orc");
+  out.push({ t:"Orçamento atualizado", g:"orcamento", v: semOrc?null:atual, vr: semOrc||!atualA?null:(atual-atualA)/Math.abs(atualA), vrRot:`vs. orçamento de ${ano-1}`, per:String(ano), exp:"Limite de gastos autorizado para o ano. Não é dinheiro gasto.", ind: semOrc?indisp:null, fonte:"Arquivo Orçamento da Despesa (anual). O filtro de meses não se aplica." });
+  out.push({ t:"Saldo disponível para empenho", g:"saldo", v: semOrc?null:atual-emp, vr:null, per:String(ano), exp:"Orçamento atualizado ainda não comprometido. Calculado pela plataforma.", ind: semOrc?indisp:null, calc:true, fonte:"Orçamento atualizado − empenhado, do mesmo arquivo. Sem variação: é uma fotografia da data de extração." });
   const [e,l,p] = soma(a.exe, fExe(ano), [5,6,7]);
   const [eA,lA,pA] = ant ? soma(ant.exe, fExe(ano-1, false, m), [5,6,7]) : [null,null,null];
+  const semExe = !disp(ano,"exe") ? naoCarregado("execução da despesa") : null;
   const lim = terr ? " Com filtro de estado, só entram despesas com UF indicada no plano de trabalho." : "";
-  out.push({ t:"Empenhado", g:"empenho", v:e, vr:varr(e,eA), per, exp:"Valor comprometido: reservado para despesas específicas.", fonte:"Arquivos mensais de Execução da Despesa, coluna Valor Empenhado."+lim });
-  out.push({ t:"Liquidado", g:"liquidacao", v:l, vr:varr(l,lA), per, exp:"Despesas cuja entrega do bem ou serviço foi verificada.", fonte:"Execução da Despesa, coluna Valor Liquidado."+lim });
-  out.push({ t:"Pago", g:"pagamento", v:p, vr:varr(p,pA), per, exp:"Dinheiro que efetivamente saiu do caixa (sem restos a pagar de anos anteriores).", fonte:"Execução da Despesa, coluna Valor Pago."+lim });
-  const [t] = soma(a.tra, fTra(ano), [4]); const [tA] = ant ? soma(ant.tra, fTra(ano-1, false, m), [4]) : [null];
-  out.push({ t:"Recursos transferidos", g:"transferencia", v:t, vr:varr(t,tA), per, exp:"Repasses federais a estados, municípios, entidades e cidadãos. Também aparecem em “Pago”: não some.", fonte:"Arquivos mensais de Recursos Transferidos, coluna Valor Transferido." });
+  out.push({ t:"Empenhado", g:"empenho", ind:semExe, v:semExe?null:e, vr:varr(e,eA), per, exp:"Valor comprometido: reservado para despesas específicas.", fonte:"Arquivos mensais de Execução da Despesa, coluna Valor Empenhado."+lim });
+  out.push({ t:"Liquidado", g:"liquidacao", ind:semExe, v:semExe?null:l, vr:varr(l,lA), per, exp:"Despesas cuja entrega do bem ou serviço foi verificada.", fonte:"Execução da Despesa, coluna Valor Liquidado."+lim });
+  out.push({ t:"Pago", g:"pagamento", ind:semExe, v:semExe?null:p, vr:varr(p,pA), per, exp:"Dinheiro que efetivamente saiu do caixa (sem restos a pagar de anos anteriores).", fonte:"Execução da Despesa, coluna Valor Pago."+lim });
+  const mT = mesesEf(ano,"mesesTra"); const perT = mT ? (mT[0]===1&&mT[1]===12? String(ano) : `${MESES[mT[0]-1]}–${MESES[mT[1]-1]}/${ano}`) : String(ano);
+  const [t] = soma(a.tra, fTra(ano), [4]); const [tA] = ant ? soma(ant.tra, fTra(ano-1, false, mT), [4]) : [null];
+  const semTra = !disp(ano,"tra") ? naoCarregado("transferências") : null;
+  out.push({ t:"Recursos transferidos", g:"transferencia", ind:semTra, v:semTra?null:t, vr:varr(t,tA,"mesesTra"), per:perT, exp:"Repasses federais a estados, municípios, entidades e cidadãos. Também aparecem em “Pago”: não some.", fonte:"Arquivos mensais de Recursos Transferidos, coluna Valor Transferido." });
   out.push({ t:"Contratos ativos identificados", g:"contrato", v:null, ind:"Ainda não integrado em lote. Entra com o arquivo Contratos (compras); por enquanto, consulta por órgão na API." });
-  out.push({ t:"Registros analisados", v: a.exe.length + a.tra.length + a.emendas.length, int:true, vr:null, per:String(ano), exp:"Linhas agregadas usadas neste painel no ano.", calc:true, fonte:"Contagem de linhas dos conjuntos carregados." });
+  const lidas = (D.conjuntos||[]).filter(c=>c.ano===ano).reduce((s,c)=>s+c.lidas,0);
+  out.push({ t:"Registros analisados", v: OFICIAL ? lidas : a.exe.length + a.tra.length + a.emendas.length, int:true, vr:null, per:String(ano), exp: OFICIAL ? "Linhas dos arquivos oficiais lidas para montar este painel no ano." : "Linhas agregadas usadas neste painel no ano.", calc:true, fonte: OFICIAL ? "Soma das linhas lidas nos arquivos oficiais processados (veja “Sobre”)." : "Contagem de linhas dos conjuntos carregados." });
   return out;
 }
 
@@ -349,7 +362,8 @@ let zoomB = null, svgSel = null, transformAtual = d3.zoomIdentity;
 
 function desenharMapa(){
   const cont = document.getElementById("mapa"); if(!cont) return;
-  const t = porUF(E.ano, E.metrica); const ch = E.modo==="per_capita"?"pc":"valor";
+  const t = porUF(E.ano, E.metrica);
+  if(t.indisponivel){ cont.innerHTML = `<div class="vazio">${esc(METRICAS[E.metrica].rot)}: arquivo ainda não carregado para ${E.ano}. Escolha outra leitura do mapa ou outro ano.</div>`; document.getElementById("legenda").innerHTML=""; document.getElementById("nota-ni").innerHTML=""; return; } const ch = E.modo==="per_capita"?"pc":"valor";
   const q = quebras(t.ufs.map(u=>u[ch])); const porCod = new Map(t.ufs.map(u=>[u.cod,u]));
   const fmt = v => E.modo==="per_capita" ? `${cheio(v)}/hab.` : comp(v);
   const sel = E.uf ? D.ufs.find(u=>u.sigla===E.uf) : null;
@@ -405,7 +419,7 @@ function selecionarUF(s){ E.uf = E.uf===s ? null : s; E.regiao=null; E.munis = f
 /* ---------- painel do estado */
 function painelEstado(){
   const u = D.ufs.find(x=>x.sigla===E.uf); const ui = D.ufs.indexOf(u); const a=A(E.ano); const f=fIdx();
-  const mets = Object.keys(METRICAS).map(k=>{ const t=porUF(E.ano,k); const x=t.ufs[ui]; const tot=t.ufs.reduce((s,y)=>s+y.valor,0); return {k, x, pcBR: tot/POP_BR}; });
+  const mets = Object.keys(METRICAS).map(k=>{ const t=porUF(E.ano,k); const x=t.ufs[ui]; const tot=t.ufs.reduce((s,y)=>s+y.valor,0); return {k, x, pcBR: tot/POP_BR, ind: !!t.indisponivel}; });
   const fe = r => fExe(E.ano)(r), ft = r => fTra(E.ano)(r);
   const nomeF = i => D.dic.funcao[i]?.nome, nomeO = i => D.dic.orgao[i]?.nome, nomeP = i => D.dic.programa[i]?.nome;
   let areas, progs, mensal = null;
@@ -419,7 +433,7 @@ function painelEstado(){
   const anual = D.anos.map(ano=>{ const t=porUF(ano,E.metrica); return {r:String(ano), v:t?t.ufs[ui].valor:null}; });
   return `<div class="painel-uf">
     <div style="display:flex;justify-content:space-between;gap:8px"><div><div class="rotulo">${u.regiao}</div><h2 style="font-size:22px">${esc(u.nome)}</h2><div class="muted">População: ${u.populacao.toLocaleString("pt-BR")} (Censo 2022)</div></div><button class="botao fechar" aria-label="Fechar painel do estado" data-acao="fechar">✕</button></div>
-    <div><div class="rotulo" style="margin-bottom:8px">Recursos federais identificados</div><div class="metricas">${mets.map(m=>`<button aria-pressed="${m.k===E.metrica}" data-metrica="${m.k}"><span class="a"><span>${METRICAS[m.k].rot}</span><b class="num">${comp(m.x.valor)}</b></span><span class="b num"><span>${cheio(m.x.pc)}/hab. · Brasil ${cheio(m.pcBR)}/hab.</span><span>${m.x.pos}º de 27</span></span></button>`).join("")}</div><p class="muted" style="margin:6px 0 0">As três linhas usam fontes e critérios de localização diferentes e se sobrepõem: não as some.</p></div>
+    <div><div class="rotulo" style="margin-bottom:8px">Recursos federais identificados</div><div class="metricas">${mets.map(m=>`<button aria-pressed="${m.k===E.metrica}" data-metrica="${m.k}" ${m.ind?"disabled":""}><span class="a"><span>${METRICAS[m.k].rot}</span><b class="num">${m.ind?"não disponível":comp(m.x.valor)}</b></span>${m.ind?`<span class="b">Arquivo ainda não carregado para ${E.ano}.</span>`:`<span class="b num"><span>${cheio(m.x.pc)}/hab. · Brasil ${cheio(m.pcBR)}/hab.</span><span>${m.x.pos}º de 27</span></span>`}</button>`).join("")}</div><p class="muted" style="margin:6px 0 0">As três linhas usam fontes e critérios de localização diferentes e se sobrepõem: não as some.</p></div>
     <div class="bloco"><div class="rotulo">Principais áreas · ${METRICAS[E.metrica].curto.toLowerCase()} ${ajuda("funcao")}</div>${barras(areas.slice(0,6).map(x=>({nome:nomeF(x.k),v:x.v,cod:D.dic.funcao[x.k].cod})), comp, it=>`funcao:${it.cod}`)}</div>
     <div class="bloco"><div class="rotulo">Órgãos com despesa localizada no estado</div>${barras(orgaos.slice(0,6).map(x=>({nome:nomeO(x.k),v:x.v})), comp)}<p class="muted" style="margin:0">Valor pago de despesas cujo plano de trabalho indica este estado, não a sede do órgão.</p></div>
     <div class="bloco"><div class="rotulo">Transferências recebidas, por tipo ${ajuda("transferencia")}</div>${barras(tipos.map(x=>({nome:D.dic.tipo[x.k].nome,v:x.v})), comp)}</div>
@@ -454,10 +468,10 @@ function viewPainel(){
   const k = indicadores();
   return `<div class="titulo-pag"><h1>Painel dos gastos federais · ${perTxt()}</h1><p>Quanto o governo federal pode gastar, quanto comprometeu e quanto pagou, e para onde foi o dinheiro.</p></div>
   ${filtrosHTML()}
-  <section class="kpis" aria-label="Indicadores principais">${k.map(i=>`<article class="cartao kpi"><h3 class="rotulo">${i.t} ${i.g?ajuda(i.g):""}</h3><div class="v num" title="${i.v!=null&&!i.int?cheio(i.v):""}">${i.v==null?"—":i.int?i.v.toLocaleString("pt-BR"):comp(i.v)}</div>${i.ind?`<p class="ind">${i.ind}</p>`:`<div class="var num">${i.vr==null?"sem base comparável":`${i.vr>=0?"↗ +":"↘ −"}${pct(Math.abs(i.vr))} <span class="muted">vs. mesmo período do ano anterior</span>`}</div><p>${i.exp}</p><p class="muted">Período: ${i.per}</p>${fonte(i.fonte,i.calc)}`}</article>`).join("")}</section>
+  <section class="kpis" aria-label="Indicadores principais">${k.map(i=>`<article class="cartao kpi"><h3 class="rotulo">${i.t} ${i.g?ajuda(i.g):""}</h3><div class="v num" title="${i.v!=null&&!i.int?cheio(i.v):""}">${i.v==null?"—":i.int?i.v.toLocaleString("pt-BR"):comp(i.v)}</div>${i.ind?`<p class="ind">${i.ind}</p>`:`<div class="var num">${i.vr==null?(i.int?"":"sem base comparável com o ano anterior"):`${i.vr>=0?"↗ +":"↘ −"}${pct(Math.abs(i.vr))} <span class="muted">${i.vrRot||"vs. mesmo período do ano anterior"}</span>`}</div><p>${i.exp}</p><p class="muted">Período: ${i.per}</p>${fonte(i.fonte,i.calc)}`}</article>`).join("")}</section>
   <section class="grade-mapa">
     <div class="cartao"><div class="sec-tit"><div><h2>Para onde vai o dinheiro · ${METRICAS[E.metrica].rot.toLowerCase()}</h2><p>${METRICAS[E.metrica].desc}</p></div></div>
-      <div class="ctrl"><div class="seg" role="radiogroup" aria-label="O que o mapa mostra">${Object.keys(METRICAS).map(m=>`<button role="radio" aria-checked="${E.metrica===m}" data-metrica="${m}">${METRICAS[m].curto}</button>`).join("")}</div><div class="seg" role="radiogroup" aria-label="Escala"><button role="radio" aria-checked="${E.modo==="absoluto"}" data-modo="absoluto">Total</button><button role="radio" aria-checked="${E.modo==="per_capita"}" data-modo="per_capita">Por habitante</button></div><button class="botao" data-acao="tabela" aria-pressed="${E.tabela}">${E.tabela?"Ver mapa":"Ver como tabela"}</button>${E.uf&&!E.tabela?`<button class="botao" data-acao="munis" aria-pressed="${E.munis}">${E.munis?"Ver estados":"Ver municípios de "+E.uf}</button>`:""}</div>
+      <div class="ctrl"><div class="seg" role="radiogroup" aria-label="O que o mapa mostra">${Object.keys(METRICAS).map(m=>{ const c=m==="transferencias"?"tra":m==="execucao"?"exe":"emendas"; const ok=disp(E.ano,c); return `<button role="radio" aria-checked="${E.metrica===m}" data-metrica="${m}" ${ok?"":`disabled title="Ainda não carregado para ${E.ano}"`}>${METRICAS[m].curto}</button>`; }).join("")}</div><div class="seg" role="radiogroup" aria-label="Escala"><button role="radio" aria-checked="${E.modo==="absoluto"}" data-modo="absoluto">Total</button><button role="radio" aria-checked="${E.modo==="per_capita"}" data-modo="per_capita">Por habitante</button></div><button class="botao" data-acao="tabela" aria-pressed="${E.tabela}">${E.tabela?"Ver mapa":"Ver como tabela"}</button>${E.uf&&!E.tabela?`<button class="botao" data-acao="munis" aria-pressed="${E.munis}">${E.munis?"Ver estados":"Ver municípios de "+E.uf}</button>`:""}</div>
       <div class="legenda" id="legenda"></div><div id="mapa"></div><p class="muted" id="nota-ni" style="margin:8px 0 0"></p>${fonte(METRICAS[E.metrica].desc + (E.modo==="per_capita"?" Por habitante: população do Censo 2022 (IBGE).":""), E.modo==="per_capita")}
     </div>
     <aside class="cartao" id="lateral" aria-label="${E.uf?"Painel do estado":"Resumo nacional"}">${E.uf?painelEstado():resumoNacional()}</aside>
@@ -479,8 +493,8 @@ function rankings(){
     ${c("Órgãos que mais pagaram","",barras(org,comp),"orgaos")}
     ${c("Áreas com maior volume pago","funcao",barras(are,comp,it=>`funcao:${it.cod}`),"areas")}
     ${c("Programas com maior orçamento","programa",terr?`<p class="muted">Orçamento não é dividido por estado: ranking indisponível neste recorte.</p>`:barras(prg,comp))}
-    ${c("Favorecidos de transferências","",barras(fav,comp))}
-    ${c("Emendas com maior valor pago","emenda",barras(em,comp),"emendas")}
+    ${c("Favorecidos de transferências","",disp(E.ano,"tra")?barras(fav,comp)+`<p class="muted" style="margin:8px 0 0">Pessoas físicas não são listadas. Receber recursos públicos não indica irregularidade.</p>`:`<p class="muted">Transferências ainda não carregadas para ${E.ano}.</p>`)}
+    ${c("Emendas com maior valor pago","emenda",disp(E.ano,"emendas")?barras(em,comp):`<p class="muted">Emendas ainda não carregadas para ${E.ano}.</p>`,"emendas")}
     ${c("Contratos com maiores valores","contrato",`<div class="vazio"><b>Ainda não integrado em lote.</b> Depende do arquivo Contratos dos dados abertos, na próxima etapa. No software, já é possível consultar contratos por órgão na API, com alertas que mostram a regra que os gerou.</div>`)}
   </div></section>`;
 }
@@ -523,6 +537,7 @@ function viewAreas(){
 
 function viewEmendas(){
   const a=A(E.ano);
+  if(!disp(E.ano,"emendas")) return `<div class="titulo-pag"><h1>Emendas parlamentares · ${E.ano}</h1></div><div class="vazio">O arquivo de emendas parlamentares ainda não foi carregado para ${E.ano}. Escolha outro ano no topo.</div>`;
   const ls = a.emendas.filter(fEme()).map(r=>({num:r[1],cod:r[0],autor:D.dic.autor[r[2]].nome,dest:`${r[4]}${D.ufs[r[3]]?` (${D.ufs[r[3]].sigla})`:""}`,area:D.dic.funcao[r[5]].nome,emp:r[6],pago:r[7]}));
   const s = ls.reduce((x,l)=>[x[0]+l.emp,x[1]+l.pago],[0,0]);
   return `<div class="titulo-pag"><h1>Emendas parlamentares · ${E.ano}</h1><p>Autoria, indicação de destino, execução (empenho, liquidação, pagamento) e recebimento são etapas distintas, com responsáveis diferentes.</p></div>${filtrosHTML()}
@@ -554,7 +569,9 @@ function buscar(q){
 }
 
 /* ---------- render e eventos */
+function ajustarMetrica(){ const c = E.metrica==="transferencias"?"tra":E.metrica==="execucao"?"exe":"emendas"; if(!disp(E.ano,c)) E.metrica = disp(E.ano,"tra")?"transferencias":disp(E.ano,"exe")?"execucao":"emendas"; }
 function render(){
+  ajustarMetrica();
   document.getElementById("nav").innerHTML = [["painel","Painel"],["orgaos","Quem gasta"],["areas","Com o que se gasta"],["emendas","Emendas"],["glossario","Glossário"],["sobre","Sobre o modelo"]].map(([v,t])=>`<li><a href="#${v}" ${E.view===v?'aria-current="page"':""}>${t}</a></li>`).join("");
   const app=document.getElementById("app");
   app.innerHTML = {painel:viewPainel,orgaos:viewOrgaos,areas:viewAreas,emendas:viewEmendas,glossario:viewGlossario,sobre:viewSobre}[E.view]();
