@@ -137,3 +137,30 @@ mkdirSync(OUT, { recursive: true });
 const json = JSON.stringify(dados).replace(/</g, "\\u003c");
 writeFileSync(join(OUT, "brasil-transparente-modelo.html"), modelo.replace("/*__DADOS__*/null", json));
 console.log(`Modelo gerado: prototipo/brasil-transparente-modelo.html (${(json.length / 1e6).toFixed(1)} MB de dados)`);
+
+// --site: gera também a página completa (com <head>) para publicar no GitHub Pages.
+if (process.argv.includes("--site")) {
+  const SITE = join(process.cwd(), "site");
+  mkdirSync(SITE, { recursive: true });
+  const descricao = "Gastos públicos federais do Brasil com dados oficiais do Portal da Transparência: orçamento, execução, transferências e emendas por estado e município.";
+  const pagina = `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="${descricao}">
+<meta property="og:title" content="Brasil Transparente">
+<meta property="og:description" content="${descricao}">
+<meta name="theme-color" content="#0b1220">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230b1220'/%3E%3Cpath d='M4 20h16M7 17v-6M10.5 17v-6M14 17v-6M17 17v-6M12 4l7 4H5z' stroke='white' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+${readFileSync(join(OUT, "brasil-transparente-modelo.html"), "utf8")}
+</body>
+</html>
+`;
+  writeFileSync(join(SITE, "index.html"), pagina);
+  writeFileSync(join(SITE, ".nojekyll"), "");
+  console.log("Site gerado: site/index.html");
+}
