@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-27T17:52:48.436Z",
+  "geradoEm": "2026-10-27T17:56:54.242Z",
   "modo": "oficial",
   "conjuntos": [
     {
@@ -157,40 +157,6 @@
         "220 linhas com nome de município sem correspondência na malha do IBGE."
       ],
       "linhasAgregadas": 77761
-    },
-    {
-      "conjunto": "transferencias",
-      "ano": 2026,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Recursos Transferidos — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/transferencias",
-        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603420-dicionario-de-dados-recursos-transferidos"
-      },
-      "arquivos": [],
-      "mesesDisponiveis": [],
-      "processadoEm": "2026-10-27T17:52:00.931Z",
-      "avisos": [
-        "Falha no processamento: [transferencias] Nenhum CSV com a estrutura esperada em transferencias-202601.zip."
-      ],
-      "linhasAgregadas": 0
-    },
-    {
-      "conjunto": "emendas",
-      "ano": 2026,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Emendas Parlamentares — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
-        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
-      },
-      "arquivos": [],
-      "mesesDisponiveis": [],
-      "processadoEm": "2026-10-27T17:52:14.415Z",
-      "avisos": [
-        "Falha no processamento: [emendas] Nenhum CSV com a estrutura esperada em emendas-UNICO.zip."
-      ],
-      "linhasAgregadas": 0
     },
     {
       "conjunto": "orcamento",
@@ -357,6 +323,40 @@
       "avisos": [
         "Período UNICO indisponível para download.",
         "Nenhum arquivo processado."
+      ],
+      "linhasAgregadas": 0
+    },
+    {
+      "conjunto": "transferencias",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Recursos Transferidos — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/transferencias",
+        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603420-dicionario-de-dados-recursos-transferidos"
+      },
+      "arquivos": [],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-27T17:56:35.488Z",
+      "avisos": [
+        "Falha no processamento: [transferencias] Nenhum CSV com a estrutura esperada em transferencias-202601.zip.\nColunas esperadas (normalizadas): anoMes (anomes), tipo (tipotransferencia), tipoFav (tipofavorecido), uf (uf), codMunSiafi (codigomunicipiosiafi), nomeMun (nomemunicipio), codOrgao (codigoorgaosiafi), nomeOrgao (nomeorgao), codFuncao (codigofuncao), nomeFuncao (nomefuncao), codPrograma (codigoprograma), nomePrograma (nomeprograma), codAcao (codigoacao), nomeAcao (nomeacao), codFav (codigofavorecido), nomeFav (nomefavorecido), valor (valortransferido)\nColunas encontradas: 202601_Transferencias.csv: anomes, tipotransferencia, tipofavorecido, uf, codigomunicipiosiafi, nomemunicipio, codigoorgaosiafi, nomeorgao, codigounidadegestora, nomeunidadegestora, codigofuncao, nomefuncao, codigosubfuncao, nomesubfuncao, codigoprograma, nomeprograma, acao, nomeacao, linguagemcidada, codigogrupodespesa, nomegrupodespesa, codigomodalidadeaplicacaodespesa, nomemodalidadeaplicacaodespesa, codigoelementodespesa, nomeelementodespesa, codigoplanoorcamentario, nomeplanoorcamentario, codigosubtitulo, nomesubtitulo, codigolocalizador, nomelocalizador, siglalocalizador, descricaocomplementarlocalizador, codigofavorecido, nomefavorecido, valortransferido"
+      ],
+      "linhasAgregadas": 0
+    },
+    {
+      "conjunto": "emendas",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Emendas Parlamentares — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
+        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
+      },
+      "arquivos": [],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-27T17:56:54.163Z",
+      "avisos": [
+        "Falha no processamento: [emendas] Nenhum CSV com a estrutura esperada em emendas-UNICO.zip.\nColunas esperadas (normalizadas): codigo (codigodaemenda), ano (anodaemenda), tipo (tipodaemenda), codAutor (codigodoautordaemenda), nomeAutor (nomedoautordaemenda), numero (numerodaemenda), localidade (localidadedogasto), codMun (codigomunicipioibge), nomeMun (municipio), uf (uf), codFuncao (codigofuncao), nomeFuncao (nomefuncao), codPrograma (codigoprograma), nomePrograma (nomeprograma), codAcao (codigoacao), nomeAcao (nomeacao), empenhado (valorempenhado), liquidado (valorliquidado), pago (valorpago), rapInscrito (valorrestosapagarinscritos), rapCancelado (valorrestosapagarcancelados), rapPago (valorrestosapagarpagos)\nColunas encontradas: EmendasParlamentares.csv: codigodaemenda, anodaemenda, tipodeemenda, codigodoautordaemenda, nomedoautordaemenda, numerodaemenda, localidadedeaplicacaodorecurso, codigomunicipioibge, municipio, codigoufibge, uf, regiao, codigofuncao, nomefuncao, codigosubfuncao, nomesubfuncao, codigoprograma, nomeprograma, codigoacao, nomeacao, codigoplanoorcamentario, nomeplanoorcamentario, valorempenhado, valorliquidado, valorpago, valorrestosapagarinscritos, valorrestosapagarcancelados, valorrestosapagarpagos | EmendasParlamentares_Convenios.csv: codigodaemenda, codigofuncao, nomefuncao, codigosubfuncao, nomesubfuncao, localidadedogasto, tipodeemenda, datapublicacaoconvenio, convenente, objetoconvenio, numeroconvenio, valorconvenio | EmendasParlamentares_PorFavorecido.csv: codigodaemenda, codigodoautordaemenda, nomedoautordaemenda, numerodaemenda, tipodeemenda, anomes, codigodofavorecido, favorecido, naturezajuridica, tipofavorecido, uffavorecido, municipiofavorecido, valorrecebido"
       ],
       "linhasAgregadas": 0
     }
