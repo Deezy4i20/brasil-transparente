@@ -88,7 +88,7 @@ const COLS: Record<string, string[]> = {
   liberado: ["valorliberado"],
   contrapartida: ["valorcontrapartida"],
   inicio: ["datainiciovigencia"],
-  fim: ["datafimvigencia"],
+  fim: ["datafimvigencia", "datafinalvigencia"], // o arquivo real usa "DATA FINAL VIGÊNCIA"
   ultima: ["dataultimaliberacao"],
   publicacao: ["datapublicacao"],
 };
