@@ -226,7 +226,7 @@ export class ProcessadorTransferencias extends Processador {
     nomeFuncao: ["nomefuncao"],
     codPrograma: ["codigoprograma"],
     nomePrograma: ["nomeprograma"],
-    codAcao: ["codigoacao"],
+    codAcao: ["codigoacao", "acao"], // o arquivo real usa "AÇÃO" para o código
     nomeAcao: ["nomeacao"],
     codFav: ["codigofavorecido"],
     nomeFav: ["nomefavorecido"],
@@ -292,7 +292,7 @@ export class ProcessadorEmendas extends Processador {
     codAutor: ["codigodoautordaemenda"],
     nomeAutor: ["nomedoautordaemenda"],
     numero: ["numerodaemenda"],
-    localidade: ["localidadedogasto"],
+    localidade: ["localidadedogasto", "localidadedeaplicacaodorecurso"],
     codMun: ["codigomunicipioibge"],
     nomeMun: ["municipio"],
     uf: ["uf"],

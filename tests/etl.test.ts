@@ -171,3 +171,14 @@ describe("ETL — erros de estrutura", () => {
     ).rejects.toThrow(/Colunas encontradas: .*colunaa, colunab/);
   });
 });
+
+describe("ETL — cabeçalhos reais publicados pelo Portal (out/2026)", () => {
+  it("reconhece as variações de nome encontradas nos arquivos reais", async () => {
+    const { criarProcessador } = await import("../scripts/etl/processadores");
+    const idx = { porNome: new Map(), porCodigo: new Map() };
+    const tra = "anomes, tipotransferencia, tipofavorecido, uf, codigomunicipiosiafi, nomemunicipio, codigoorgaosiafi, nomeorgao, codigounidadegestora, nomeunidadegestora, codigofuncao, nomefuncao, codigosubfuncao, nomesubfuncao, codigoprograma, nomeprograma, acao, nomeacao, linguagemcidada, codigogrupodespesa, nomegrupodespesa, codigomodalidadeaplicacaodespesa, nomemodalidadeaplicacaodespesa, codigoelementodespesa, nomeelementodespesa, codigoplanoorcamentario, nomeplanoorcamentario, codigosubtitulo, nomesubtitulo, codigolocalizador, nomelocalizador, siglalocalizador, descricaocomplementarlocalizador, codigofavorecido, nomefavorecido, valortransferido".split(", ");
+    const eme = "codigodaemenda, anodaemenda, tipodeemenda, codigodoautordaemenda, nomedoautordaemenda, numerodaemenda, localidadedeaplicacaodorecurso, codigomunicipioibge, municipio, codigoufibge, uf, regiao, codigofuncao, nomefuncao, codigosubfuncao, nomesubfuncao, codigoprograma, nomeprograma, codigoacao, nomeacao, codigoplanoorcamentario, nomeplanoorcamentario, valorempenhado, valorliquidado, valorpago, valorrestosapagarinscritos, valorrestosapagarcancelados, valorrestosapagarpagos".split(", ");
+    expect(criarProcessador("transferencias", 2026, idx).reconhece(tra)).toBe(true);
+    expect(criarProcessador("emendas", 2026, idx).reconhece(eme)).toBe(true);
+  });
+});
