@@ -1,0 +1,33 @@
+{
+  "geradoEm": "2026-10-27T16:20:53.181Z",
+  "origens": {
+    "ufs": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/fititnt/gis-dataset-brasil/master/uf/geojson/uf.json)",
+    "municipios_RO": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-11-mun.json)",
+    "municipios_AC": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-12-mun.json)",
+    "municipios_AM": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-13-mun.json)",
+    "municipios_RR": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-14-mun.json)",
+    "municipios_PA": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-15-mun.json)",
+    "municipios_AP": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-16-mun.json)",
+    "municipios_TO": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-17-mun.json)",
+    "municipios_MA": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-21-mun.json)",
+    "municipios_PI": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-22-mun.json)",
+    "municipios_CE": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-23-mun.json)",
+    "municipios_RN": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-24-mun.json)",
+    "municipios_PB": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-25-mun.json)",
+    "municipios_PE": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-26-mun.json)",
+    "municipios_AL": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-27-mun.json)",
+    "municipios_SE": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-28-mun.json)",
+    "municipios_BA": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-29-mun.json)",
+    "municipios_MG": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-31-mun.json)",
+    "municipios_ES": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-32-mun.json)",
+    "municipios_RJ": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-33-mun.json)",
+    "municipios_SP": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-35-mun.json)",
+    "municipios_PR": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-41-mun.json)",
+    "municipios_SC": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-42-mun.json)",
+    "municipios_RS": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-43-mun.json)",
+    "municipios_MS": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-50-mun.json)",
+    "municipios_MT": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-51-mun.json)",
+    "municipios_GO": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-52-mun.json)",
+    "municipios_DF": "Espelho derivado das malhas do IBGE (https://raw.githubusercontent.com/tbrugz/geodata-br/master/geojson/geojs-53-mun.json)"
+  }
+}

@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --plano: #f4f6f9;
+  --superficie: #ffffff;
+  --borda: #e2e7ee;
+  --tinta: #0b1220;
+  --tinta-2: #46505f;
+  --tinta-3: #6b7482;
+  --marinho: #0b2a5b;
+  --marinho-2: #12397a;
+  --marinho-claro: #e8eef8;
+  --bom: #006300;
+  --alerta: #b07a00;
+  --serio: #b8501f;
+  --critico: #d03b3b;
+  --foco: #2a78d6;
+}
+
+html {
+  background: var(--plano);
+  color: var(--tinta);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  background: var(--plano);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  .cartao {
+    @apply rounded-cartao border border-borda bg-superficie;
+  }
+  .rotulo {
+    @apply text-[12px] font-semibold uppercase tracking-[0.06em] text-tinta-3;
+  }
+  .botao {
+    @apply inline-flex items-center gap-1.5 rounded-md border border-borda bg-superficie px-3 py-1.5 text-sm font-medium text-tinta hover:bg-plano disabled:opacity-50;
+  }
+  .botao-primario {
+    @apply inline-flex items-center gap-1.5 rounded-md bg-marinho px-3 py-1.5 text-sm font-medium text-white hover:bg-marinho-2;
+  }
+  .campo {
+    @apply w-full rounded-md border border-borda bg-superficie px-2.5 py-1.5 text-sm text-tinta;
+  }
+  .link {
+    @apply text-marinho-2 underline decoration-marinho-2/30 underline-offset-2 hover:decoration-marinho-2;
+  }
+  .tabela {
+    @apply w-full border-collapse text-sm;
+  }
+  .tabela th {
+    @apply border-b border-borda px-3 py-2 text-left text-[12px] font-semibold uppercase tracking-[0.04em] text-tinta-3;
+  }
+  .tabela td {
+    @apply border-b border-borda/70 px-3 py-2 align-top;
+  }
+  .tabela td.valor,
+  .tabela th.valor {
+    @apply text-right;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
