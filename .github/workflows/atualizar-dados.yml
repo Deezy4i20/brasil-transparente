@@ -52,16 +52,26 @@ jobs:
           ATUAL=$(TZ=America/Sao_Paulo date +%Y)
           ANOS="${ANOS//ATUAL/$ATUAL}"
           ANOS="${ANOS//ANTERIOR/$((ATUAL-1))}"
+          FALHOU=0
           for ANO in $ANOS; do
             echo "::group::Ano $ANO"
-            npm run etl -- --ano "$ANO"
+            set +e
+            npm run etl -- --ano "$ANO" 2>&1 | tee -a etl.log
+            ST=${PIPESTATUS[0]}
+            set -e
+            [ "$ST" = "0" ] || FALHOU=1
             echo "::endgroup::"
           done
+          # Publica o final do log como anotação (legível pela API do GitHub)
+          RESUMO=$(grep -E "▶|baixando|falhou|✓|✗|ignorado|lendo|Erro|Colunas|indisponível|[0-9]{3} https" etl.log | tail -70 | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')
+          if [ "$FALHOU" = "1" ]; then echo "::error title=ETL::$RESUMO"; else echo "::notice title=ETL::$RESUMO"; fi
+          echo "FALHOU=$FALHOU" >> "$GITHUB_ENV"
 
       - name: Resumo
+        if: always()
         run: |
           node -e '
-            const m = require("./data/agregados/manifesto.json");
+            let m; try { m = require("./data/agregados/manifesto.json"); } catch { console.log("Sem manifesto."); process.exit(0); }
             const linhas = m.conjuntos.map(c => `| ${c.ano} | ${c.conjunto} | ${c.mesesDisponiveis.join(",") || "anual"} | ${c.arquivos.reduce((s,a)=>s+a.linhasLidas,0)} | ${c.avisos.length} |`);
             require("fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, "| Ano | Conjunto | Meses | Linhas lidas | Avisos |\n|---|---|---|---|---|\n" + linhas.join("\n") + "\n");
           '
@@ -77,3 +87,9 @@ jobs:
             git commit -m "Dados oficiais atualizados em $(TZ=America/Sao_Paulo date '+%d/%m/%Y %H:%M')"
             git push
           fi
+
+      - name: Sinalizar falha parcial
+        if: env.FALHOU == '1'
+        run: |
+          echo "Alguns conjuntos falharam; os que funcionaram foram publicados. Veja a anotação ETL."
+          exit 1

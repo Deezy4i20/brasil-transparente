@@ -113,7 +113,20 @@ export async function executarETL(o: Opcoes): Promise<ManifestoConjunto[]> {
   mkdirSync(tmp, { recursive: true });
   const resultados: ManifestoConjunto[] = [];
 
+  const falhas: string[] = [];
   for (const c of o.conjuntos) {
+    try {
+      resultados.push(...(await processarConjunto(c)));
+    } catch (e) {
+      const msg = `[${c}] ${(e as Error).message}`;
+      console.error(`  ✗ ${msg}`);
+      falhas.push(msg);
+      resultados.push(manifesto(c, o.ano, FONTES[c], [], [], [`Falha no processamento: ${(e as Error).message.split("\n")[0]}`], 0));
+    }
+  }
+
+  async function processarConjunto(c: ConjuntoETL): Promise<ManifestoConjunto[]> {
+    const resultados: ManifestoConjunto[] = [];
     const fonte = FONTES[c];
     const p = criarProcessador(c, o.ano, mun);
     const arquivos: ArquivoProcessado[] = [];
@@ -165,7 +178,7 @@ export async function executarETL(o: Opcoes): Promise<ManifestoConjunto[]> {
     if (!arquivos.length) {
       console.warn(`  ✗ nenhum arquivo processado para ${c}`);
       resultados.push(manifesto(c, o.ano, fonte, arquivos, [], [...avisos, "Nenhum arquivo processado."], 0));
-      continue;
+      return resultados;
     }
 
     const naoId = Object.entries(p.locaisNaoIdentificados).sort((a, b) => b[1] - a[1]);
@@ -197,6 +210,7 @@ export async function executarETL(o: Opcoes): Promise<ManifestoConjunto[]> {
       for (const l of principal.linhas) meses.add(l[iMes]);
     }
     resultados.push(manifesto(c, o.ano, fonte, arquivos, [...meses].sort((a, b) => a - b), avisos, total));
+    return resultados;
   }
 
   await rm(tmp, { recursive: true, force: true });
@@ -206,6 +220,7 @@ export async function executarETL(o: Opcoes): Promise<ManifestoConjunto[]> {
     for (const r of resultados) if (r.conjunto === "execucao" || r.conjunto === "orcamento") r.avisos.push(aviso);
   }
   await atualizarManifesto(o.saida, resultados);
+  if (falhas.length) throw new Error(`Falharam ${falhas.length} conjunto(s):\n${falhas.join("\n")}`);
   return resultados;
 }
 
