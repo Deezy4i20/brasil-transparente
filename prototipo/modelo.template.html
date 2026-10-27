@@ -168,7 +168,7 @@ ol.barras button.lnk:hover { text-decoration: underline; }
 .projs { display: grid; gap: 10px; }
 .proj { border: 1px solid var(--borda); border-radius: 8px; padding: 10px 12px; display: grid; gap: 4px; font-size: 13px; }
 .proj .t { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
-.proj .obj { font-weight: 600; font-size: 13.5px; }
+.proj .obj { font-weight: 600; font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .proj .meta { color: var(--tinta-2); font-size: 12.5px; }
 .proj .vals { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--tinta-2); }
 .proj .vals b { color: var(--tinta); }
@@ -392,11 +392,11 @@ const dataBR = iso => iso ? iso.split("-").reverse().join("/") : "—";
 const aLiberar = c => (c[CI.valor]!=null && c[CI.liberado]!=null) ? Math.max(0, c[CI.valor]-c[CI.liberado]) : null;
 function cartaoProjeto(c, comMun){
   const st = statusProj(c), al = aLiberar(c);
-  return `<div class="proj"><div class="t"><span class="obj">${esc(c[CI.objeto]||"Objeto não informado")}</span><span class="pill ${st}">${ROT_STATUS[st]}</span></div>
+  return `<div class="proj"><div class="t"><span class="obj" title="${esc(c[CI.objeto]||"")}">${esc(c[CI.objeto]||"Objeto não informado")}</span><span class="pill ${st}">${ROT_STATUS[st]}</span></div>
   <div class="meta"><b>Quem executa:</b> ${esc(c[CI.convenente]||"—")}${c[CI.tipoConv]?` <span class="muted">(${esc(c[CI.tipoConv])})</span>`:""}</div>
   <div class="meta"><b>Quem financia:</b> ${esc(c[CI.concedente]||"—")}${c[CI.orgaoSup]&&c[CI.orgaoSup]!==c[CI.concedente]?` · ${esc(c[CI.orgaoSup])}`:""}</div>
   <div class="vals num"><span>Pactuado <b>${comp(c[CI.valor])}</b></span><span>Liberado <b>${comp(c[CI.liberado])}</b></span><span>A liberar <b>${comp(al)}</b></span>${c[CI.contrapartida]?`<span>Contrapartida <b>${comp(c[CI.contrapartida])}</b></span>`:""}</div>
-  <div class="meta muted">${comMun?`${esc(c[CI.munNome]||"Município não identificado")} · `:""}${esc(c[CI.instrumento]||"Instrumento")} nº ${esc(c[CI.numero])} · vigência ${dataBR(c[CI.inicio])} a ${dataBR(c[CI.fim])} · situação oficial: ${esc(c[CI.situacao]||"—")}</div></div>`;
+  <div class="meta muted">${comMun?`${esc(c[CI.munNome]||"Município não identificado")} · `:""}${c[CI.instrumento] && !/n[aã]o se aplica/i.test(c[CI.instrumento]) ? esc(c[CI.instrumento][0] + c[CI.instrumento].slice(1).toLowerCase()) + " " : ""}nº ${esc(c[CI.numero])} · vigência ${dataBR(c[CI.inicio])} a ${dataBR(c[CI.fim])} · situação oficial: ${esc(c[CI.situacao]||"—")}</div></div>`;
 }
 const NOTA_PROJ = `Projetos = convênios, contratos de repasse e instrumentos parecidos publicados no Portal da Transparência: recursos federais repassados para alguém executar um objeto (obra, compra, serviço). “A liberar” = valor pactuado − valor já liberado. O avanço físico da obra não é publicado nesta fonte.`;
 
