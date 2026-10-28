@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-28T02:41:10.392Z",
+  "geradoEm": "2026-10-28T03:16:26.883Z",
   "modo": "oficial",
   "conjuntos": [
     {
@@ -724,24 +724,24 @@
           "nome": "API 1.2_consultarContratos_FimVigencia",
           "url": "https://dadosabertos.compras.gov.br/modulo-contratos/1.2_consultarContratos_FimVigencia?dataVigenciaFinalMin=2025-01-01",
           "periodo": "fim de vigência desde 2025-01-01",
-          "baixadoEm": "2026-10-28T02:35:16.413Z",
+          "baixadoEm": "2026-10-28T02:42:42.109Z",
           "bytes": 0,
-          "linhasLidas": 34586,
-          "linhasDescartadas": 28128,
+          "linhasLidas": 409210,
+          "linhasDescartadas": 262097,
           "motivosDescarte": {
-            "contrato de receita (o governo recebe)": 88,
-            "registro repetido": 4951,
-            "contrato excluído": 44,
-            "nota de empenho (só no resumo)": 23045
+            "contrato de receita (o governo recebe)": 5341,
+            "registro repetido": 51003,
+            "contrato excluído": 1542,
+            "nota de empenho (só no resumo)": 204211
           }
         }
       ],
       "mesesDisponiveis": [],
-      "processadoEm": "2026-10-28T02:35:16.413Z",
-      "linhasAgregadas": 6458,
+      "processadoEm": "2026-10-28T02:42:42.109Z",
+      "linhasAgregadas": 147113,
       "avisos": [
-        "Consultados 2 órgãos federais; 0 falharam.",
-        "0 contratos sem UF da unidade contratante (lista \"NI\").",
+        "Consultados 1160 órgãos federais; 0 falharam.",
+        "28 contratos sem UF da unidade contratante (lista \"NI\").",
         "O local é o da unidade que assinou o contrato, não necessariamente onde o serviço é prestado."
       ]
     },
@@ -757,18 +757,21 @@
       "arquivos": [
         {
           "nome": "API 1_consultarContratacoes_PNCP_14133",
-          "url": "https://dadosabertos.compras.gov.br/modulo-contratacoes/1_consultarContratacoes_PNCP_14133?dataPublicacaoPncpInicial=2026-10-01",
-          "periodo": "publicadas desde 2026-10-01",
-          "baixadoEm": "2026-10-28T02:35:16.413Z",
+          "url": "https://dadosabertos.compras.gov.br/modulo-contratacoes/1_consultarContratacoes_PNCP_14133?dataPublicacaoPncpInicial=2026-01-01",
+          "periodo": "publicadas desde 2026-01-01",
+          "baixadoEm": "2026-10-28T02:42:42.109Z",
           "bytes": 0,
-          "linhasLidas": 0,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
+          "linhasLidas": 213141,
+          "linhasDescartadas": 121787,
+          "motivosDescarte": {
+            "órgão não federal": 121739,
+            "contratação excluída": 48
+          }
         }
       ],
       "mesesDisponiveis": [],
-      "processadoEm": "2026-10-28T02:35:16.413Z",
-      "linhasAgregadas": 0,
+      "processadoEm": "2026-10-28T02:42:42.109Z",
+      "linhasAgregadas": 91354,
       "avisos": [
         "Inclui licitações (pregão, concorrência…) e contratações diretas (dispensa, inexigibilidade) publicadas no PNCP pela Lei 14.133. Processos pela lei antiga (8.666) não entram."
       ]
