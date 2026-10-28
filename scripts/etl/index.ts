@@ -17,7 +17,7 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import type { ArquivoProcessado, Manifesto, ManifestoConjunto } from "../../src/lib/dados/tipos";
 import { lerCSV, paraCadaCSV } from "./csv";
-import { CONJUNTOS_ETL, criarProcessador, type ConjuntoETL, type Processador } from "./processadores";
+import { CONJUNTOS_ETL, criarProcessador, ProcessadorEmendas, type ConjuntoETL, type Processador } from "./processadores";
 import { FONTES, periodos, urlsCandidatas } from "./fontes";
 import { carregarIndiceMunicipios } from "./municipios";
 
@@ -100,9 +100,17 @@ async function processarArquivo(p: Processador, caminho: string): Promise<void> 
   const vistos: string[] = [];
   await paraCadaCSV(caminho, async (nome, fluxo) => {
     let usar = true;
+    let vinculo = false;
     await lerCSV(
       fluxo,
       (cols) => {
+        // O zip de emendas traz também a ligação emenda → convênio: usada para mostrar quem indicou cada projeto.
+        if (p instanceof ProcessadorEmendas && !p.reconhece(cols) && p.reconheceVinculo(cols)) {
+          usar = false;
+          vinculo = true;
+          console.log(`    lendo ${nome} (ligação emenda → convênio)`);
+          return;
+        }
         // Arquivos .zip podem ter vários CSVs (ex.: emendas). Processa apenas o reconhecido.
         if (!p.reconhece(cols)) {
           usar = false;
@@ -114,7 +122,7 @@ async function processarArquivo(p: Processador, caminho: string): Promise<void> 
         reconhecido = true;
         console.log(`    lendo ${nome}`);
       },
-      (l) => usar && p.processar(l),
+      (l) => (vinculo ? (p as ProcessadorEmendas).processarVinculo(l) : usar && p.processar(l)),
     );
   });
   if (!reconhecido) {
@@ -216,6 +224,14 @@ export async function executarETL(o: Opcoes): Promise<ManifestoConjunto[]> {
       avisos.push(
         `${(p as { favorecidosPFOmitidos: number }).favorecidosPFOmitidos} linhas de favorecidos pessoa física não são listadas individualmente (privacidade); os valores permanecem nos totais.`,
       );
+
+    if (p instanceof ProcessadorEmendas && p.vinculos.size) {
+      const v = p.vinculosComAutor();
+      const dirConv = join(o.saida, "convenios");
+      mkdirSync(dirConv, { recursive: true });
+      await writeFile(join(dirConv, "emendas.json"), JSON.stringify({ processadoEm: new Date().toISOString(), colunas: ["codigoEmenda", "autor", "tipo", "ano"], porConvenio: v }));
+      console.log(`  ✓ ligação emenda → convênio: ${Object.keys(v).length} convênios com autor identificado`);
+    }
 
     let total = 0;
     for (const b of p.cubos()) {

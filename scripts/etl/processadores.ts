@@ -313,8 +313,44 @@ export class ProcessadorEmendas extends Processador {
     ["emenda", "autor", "tipo", "uf", "municipio", "funcao", "programa", "acao"],
     ["empenhado", "liquidado", "pago", "rapInscrito", "rapCancelado", "rapPago"]);
 
+  /** Autor de cada emenda (todas as emendas do arquivo, de qualquer ano): código → [autor, tipo, ano]. */
+  autores = new Map<string, [string, string, string]>();
+  /** Ligação emenda → convênio (arquivo EmendasParlamentares_Convenios): nº convênio → códigos de emenda. */
+  vinculos = new Map<string, Set<string>>();
+  private colVinc: { codigo: string; convenio: string } | null = null;
+
+  reconheceVinculo(cols: string[]): boolean {
+    const s = new Set(cols);
+    if (s.has("codigodaemenda") && s.has("numeroconvenio")) {
+      this.colVinc = { codigo: "codigodaemenda", convenio: "numeroconvenio" };
+      return true;
+    }
+    return false;
+  }
+
+  processarVinculo(l: Linha): void {
+    const cod = (l[this.colVinc!.codigo] ?? "").trim();
+    const conv = (l[this.colVinc!.convenio] ?? "").trim();
+    if (!cod || !conv) return;
+    let s = this.vinculos.get(conv);
+    if (!s) this.vinculos.set(conv, (s = new Set()));
+    s.add(cod);
+  }
+
+  /** nº convênio → [[código da emenda, autor, tipo, ano]] — só ligações com autor conhecido. */
+  vinculosComAutor(): Record<string, [string, string, string, string][]> {
+    const out: Record<string, [string, string, string, string][]> = {};
+    for (const [conv, cods] of this.vinculos) {
+      const l = [...cods].map((c) => [c, ...(this.autores.get(c) ?? ["", "", ""])] as [string, string, string, string]).filter((x) => x[1]);
+      if (l.length) out[conv] = l;
+    }
+    return out;
+  }
+
   processar(l: Linha): void {
     this.lidas++;
+    const codTodos = this.v(l, "codigo");
+    if (codTodos && !this.autores.has(codTodos)) this.autores.set(codTodos, [this.v(l, "nomeAutor"), this.v(l, "tipo"), this.v(l, "ano")]);
     if (extrairAno(this.v(l, "ano")) !== this.ano) return this.descartar("ano da emenda diferente do solicitado");
     const codigo = this.v(l, "codigo");
     if (!codigo) return this.descartar("emenda sem código");

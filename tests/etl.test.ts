@@ -73,7 +73,7 @@ beforeAll(async () => {
   ]);
   const eme = csv("EmendasParlamentares.csv", [CAB_EME, linhaEme("202512340001", "2025", "2927408", "Salvador", "Bahia", "300,00", "200,00"), linhaEme("202512340002", "2025", "", "", "NACIONAL", "100,00", "0,00"), linhaEme("202412340003", "2024", "", "", "Bahia", "1,00", "1,00")]);
   // O arquivo de emendas oficial é um .zip com vários CSVs; o ETL deve escolher o certo pelo cabeçalho.
-  const outro = csv("EmendasParlamentares_Convenios.csv", [["Código da Emenda", "Convenente", "Valor Convênio"], ["202512340001", "X", "10,00"]]);
+  const outro = csv("EmendasParlamentares_Convenios.csv", [["Código da Emenda", "Convenente", "Número Convênio", "Valor Convênio"], ["202512340001", "X", "900001", "10,00"], ["202412340003", "Y", "900002", "5,00"], ["999999999999", "Z", "900003", "1,00"]]);
   let emeArq = eme;
   try {
     emeArq = join(dir, "EmendasParlamentares.zip");
@@ -180,5 +180,14 @@ describe("ETL — cabeçalhos reais publicados pelo Portal (out/2026)", () => {
     const eme = "codigodaemenda, anodaemenda, tipodeemenda, codigodoautordaemenda, nomedoautordaemenda, numerodaemenda, localidadedeaplicacaodorecurso, codigomunicipioibge, municipio, codigoufibge, uf, regiao, codigofuncao, nomefuncao, codigosubfuncao, nomesubfuncao, codigoprograma, nomeprograma, codigoacao, nomeacao, codigoplanoorcamentario, nomeplanoorcamentario, valorempenhado, valorliquidado, valorpago, valorrestosapagarinscritos, valorrestosapagarcancelados, valorrestosapagarpagos".split(", ");
     expect(criarProcessador("transferencias", 2026, idx).reconhece(tra)).toBe(true);
     expect(criarProcessador("emendas", 2026, idx).reconhece(eme)).toBe(true);
+  });
+});
+
+describe("ETL — ligação emenda → convênio", () => {
+  it("liga o convênio ao autor da emenda (de qualquer ano) e ignora emendas sem autor conhecido", () => {
+    const v = JSON.parse(readFileSync(join(saida, "convenios", "emendas.json"), "utf8")).porConvenio;
+    expect(v["900001"]).toEqual([["202512340001", "AUTOR TESTE", "Emenda Individual", "2025"]]);
+    expect(v["900002"][0][1]).toBe("AUTOR TESTE");
+    expect(v["900003"]).toBeUndefined();
   });
 });
