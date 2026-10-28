@@ -117,7 +117,10 @@ const convResumo = existsSync(join(dirConv, "resumo.json")) ? JSON.parse(readFil
 
 // Contratos e licitações: resumo embutido (sem a lista por município), listas por UF em arquivos separados.
 const dirContr = join(DIR, "contratos"), dirLic = join(DIR, "licitacoes");
-const contratosResumo = existsSync(join(dirContr, "resumo.json")) ? JSON.parse(readFileSync(join(dirContr, "resumo.json"), "utf8")) : null;
+const contratosLido = existsSync(join(dirContr, "resumo.json")) ? JSON.parse(readFileSync(join(dirContr, "resumo.json"), "utf8")) : null;
+// Só publica coletas completas (todos os órgãos federais). Coletas de teste (--orgaos) ficam fora do site.
+const contratosResumo = contratosLido && contratosLido.parcial === false ? contratosLido : null;
+if (contratosLido && !contratosResumo) console.log("Contratos: coleta parcial ou de teste — não publicada no site.");
 function copiarPasta(origem: string, destino: string) {
   if (!existsSync(origem)) return;
   mkdirSync(destino, { recursive: true });
@@ -174,8 +177,10 @@ if (existsSync(dirConv)) {
   for (const f of readdirSync(dirConv)) if (f !== "emendas.json") writeFileSync(join(OUT, "dados", "convenios", f), readFileSync(join(dirConv, f)));
   writeFileSync(join(OUT, "dados", "convenios", "emendas.json"), emendasConvReduzido());
 }
-copiarPasta(dirContr, join(OUT, "dados", "contratos"));
-copiarPasta(dirLic, join(OUT, "dados", "licitacoes"));
+if (contratosResumo) {
+  copiarPasta(dirContr, join(OUT, "dados", "contratos"));
+  copiarPasta(dirLic, join(OUT, "dados", "licitacoes"));
+}
 console.log(`Modelo gerado: prototipo/brasil-transparente-modelo.html (${(json.length / 1e6).toFixed(1)} MB de dados)`);
 
 // --site: gera também a página completa (com <head>) para publicar no GitHub Pages.
@@ -206,8 +211,10 @@ ${readFileSync(join(OUT, "brasil-transparente-modelo.html"), "utf8")}
     for (const f of readdirSync(dirConv)) if (f !== "emendas.json") writeFileSync(join(SITE, "dados", "convenios", f), readFileSync(join(dirConv, f)));
     writeFileSync(join(SITE, "dados", "convenios", "emendas.json"), emendasConvReduzido());
   }
-  copiarPasta(dirContr, join(SITE, "dados", "contratos"));
-  copiarPasta(dirLic, join(SITE, "dados", "licitacoes"));
+  if (contratosResumo) {
+    copiarPasta(dirContr, join(SITE, "dados", "contratos"));
+    copiarPasta(dirLic, join(SITE, "dados", "licitacoes"));
+  }
   writeFileSync(join(SITE, ".nojekyll"), "");
   console.log("Site gerado: site/index.html");
 }

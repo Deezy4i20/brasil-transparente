@@ -302,7 +302,7 @@ export async function executarContratos(opts: { desde?: string; licitacoesDesde?
     await writeFile(join(dirC, `${u}.json`), JSON.stringify({ uf: u, referencia: hoje, processadoEm, colunas: COLUNAS_CONTRATO, itens }));
   }
   const resumo = resumirContratos(porUF, empenhos, hoje);
-  await writeFile(join(dirC, "resumo.json"), JSON.stringify({ processadoEm, desde, ...resumo }));
+  await writeFile(join(dirC, "resumo.json"), JSON.stringify({ processadoEm, desde, parcial: !!opts.orgaos?.length, orgaosConsultados: orgaos.length, ...resumo }));
   const mantidos = Object.values(porUF).reduce((s, x) => s + x.length, 0);
   console.log(`  ✓ contratos: ${mantidos.toLocaleString("pt-BR")} contratos (${resumo.totais.vigentes.toLocaleString("pt-BR")} vigentes) + ${empenhos.qtd.toLocaleString("pt-BR")} notas de empenho; ${falhasOrgao} órgãos com falha`);
   const manifestos: ManifestoConjunto[] = [{
