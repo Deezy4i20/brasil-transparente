@@ -50,10 +50,16 @@ function simplificar(fc: FC, nomeCamada: string, pct: string): string {
   writeFileSync(ent, JSON.stringify(fc));
   execFileSync(
     join(process.cwd(), "node_modules", ".bin", "mapshaper"),
-    [ent, "-simplify", pct, "keep-shapes", "-clean", "-o", "format=topojson", "quantization=1e5", sai],
+    // "-clean" ANTES de simplificar: depois da simplificação ele descartava municípios inteiros
+    // (ex.: Rio de Janeiro, Vitória, Macaé). "keep-shapes" impede que algum polígono desapareça.
+    [ent, "-clean", "-simplify", pct, "keep-shapes", "-o", "format=topojson", "quantization=1e5", sai],
     { stdio: "pipe" },
   );
-  return readFileSync(sai, "utf8");
+  const saida = readFileSync(sai, "utf8");
+  // Nenhuma feição pode se perder na simplificação.
+  const geoms = (Object.values(JSON.parse(saida).objects)[0] as { geometries: unknown[] }).geometries;
+  if (geoms.length !== fc.features.length) throw new Error(`[malhas] ${nomeCamada}: ${fc.features.length} feições na entrada, ${geoms.length} na saída.`);
+  return saida;
 }
 
 async function malhaUfs(): Promise<{ fc: FC; origem: string }> {

@@ -9,6 +9,7 @@ import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from 
 import { join } from "node:path";
 import type { Cubo, Manifesto } from "../src/lib/dados/tipos";
 import { UFS } from "../src/lib/referencia/ufs";
+import { mesesParciais, naturezaDivida } from "../src/lib/auditoria";
 
 const oficial = process.argv.includes("--oficial");
 const DIR = join(process.cwd(), "data", oficial ? "agregados" : "demo");
@@ -62,6 +63,28 @@ function reagrupar(c: Cubo | null, dims: string[], medidas: string[]): number[][
   return [...acc.values()].map((a) => a.map((v, i) => (i < dims.length ? v : r2(v))));
 }
 
+/**
+ * Execução com a natureza da despesa em relação à dívida (0 demais, 1 refinanciamento, 2 juros/amortização)
+ * e os restos a pagar pagos. Linha: [mes, uf, orgaoSup, funcao, programa, emp, liq, pago, divida, rapPago].
+ * As cinco primeiras dimensões e as três medidas mantêm as posições usadas pela interface.
+ */
+function execucaoComDivida(c: Cubo | null): number[][] {
+  if (!c) return [];
+  const p = (d: string) => c.dimensoes.indexOf(d);
+  const m = (x: string) => c.dimensoes.length + c.medidas.indexOf(x);
+  const [iA, iG] = [p("acao"), p("grupo")];
+  const acc = new Map<string, number[]>();
+  for (const l of c.linhas) {
+    const dv = naturezaDivida(c.dicionarios.acao[l[iA]]?.nome ?? "", c.dicionarios.grupo[l[iG]]?.cod ?? "");
+    const ch = [l[p("mes")], ufIdx(c.dicionarios.uf[l[p("uf")]].cod), di("orgao", c.dicionarios.orgaoSuperior[l[p("orgaoSuperior")]]), di("funcao", c.dicionarios.funcao[l[p("funcao")]]), di("programa", c.dicionarios.programa[l[p("programa")]]), dv];
+    const k = ch.join("|");
+    let a = acc.get(k);
+    if (!a) acc.set(k, (a = [...ch, 0, 0, 0, 0]));
+    a[6] += l[m("empenhado")]; a[7] += l[m("liquidado")]; a[8] += l[m("pago")]; a[9] += l[m("rapPago")];
+  }
+  return [...acc.values()].map((a) => [a[0], a[1], a[2], a[3], a[4], r2(a[6]), r2(a[7]), r2(a[8]), a[5], r2(a[9])]);
+}
+
 const porAno: Record<number, unknown> = {};
 const nomesMun: Record<string, string> = {};
 for (const ano of anos) {
@@ -84,9 +107,12 @@ for (const ano of anos) {
   porAno[ano] = {
     disp: { orc: ok("orcamento"), exe: ok("execucao"), tra: ok("transferencias"), emendas: ok("emendas"), fav: ok("transferencias_favorecidos") || ok("transferencias") },
     meses: mc("execucao")?.mesesDisponiveis ?? [],
+    // Meses cujo arquivo foi baixado antes do fim do mês (dados incompletos): ficam fora das comparações.
+    parciais: { exe: mesesParciais(mc("execucao")?.arquivos ?? []), tra: mesesParciais(mc("transferencias")?.arquivos ?? []) },
+    baixadoEm: { exe: mc("execucao")?.arquivos.at(-1)?.baixadoEm ?? null, tra: mc("transferencias")?.arquivos.at(-1)?.baixadoEm ?? null },
     mesesTra: mc("transferencias")?.mesesDisponiveis ?? [],
     orc: reagrupar(ler(ano, "orcamento"), ["orgaoSuperior", "funcao", "programa"], ["atualizado", "empenhado"]),
-    exe: reagrupar(ler(ano, "execucao"), ["mes", "uf", "orgaoSuperior", "funcao", "programa"], ["empenhado", "liquidado", "pago"]),
+    exe: execucaoComDivida(ler(ano, "execucao")),
     tra: reagrupar(ler(ano, "transferencias"), ["mes", "uf", "funcao", "tipo"], ["valor"]),
     traMun: reagrupar(ler(ano, "transferencias_municipios"), ["uf", "municipio", "funcao"], ["valor"]),
     // Mês a mês por cidade (sem área), para o gráfico "subiu ou caiu" da cidade.
