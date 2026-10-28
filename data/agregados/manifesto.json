@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-27T23:05:52.218Z",
+  "geradoEm": "2026-10-28T00:47:26.922Z",
   "modo": "oficial",
   "conjuntos": [
     {
@@ -287,36 +287,6 @@
         "22210 linhas com nome de município sem correspondência na malha do IBGE."
       ],
       "linhasAgregadas": 459153
-    },
-    {
-      "conjunto": "emendas",
-      "ano": 2026,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Emendas Parlamentares — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
-        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
-      },
-      "arquivos": [
-        {
-          "nome": "emendas-UNICO.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/emendas-parlamentares/EmendasParlamentares.zip",
-          "periodo": "UNICO",
-          "baixadoEm": "2026-10-27T18:01:30.042Z",
-          "bytes": 32530367,
-          "linhasLidas": 94747,
-          "linhasDescartadas": 88993,
-          "motivosDescarte": {
-            "ano da emenda diferente do solicitado": 88993
-          }
-        }
-      ],
-      "mesesDisponiveis": [],
-      "processadoEm": "2026-10-27T18:01:30.053Z",
-      "avisos": [
-        "Linhas sem UF identificável classificadas como \"Localização não identificada\": Sem informação (585), Múltiplo (59)."
-      ],
-      "linhasAgregadas": 5754
     },
     {
       "conjunto": "orcamento",
@@ -709,6 +679,36 @@
         "2.685 convênios sem município identificado na malha do IBGE (aparecem só na lista do estado)."
       ],
       "linhasAgregadas": 75939
+    },
+    {
+      "conjunto": "emendas",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Emendas Parlamentares — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
+        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
+      },
+      "arquivos": [
+        {
+          "nome": "emendas-UNICO.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/emendas-parlamentares/EmendasParlamentares.zip",
+          "periodo": "UNICO",
+          "baixadoEm": "2026-10-28T00:47:26.639Z",
+          "bytes": 32530367,
+          "linhasLidas": 94747,
+          "linhasDescartadas": 88993,
+          "motivosDescarte": {
+            "ano da emenda diferente do solicitado": 88993
+          }
+        }
+      ],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-28T00:47:26.862Z",
+      "avisos": [
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": Sem informação (585), Múltiplo (59)."
+      ],
+      "linhasAgregadas": 5754
     }
   ]
 }
