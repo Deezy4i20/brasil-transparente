@@ -268,6 +268,8 @@ export async function executarContratos(opts: { desde?: string; licitacoesDesde?
   const vistos = new Set<string>();
   const descartes: Record<string, number> = {};
   const empenhos = { qtd: 0, valor: 0 };
+  // Auditoria: detalhamento das notas de empenho (não entram na lista), para entender o que somam.
+  const empOrgao = new Map<string, [number, number]>(), empMaiores: (string | number)[][] = [];
   let lidos = 0, falhasOrgao = 0;
   const vencedores = new Map<string, [string, number][]>(); // idCompra → [[empresa, valor]]
   const I = Object.fromEntries(COLUNAS_CONTRATO.map((c, i) => [c, i])) as Record<string, number>;
@@ -283,7 +285,14 @@ export async function executarContratos(opts: { desde?: string; licitacoesDesde?
           vistos.add(id);
           const idc = String(n.linha[I.idCompra]);
           if (idc) { const l = vencedores.get(idc) ?? []; l.push([String(n.linha[I.fornecedor]), Number(n.linha[I.valorGlobal])]); vencedores.set(idc, l); }
-          if (n.empenho) { empenhos.qtd++; empenhos.valor += Number(n.linha[I.valorGlobal]) || 0; continue; }
+          if (n.empenho) {
+            const v = Number(n.linha[I.valorGlobal]) || 0;
+            empenhos.qtd++; empenhos.valor += v;
+            const o = empOrgao.get(String(n.linha[I.orgao])) ?? [0, 0]; o[0]++; o[1] += v; empOrgao.set(String(n.linha[I.orgao]), o);
+            empMaiores.push([n.linha[I.orgao], n.linha[I.ug], n.linha[I.fornecedor], n.linha[I.objeto], n.linha[I.inicio], n.linha[I.fim], v, n.linha[I.numero]]);
+            if (empMaiores.length > 400) { empMaiores.sort((a, b) => Number(b[6]) - Number(a[6])); empMaiores.length = 200; }
+            continue;
+          }
           (porUF[n.uf] ??= []).push(n.linha);
         }
       });
@@ -302,7 +311,13 @@ export async function executarContratos(opts: { desde?: string; licitacoesDesde?
     await writeFile(join(dirC, `${u}.json`), JSON.stringify({ uf: u, referencia: hoje, processadoEm, colunas: COLUNAS_CONTRATO, itens }));
   }
   const resumo = resumirContratos(porUF, empenhos, hoje);
-  await writeFile(join(dirC, "resumo.json"), JSON.stringify({ processadoEm, desde, parcial: !!opts.orgaos?.length, orgaosConsultados: orgaos.length, ...resumo }));
+  empMaiores.sort((a, b) => Number(b[6]) - Number(a[6]));
+  const auditoriaEmpenhos = {
+    colunasMaiores: ["orgao", "ug", "fornecedor", "objeto", "inicio", "fim", "valor", "numero"],
+    maiores: empMaiores.slice(0, 40),
+    porOrgao: [...empOrgao.entries()].sort((a, b) => b[1][1] - a[1][1]).slice(0, 25).map(([k, v]) => [k, v[0], Math.round(v[1] * 100) / 100]),
+  };
+  await writeFile(join(dirC, "resumo.json"), JSON.stringify({ processadoEm, desde, parcial: !!opts.orgaos?.length, orgaosConsultados: orgaos.length, ...resumo, auditoriaEmpenhos }));
   const mantidos = Object.values(porUF).reduce((s, x) => s + x.length, 0);
   console.log(`  ✓ contratos: ${mantidos.toLocaleString("pt-BR")} contratos (${resumo.totais.vigentes.toLocaleString("pt-BR")} vigentes) + ${empenhos.qtd.toLocaleString("pt-BR")} notas de empenho; ${falhasOrgao} órgãos com falha`);
   const manifestos: ManifestoConjunto[] = [{
