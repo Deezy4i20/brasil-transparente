@@ -89,6 +89,8 @@ for (const ano of anos) {
     exe: reagrupar(ler(ano, "execucao"), ["mes", "uf", "orgaoSuperior", "funcao", "programa"], ["empenhado", "liquidado", "pago"]),
     tra: reagrupar(ler(ano, "transferencias"), ["mes", "uf", "funcao", "tipo"], ["valor"]),
     traMun: reagrupar(ler(ano, "transferencias_municipios"), ["uf", "municipio", "funcao"], ["valor"]),
+    // Mês a mês por cidade (sem área), para o gráfico "subiu ou caiu" da cidade.
+    traMunMes: reagrupar(ler(ano, "transferencias_municipios"), ["uf", "municipio", "mes"], ["valor"]),
     exeMun: reagrupar(ler(ano, "execucao_municipios"), ["uf", "municipio", "funcao"], ["pago"]),
     emendas,
     // Só os 40 maiores favorecidos por UF (a lista completa fica no software).
