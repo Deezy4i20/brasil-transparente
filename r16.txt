@@ -1,0 +1,4 @@
+{
+  "message": "Missing 'plone.restapi: Use REST API' permission", 
+  "type": "Unauthorized"
+}

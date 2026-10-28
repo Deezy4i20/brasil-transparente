@@ -1,0 +1,17 @@
+1 405 0.185106s 2559B https://portaldatransparencia.gov.br/orcamento
+2 405 0.015403s 2559B https://portaldatransparencia.gov.br/despesas/visao-geral
+3 405 0.026681s 2559B https://portaldatransparencia.gov.br/transferencias
+4 405 0.014873s 2559B https://portaldatransparencia.gov.br/emendas
+5 405 0.014303s 2559B https://portaldatransparencia.gov.br/convenios/consulta
+6 200 2.718820s 26813B https://contratos.comprasnet.gov.br/transparencia/contratos
+7 200 1.154169s 59879B https://pncp.gov.br/app/contratos/83899526000182/2025/2359
+8 000 0.498954s 0B https://pncp.gov.br/app/editais/00394429000100/2025/3992
+9 000 0.821932s 0B https://pncp.gov.br/app/editais
+10 405 0.879260s 2559B https://www.portaldatransparencia.gov.br/pagina-interna/603417-dicionario-de-dados-orcamento-da-despesa
+11 405 0.020827s 2559B https://portaldatransparencia.gov.br/pagina-interna/603453-dicionario-de-dados-execucao-da-despesa
+12 405 0.688385s 2559B https://www.portaldatransparencia.gov.br/pagina-interna/603420-dicionario-de-dados-recursos-transferidos
+13 405 0.020480s 2559B https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares
+14 405 0.686399s 2559B https://www.portaldatransparencia.gov.br/pagina-interna/603415-dicionario-de-dados-convenios
+15 200 0.659165s 734B https://dadosabertos.compras.gov.br/swagger-ui/index.html
+16 401 0.765549s 94B https://www.gov.br/compras/pt-br/acesso-a-informacao/manuais/manual-dados-abertos/manual-api-compras.pdf
+17 200 0.989662s 96447B https://portaldatransparencia.gov.br/download-de-dados/despesas-execucao
