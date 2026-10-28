@@ -119,7 +119,8 @@ const convResumo = existsSync(join(dirConv, "resumo.json")) ? JSON.parse(readFil
 const dirContr = join(DIR, "contratos"), dirLic = join(DIR, "licitacoes");
 const contratosLido = existsSync(join(dirContr, "resumo.json")) ? JSON.parse(readFileSync(join(dirContr, "resumo.json"), "utf8")) : null;
 // Só publica coletas completas (todos os órgãos federais). Coletas de teste (--orgaos) ficam fora do site.
-const contratosResumo = contratosLido && contratosLido.parcial === false ? contratosLido : null;
+const orgaosNoManifesto = Number(manifesto.conjuntos.find((c) => c.conjunto === "contratos")?.avisos.join(" ").match(/Consultados (\d+) órgãos/)?.[1] ?? 0);
+const contratosResumo = contratosLido && (contratosLido.parcial === false || (contratosLido.parcial === undefined && orgaosNoManifesto >= 100)) ? contratosLido : null;
 if (contratosLido && !contratosResumo) console.log("Contratos: coleta parcial ou de teste — não publicada no site.");
 function copiarPasta(origem: string, destino: string) {
   if (!existsSync(origem)) return;
