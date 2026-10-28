@@ -13,7 +13,7 @@ on:
         default: ""
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   inspecionar:
@@ -46,9 +46,15 @@ jobs:
               h=$(head -1 "$f" | iconv -f latin1 -t utf-8)
               e=$(sed -n '2,3p' "$f" | iconv -f latin1 -t utf-8 | cut -c1-900)
               OUT="$OUT\n### $f ($n linhas)\nCAB: $h\nEX: $e"
+              mkdir -p ../../amostras && head -300 "$f" | iconv -f latin1 -t utf-8 > "../../amostras/$S-$f"
             done
             cd ../..
           done
           printf "%b" "$OUT"
-          MSG=$(printf "%b" "$OUT" | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')
-          echo "::notice title=INSPECAO::$MSG"
+          printf "%b" "$OUT" > inspecao.txt
+      - name: Publicar resultado no branch "inspecao"
+        run: |
+          git init -q pub && cd pub
+          git config user.name "brasil-transparente-bot"; git config user.email "brasil-transparente-bot@users.noreply.github.com"
+          cp ../inspecao.txt . && cp -r ../amostras . 2>/dev/null; git add -A && git commit -qm "Inspeção de fonte"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/inspecao
