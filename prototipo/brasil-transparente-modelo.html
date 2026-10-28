@@ -310,7 +310,9 @@ const GLOSS = [
   ["liquidacao","Liquidação","Verificação de que o bem foi entregue ou o serviço prestado. Só depois disso o pagamento pode ser feito."],
   ["pagamento","Pagamento","O dinheiro sai do caixa para o credor. Empenhado, liquidado e pago são etapas do mesmo gasto e nunca devem ser somados."],
   ["saldo","Saldo disponível para empenho","Orçamento atualizado menos o valor empenhado. Não considera bloqueios (contingenciamento)."],
-  ["restos","Restos a pagar","Despesas empenhadas que ficaram sem pagamento no fim do ano e passam para o seguinte."],
+  ["restos","Restos a pagar","Despesas reservadas (empenhadas) num ano e não pagas até 31/12. Passam para o ano seguinte. Quando são pagas, aparecem como “pago de anos anteriores”, separadas do “pago de fato” do ano."],
+  ["rolagem","Rolagem da dívida (refinanciamento)","Quando um título público vence, o governo paga quem o tinha usando o dinheiro de títulos novos. Entra no total oficial de pagamentos, mas não é gasto com serviços públicos. O site mostra essa parte separada, sem tirá-la do total."],
+  ["parcial","Mês incompleto","O arquivo do mês em curso é baixado antes de o mês terminar e tem só parte dos registros. Por isso fica fora das comparações com o ano anterior, que usam meses completos."],
   ["transferencia","Transferência","Recurso federal repassado a estados, municípios, entidades ou cidadãos. Aparece pelo local de quem recebe."],
   ["emenda","Emenda parlamentar","Indicação de deputados e senadores para direcionar parte do orçamento. Autoria, destino, execução e recebimento são etapas diferentes."],
   ["funcao","Função (área de atuação)","A grande área de governo da despesa, como Saúde ou Educação, pela classificação funcional oficial."],
@@ -531,7 +533,7 @@ function avisoParcial(){
   const pc = parciais(E.ano,"meses"), pt = parciais(E.ano,"mesesTra"); const ms = [...new Set([...pc,...pt])];
   if(!ms.length) return "";
   const nomes = ms.map(x=>MESES_LONGOS[x-1]).join(" e "), dt = diaBR(A(E.ano)?.baixadoEm?.exe);
-  return `<div class="cartao aviso-parcial" role="note"><p><b>${nomes[0].toUpperCase()+nomes.slice(1)} de ${E.ano} ainda está incompleto</b> (arquivos baixados em ${dt}). ${E.incluirParcial ? `Os números agora incluem esse mês parcial; por isso as comparações com ${E.ano-1} ficam desligadas.` : `Para comparar meses completos, os números mostram até o mês anterior.`}</p><button class="botao" data-acao="parcial:${E.incluirParcial?0:1}">${E.incluirParcial?"Mostrar só meses completos":`Incluir ${nomes} (parcial)`}</button></div>`;
+  return `<div class="cartao aviso-parcial" role="note"><p><b>${nomes[0].toUpperCase()+nomes.slice(1)} de ${E.ano} ainda está incompleto</b> ${ajuda("parcial")} (arquivos baixados em ${dt}). ${E.incluirParcial ? `Os números agora incluem esse mês parcial; por isso as comparações com ${E.ano-1} ficam desligadas.` : `Para comparar meses completos, os números mostram até o mês anterior.`}</p><button class="botao" data-acao="parcial:${E.incluirParcial?0:1}">${E.incluirParcial?"Mostrar só meses completos":`Incluir ${nomes} (parcial)`}</button></div>`;
 }
 /* ---------- entrada para o cidadão: três perguntas */
 function tresPerguntas(){
@@ -541,7 +543,7 @@ function tresPerguntas(){
   // 1. Quanto foi pago?
   const i1 = lugar ? g("transferencia") : g("pagamento");
   const pop = E.uf ? D.ufs.find(u=>u.sigla===E.uf).populacao : E.regiao ? D.ufs.filter(u=>u.regiao===E.regiao).reduce((s,u)=>s+u.populacao,0) : POP_BR;
-  const r1 = i1?.v!=null ? `<p class="resp num">${extenso(i1.v)}</p><p>${lugar?`enviados pelo governo federal em transferências · ${esc(lugar)}, ${esc(i1.per)}`:`pagos pelo governo federal de ${esc(i1.per)}`}.</p>${lugar ? `<p class="muted">Dá cerca de <b>${extenso(i1.v/pop)}</b> por morador.</p>` : `<p class="muted">Desse total, <b>${extenso(i1.v-i1.pbrV)}</b> foram <b>rolagem da dívida</b>: o governo paga títulos que vencem usando o dinheiro de títulos novos. Sem a rolagem, dá cerca de <b>${extenso(i1.pbrV/pop)}</b> por brasileiro.</p>`}` : `<p class="muted">${esc(i1?.ind||"Sem dados para este período.")}</p>`;
+  const r1 = i1?.v!=null ? `<p class="resp num">${extenso(i1.v)}</p><p>${lugar?`enviados pelo governo federal em transferências · ${esc(lugar)}, ${esc(i1.per)}`:`pagos pelo governo federal de ${esc(i1.per)}`}.</p>${lugar ? `<p class="muted">Dá cerca de <b>${extenso(i1.v/pop)}</b> por morador.</p>` : `<p class="muted">Desse total, <b>${extenso(i1.v-i1.pbrV)}</b> foram <b>rolagem da dívida</b> ${ajuda("rolagem")}: o governo paga títulos que vencem usando o dinheiro de títulos novos. Sem a rolagem, dá cerca de <b>${extenso(i1.pbrV/pop)}</b> por brasileiro.</p>`}` : `<p class="muted">${esc(i1?.ind||"Sem dados para este período.")}</p>`;
   // 2. Em que foi gasto?
   let top = [], tot = 0;
   if(a){ if(lugar){ if(disp(E.ano,"tra")) top = agrupa(a.tra, fTra(E.ano), r=>r[2], 4); } else if(disp(E.ano,"exe")) top = areasPagas(E.ano, fExe(E.ano)); }

@@ -75,7 +75,10 @@ npm run typecheck
 npm run lint
 npm run verificar:api  # com token: confere endpoints e formatos de resposta
 npm run malhas         # regenera as malhas do IBGE (usa a API oficial quando acessível)
+npm run reconciliar    # confere os dados processados: orçamento × execução, transferências × pagos, malhas
 ```
+
+As regras de cálculo e as evidências de cada uma estão em [docs/METODOLOGIA.md](docs/METODOLOGIA.md).
 
 ## Hospedagem
 

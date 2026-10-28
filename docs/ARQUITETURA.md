@@ -35,7 +35,7 @@
 | `scripts/gerar-demo.ts` | Dados de demonstração (fictícios, marcados) |
 | `scripts/verificar-api.ts` | Confere endpoints e formatos com um token real |
 | `data/geo` | Malhas TopoJSON (versionadas) |
-| `data/agregados` | Saída do ETL (não versionada) |
+| `data/agregados` | Saída do ETL (versionada; atualizada pelo GitHub Actions) |
 | `db/schema.sql` | Modelo normalizado para a fase com banco |
 | `tests` | Testes de cálculo, consulta, filtros, limitador, alertas e ETL ponta a ponta |
 
