@@ -172,6 +172,13 @@ ol.barras button.lnk:hover { text-decoration: underline; }
 .trilhas-tab { display: grid; gap: 4px; margin-top: 8px; }
 .kpi:has(details.trilha[open]) { grid-column: 1 / -1; }
 .trilha details summary { cursor: pointer; text-decoration: underline dotted; }
+.explorar { border: 1px solid var(--borda); border-radius: 10px; background: var(--sup); padding: 12px 14px; }
+.explorar > summary { cursor: pointer; list-style: none; display: grid; gap: 2px; }
+.explorar > summary::-webkit-details-marker { display: none; }
+.explorar > summary h2 { font-size: 17px; margin: 0; }
+.explorar > summary h2::before { content: "▸ "; }
+.explorar[open] > summary h2::before { content: "▾ "; }
+.explorar[open] > .rank { margin-top: 12px; }
 .aviso-parcial { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; border-left: 4px solid var(--aviso, #c98a00); }
 .aviso-parcial p { margin: 0; flex: 1 1 320px; }
 .links-p .lnk { border: 0; background: none; padding: 0; color: var(--link, var(--barra)); cursor: pointer; font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
@@ -394,7 +401,7 @@ function indicadores(){
   const indisp = !disp(ano,"orc") ? naoCarregado("orçamento") : "O arquivo de orçamento não é dividido por estado; não há valor estadual equivalente.";
   const semOrc = terr || !disp(ano,"orc");
   out.push({ t:"Autorizado para gastar no ano", termo:"orçamento atualizado", g:"orcamento", v: semOrc?null:atual, vr:null, semVar:true, per:String(ano), exp:"É o teto: quanto o governo pode gastar no ano. Ainda não é dinheiro gasto.", ind: semOrc?indisp:null, fonte:"Arquivo Orçamento da Despesa (anual). O filtro de meses não se aplica.", tr:{ conj:"orcamento", ano, col:"ORÇAMENTO ATUALIZADO (R$)", conta:"Somamos a coluna ORÇAMENTO ATUALIZADO de todas as linhas do arquivo anual"+(fIdx()!=null?", só nas linhas da área escolhida":"")+".", semComparacao:`Não comparamos com ${ano-1}: o orçamento atualizado muda ao longo do ano (créditos extras, cortes). O valor de ${ano} é de ${diaBR(D.conjuntos?.find(c=>c.ano===ano&&c.conjunto==="orcamento")?.arquivos?.[0]?.baixadoEm)}, ainda no meio do ano; o de ${ano-1} já é o valor final. Comparar os dois daria uma diferença que não é real.`, naoAplica:["meses (o orçamento é anual)","estado/região (o arquivo não é dividido por estado)"] } });
-  out.push({ t:"Ainda não reservado", termo:"saldo para empenho", g:"saldo", v: semOrc?null:atual-emp, vr:null, per:String(ano), exp:"Parte do valor autorizado que ainda não foi reservada para nenhum gasto. Conta feita pela plataforma: autorizado menos reservado.", ind: semOrc?indisp:null, calc:true, fonte:"Orçamento atualizado − empenhado, do mesmo arquivo. Sem variação: é uma fotografia da data de extração.", tr:{ conj:"orcamento", ano, col:"ORÇAMENTO ATUALIZADO (R$) e ORÇAMENTO EMPENHADO (R$)", conta: semOrc?"":`Conta da plataforma: ${cheio(atual)} (autorizado) − ${cheio(emp)} (reservado) = ${cheio(atual-emp)}.`, naoAplica:["meses (o orçamento é anual)","estado/região"] } });
+  out.push({ t:"Ainda não reservado", termo:"saldo para empenho", g:"saldo", v: semOrc?null:atual-emp, vr:null, semVar:true, per:String(ano), exp:"Parte do valor autorizado que ainda não foi reservada para nenhum gasto. Conta feita pela plataforma: autorizado menos reservado.", ind: semOrc?indisp:null, calc:true, fonte:"Orçamento atualizado − empenhado, do mesmo arquivo. Sem variação: é uma fotografia da data de extração.", tr:{ conj:"orcamento", ano, col:"ORÇAMENTO ATUALIZADO (R$) e ORÇAMENTO EMPENHADO (R$)", conta: semOrc?"":`Conta da plataforma: ${cheio(atual)} (autorizado) − ${cheio(emp)} (reservado) = ${cheio(atual-emp)}.`, naoAplica:["meses (o orçamento é anual)","estado/região"] } });
   const [e,l,p] = soma(a.exe, fExe(ano), [5,6,7]);
   const fE = fExe(ano), [pRef] = soma(a.exe, r=>fE(r)&&r[8]===1, [7]), [pSer] = soma(a.exe, r=>fE(r)&&r[8]===2, [7]), [rap] = soma(a.exe, fE, [9]);
   const fEA = ant ? fExe(ano-1, false, m) : null;
@@ -485,8 +492,10 @@ function blocoContratosCidade(cod, m){
 /* trilhas do painel da cidade */
 function trilhaCidade(cod, m, u, x){
   if(!x || x.ind) return "";
-  const ms = A(E.ano)?.[E.metrica==="transferencias"?"mesesTra":"meses"]||[];
-  const per = ms.length ? `${MESES[Math.min(...ms)-1]}–${MESES[Math.max(...ms)-1]}/${E.ano}` : String(E.ano);
+  const porPeriodo = E.metrica==="transferencias" && fIdx()==null;
+  const campo = E.metrica==="transferencias"?"mesesTra":"meses", ms = A(E.ano)?.[campo]||[], pc = parciais(E.ano, campo);
+  const mm = porPeriodo ? mesesEf(E.ano,"mesesTra") : null;
+  const per = mm ? `${MESES[mm[0]-1]}–${MESES[mm[1]-1]}/${E.ano}` : ms.length ? `${MESES[Math.min(...ms)-1]}–${MESES[Math.max(...ms)-1]}/${E.ano}${pc.length?` (inclui ${pc.map(x=>MESES_LONGOS[x-1]).join(", ")} ainda incompleto)`:""}` : String(E.ano);
   const pos = x.pos ? ` A posição (${x.pos}º de ${x.total}) é a ordem desse valor entre as cidades de ${u.nome} que têm registro.` : "";
   const T = {
     transferencias: { conj:"transferencias", col:"VALOR TRANSFERIDO (R$), linhas com UF = "+u.sigla+" e NOME MUNICÍPIO = "+m.nome.toUpperCase(), conta:`Somamos o valor transferido de todas as linhas em que o município de quem recebeu é ${m.nome} (${u.sigla}). O arquivo traz o nome da cidade; ligamos esse nome ao código IBGE ${cod} comparando os nomes sem acentos.${pos}`, campoMeses:"mesesTra", consulta:{ url:CONSULTA.transferencias.url, rot:CONSULTA.transferencias.rot, passo:`escolha o ano ${E.ano}, o estado ${u.nome} e a cidade ${m.nome}` } },
@@ -494,7 +503,7 @@ function trilhaCidade(cod, m, u, x){
     emendas: { conj:"emendas", col:"VALOR PAGO (R$), emendas com município de destino = "+m.nome.toUpperCase(), conta:`Somamos o valor pago das emendas parlamentares cujo destino informado é ${m.nome} (${u.sigla}).${pos}`, consulta:{ url:CONSULTA.emendas.url, rot:CONSULTA.emendas.rot, passo:`escolha o ano ${E.ano} e filtre pela localidade ${m.nome}` } },
   }[E.metrica];
   if(!T) return "";
-  return trilha({ ...T, ano:E.ano, anoInteiro:true, filtrosExtra:[`cidade: ${m.nome}`], naoAplica:["filtro de meses (por cidade mostramos o ano inteiro publicado)"] }, { v:x.valor, per, calc:false });
+  return trilha({ ...T, ano:E.ano, anoInteiro:!porPeriodo, periodo: porPeriodo ? null : `${per} — por cidade, com filtro de área ou nesta leitura, mostramos o ano inteiro publicado.`, filtrosExtra:[`cidade: ${m.nome}`], naoAplica: porPeriodo ? [] : ["filtro de meses (por cidade mostramos o ano inteiro publicado)"] }, { v:x.valor, per, calc:false });
 }
 const u0 = m => D.ufs[m.ui]?.nome || "";
 function trilhaProjetos(m, pr){
@@ -535,11 +544,11 @@ function tresPerguntas(){
   let top = [], tot = 0;
   if(a){ if(lugar){ if(disp(E.ano,"tra")) top = agrupa(a.tra, fTra(E.ano), r=>r[2], 4); } else if(disp(E.ano,"exe")) top = areasPagas(E.ano, fExe(E.ano)); }
   tot = top.reduce((s,x)=>s+x.v,0);
-  const r2 = top.length ? `<ol class="top3">${top.slice(0,3).map(x=>{ const nome=nomeArea(x.k), nt=notaArea(x.k); return `<li><span>${esc(nome)}${nt?`<span class="muted"> (${esc(nt)})</span>`:""}</span><b class="num">${tot?Math.round(x.v/tot*100):0} de cada R$ 100</b></li>`; }).join("")}</ol><p class="muted">Das ${top.length} áreas de governo, essas três somam ${extenso(top.slice(0,3).reduce((s,x)=>s+x.v,0))}.</p>` : `<p class="muted">Sem dados por área para este período.</p>`;
+  const r2 = top.length ? `<ol class="top3">${top.slice(0,3).map(x=>{ const nome=nomeArea(x.k), nt=notaArea(x.k); return `<li><span>${esc(nome)}${nt?`<span class="muted"> (${esc(nt)})</span>`:""}</span><b class="num">${tot?Math.round(x.v/tot*100):0} de cada R$ 100</b></li>`; }).join("")}</ol><p class="muted">Essas três linhas somam ${extenso(top.slice(0,3).reduce((s,x)=>s+x.v,0))}.</p>` : `<p class="muted">Sem dados por área para este período.</p>`;
   const t2 = top.length ? { conj: lugar?"transferencias":"execucao", ano:E.ano, col: lugar?"VALOR TRANSFERIDO (R$) agrupado por NOME FUNÇÃO":"VALOR PAGO (R$) agrupado por NOME FUNÇÃO", conta:`Separamos as linhas pela coluna da área de governo (função) e somamos ${lugar?"o valor transferido":"o valor pago"} de cada uma.${lugar?"":" A rolagem da dívida (ações “Refinanciamento da Dívida Pública”, dentro da função Encargos especiais) aparece como uma linha própria; o resto de Encargos especiais continua com o nome oficial."} “De cada R$ 100” = valor da área ÷ total de todas as áreas (${cheio(tot)}) × 100.`, campoMeses: lugar?"mesesTra":"meses" } : null;
   // 3. O que mudou?
   const vari = lugar ? null : variacoesPorArea();
-  const r3 = i1?.vr!=null ? `<p class="resp"><span class="${i1.vr>=0?"seta-sobe":"seta-cai"} sobe">${i1.vr>=0?"Subiu":"Caiu"} ${pct(Math.abs(i1.vr))}</span></p><p>${lugar?`O valor recebido por ${esc(lugar)}`:"O que o governo pagou"} de ${esc(i1.per)} foi ${extenso(Math.abs(i1.v-i1.tr.base))} ${i1.vr>=0?"a mais":"a menos"} que nos mesmos meses de ${E.ano-1}.</p>${!lugar && i1.semRolagemVr!=null?`<p class="muted">Sem contar a rolagem da dívida: <b>${i1.semRolagemVr>=0?"+":"−"}${pct(Math.abs(i1.semRolagemVr))}</b>.</p>`:""}${vari?.sobe?.[0]||vari?.cai?.[0]?`<p class="muted">${vari.sobe[0]?`Mais subiu: <b>${esc(vari.sobe[0].nome)}</b> (+${pct(vari.sobe[0].p)}).`:""} ${vari.cai[0]?`Mais caiu: <b>${esc(vari.cai[0].nome)}</b> (−${pct(Math.abs(vari.cai[0].p))}).`:""}</p>`:""}` : `<p class="muted">Ainda não dá para comparar: ${E.ano-1} não tem os mesmos meses publicados.</p>`;
+  const r3 = i1?.vr!=null ? `<p class="resp"><span class="${i1.vr>=0?"seta-sobe":"seta-cai"} sobe">${i1.vr>=0?"Subiu":"Caiu"} ${pct(Math.abs(i1.vr))}</span></p><p>${lugar?`O valor recebido por ${esc(lugar)}`:"O que o governo pagou"} de ${esc(i1.per)} foi ${extenso(Math.abs(i1.v-i1.tr.base))} ${i1.vr>=0?"a mais":"a menos"} que nos mesmos meses de ${E.ano-1}.</p>${!lugar && i1.semRolagemVr!=null?`<p class="muted">Sem contar a rolagem da dívida: <b>${i1.semRolagemVr>=0?"+":"−"}${pct(Math.abs(i1.semRolagemVr))}</b>.</p>`:""}${vari?.sobe?.[0]||vari?.cai?.[0]?`<p class="muted">${vari.sobe[0]?`Mais subiu: <b>${esc(vari.sobe[0].nome)}</b> (+${pct(vari.sobe[0].p)}).`:""} ${vari.cai[0]?`Mais caiu: <b>${esc(vari.cai[0].nome)}</b> (−${pct(Math.abs(vari.cai[0].p))}).`:""}</p>`:""}` : `<p class="muted">Ainda não dá para comparar: ${temParcial(E.ano, mesesEf(E.ano, lugar?"mesesTra":"meses"), lugar?"mesesTra":"meses") ? `o período escolhido inclui um mês de ${E.ano} ainda incompleto.` : `${E.ano-1} não tem os mesmos meses publicados.`}</p>`;
   const card = (n, q, corpo, links, tr, iv) => `<article class="cartao pergunta"><h2><span class="nq">${n}</span>${q}</h2>${corpo}<div class="links-p">${links}</div>${tr?trilha(tr, iv):""}</article>`;
   return `<section class="perguntas" aria-label="Três perguntas">
     ${card(1, lugar?(E.uf?"Quanto chegou ao estado?":"Quanto chegou à região?"):"Quanto foi pago?", r1, `<button class="lnk" data-acao="ir:kpis">Ver as etapas do gasto →</button>`, i1?.tr, i1||{})}
@@ -547,6 +556,7 @@ function tresPerguntas(){
     ${card(3, "O que mudou em relação ao ano passado?", r3, `<button class="lnk" data-acao="ir:tendencia">Ver o gráfico mês a mês →</button>`, i1?.tr, i1||{})}
   </section>`;
 }
+function perTxtTra(){ const m=mesesEf(E.ano,"mesesTra"); return m?`${MESES[m[0]-1]}–${MESES[m[1]-1]}/${E.ano}`:String(E.ano); }
 function perTxt(){ const m=mesesEf(E.ano); return m?(m[0]===1&&m[1]===12?String(E.ano):`${MESES[m[0]-1]}–${MESES[m[1]-1]}/${E.ano}`):String(E.ano); }
 function graficoBarras(dados, rot){
   const W=520,H=170,pl=44,pb=22,pt=8; const max=Math.max(...dados.map(d=>d.v||0),1);
@@ -567,6 +577,12 @@ function valoresMun(ui, metrica = E.metrica, ano = E.ano){
   const conj = metrica==="transferencias"?"tra":metrica==="execucao"?"exe":"emendas";
   if(!disp(ano,conj)) return { mapa, semId, ind:true };
   if(metrica==="emendas"){ for(const r of a.emendas){ if(r[3]!==ui||(f!=null&&r[5]!==f)) continue; if(r[8]>0) mapa.set(r[8],(mapa.get(r[8])||0)+r[7]); else semId+=r[7]; } }
+  else if(metrica==="transferencias" && f==null && a.traMunMes){
+    // Sem filtro de área: usa a série mensal, respeitando o período (e deixando de fora meses incompletos).
+    const mm = mesesEf(ano,"mesesTra"); if(!mm) return { mapa, semId };
+    for(const r of a.traMunMes){ if(r[0]!==ui||r[2]<mm[0]||r[2]>mm[1]) continue; if(r[1]===-1) semId+=r[3]; else mapa.set(r[1],(mapa.get(r[1])||0)+r[3]); }
+    return { mapa, semId, per: mm };
+  }
   else { const rows = metrica==="transferencias"?a.traMun:a.exeMun; for(const r of rows){ if(r[0]!==ui||(f!=null&&r[2]!==f)) continue; if(r[1]===-1) semId+=r[3]; else mapa.set(r[1],(mapa.get(r[1])||0)+r[3]); } }
   return { mapa, semId };
 }
@@ -687,7 +703,7 @@ function desenharMapa(){
     document.getElementById("zout").onclick = () => svgSel.transition().duration(250).call(zoomB.scaleBy, 1/1.6);
     document.getElementById("zreset").onclick = () => { ultimoTransform = null; if(E.uf||E.mun){ E.uf=null; E.mun=null; E.munis=false; render(); } else svgSel.transition().call(zoomB.transform, d3.zoomIdentity); };
   }
-  document.getElementById("nota-ni").innerHTML = `Fora do mapa, <b>localização não identificada</b>: <span class="num"><b>${comp(t.ni)}</b></span>${munData?` · no estado, sem município identificado: <b class="num">${comp(munData.semId)}</b>`:""}. Despesas sem estado confiável não vão para a sede do órgão.`;
+  document.getElementById("nota-ni").innerHTML = `Fora do mapa, <b>localização não identificada</b>: <span class="num"><b>${comp(t.ni)}</b></span>${munData?` · no estado, sem município identificado: <b class="num">${comp(munData.semId)}</b>`:""}. Despesas sem estado confiável não vão para a sede do órgão.${(()=>{ const noMapa=t.ufs.reduce((x,u)=>x+u.valor,0), tot=noMapa+(t.ni||0); return tot>0 ? ` <b>Cobertura:</b> o mapa mostra ${pct(noMapa/tot)} do valor desta leitura${E.metrica==="execucao"?" — a maior parte da despesa federal não informa estado na fonte (sobretudo dívida pública, benefícios da Previdência e repasses obrigatórios)":""}.` : ""; })()}`;
 }
 function selecionarMun(cod){ const m = MUN[cod]; if(!m) return; E.mun = cod; E.uf = m.uf; E.regiao = null; render(); document.getElementById("lateral")?.scrollIntoView({block:"nearest", behavior:"smooth"}); }
 function selecionarUF(s){ E.uf = E.uf===s ? null : s; E.mun = null; E.regiao=null; E.munis = false; ultimoTransform = null; render(); document.getElementById("lateral")?.scrollIntoView({block:"nearest"}); }
@@ -793,7 +809,8 @@ function variacoesPorArea(){
   const ant = A(E.ano-1); if(!ant || !disp(E.ano,"exe") || !disp(E.ano-1,"exe")) return null;
   const m = mesesEf(E.ano); if(!m || !cobre(E.ano-1, m, "meses")) return null;
   const u = ufsFiltro();
-  const filt = r => r[0]>=m[0] && r[0]<=m[1] && (!u||u.includes(r[1]));
+  const filt = r => r[0]>=m[0] && r[0]<=m[1] && (!u||u.includes(r[1])) && r[8]!==1; // sem a rolagem da dívida
+  if(temParcial(E.ano, m, "meses")) return null;
   const g1 = new Map(agrupa(A(E.ano).exe, filt, r=>r[3], 7).map(x=>[x.k,x.v]));
   const g0 = new Map(agrupa(ant.exe, filt, r=>r[3], 7).map(x=>[D.dic.funcao[x.k]?.cod, x.v]));
   const lin = [...g1].map(([k,v])=>{ const cod=D.dic.funcao[k]?.cod; const v0=g0.get(cod)||0; return { nome: D.dic.funcao[k]?.nome, v, v0, d: v-v0, p: v0>0?(v-v0)/v0:null }; }).filter(x=>x.v0 >= 1e8 && x.p!=null);
@@ -831,7 +848,7 @@ function painelMunicipio(){
   const pr = D.convResumo?.porMunicipio?.[cod];
   return `<div class="painel-uf">
     <div style="display:flex;justify-content:space-between;gap:8px"><div><button class="voltar" data-acao="voltar-uf">← ${esc(u.nome)}</button><h2 style="font-size:22px">${esc(m.nome)}</h2><div class="muted">Município de ${esc(u.nome)} · código IBGE ${cod}</div></div><button class="botao fechar" aria-label="Fechar painel da cidade" data-acao="fechar">✕</button></div>
-    <div><div class="rotulo" style="margin-bottom:8px">Recursos federais identificados na cidade · ${E.ano}</div><div class="metricas">${mets.map(x=>`<button aria-pressed="${x.k===E.metrica}" data-metrica="${x.k}" ${x.ind?"disabled":""}><span class="a"><span>${METRICAS[x.k].rot}</span><b class="num">${x.ind?"não disponível":x.valor?comp(x.valor):"—"}</b></span>${x.ind?"":`<span class="b num"><span>${x.pos?`${x.pos}º de ${x.total} cidades de ${u.sigla} com registro`:"sem registro no período"}</span></span>`}</button>`).join("")}</div><p class="muted" style="margin:6px 0 0">Valores do ano todo por município. Fontes e critérios diferentes: não some as linhas.</p>${trilhaCidade(cod, m, u, mets.find(x=>x.k===E.metrica))}</div>
+    <div><div class="rotulo" style="margin-bottom:8px">Recursos federais identificados na cidade · ${E.ano}</div><div class="metricas">${mets.map(x=>`<button aria-pressed="${x.k===E.metrica}" data-metrica="${x.k}" ${x.ind?"disabled":""}><span class="a"><span>${METRICAS[x.k].rot}</span><b class="num">${x.ind?"não disponível":x.valor?comp(x.valor):"—"}</b></span>${x.ind?"":`<span class="b num"><span>${x.pos?`${x.pos}º de ${x.total} cidades de ${u.sigla} com registro`:"sem registro no período"}</span></span>`}</button>`).join("")}</div><p class="muted" style="margin:6px 0 0">${E.metrica==="transferencias"&&fIdx()==null?`Transferências de ${perTxtTra()}.`:"Valores do ano todo publicado, por município."} Fontes e critérios diferentes: não some as linhas.</p>${trilhaCidade(cod, m, u, mets.find(x=>x.k===E.metrica))}</div>
     ${disp(E.ano,"tra")?`<div class="bloco"><div class="rotulo">Está subindo ou caindo? · transferências</div>${blocoTendencia("transferencias", { mun: cod }, m.nome)}</div>`:""}
     <div class="bloco"><div class="rotulo">Projetos na cidade ${ajuda("contrato")}</div>${pr?`<div class="resumo-proj" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div><span class="muted">Projetos</span><b class="num">${pr[0]}</b></div><div><span class="muted">Ainda vão começar</span><b class="num">${pr[3]}</b></div><div><span class="muted">Valor combinado</span><b class="num">${comp(pr[1])}</b></div><div><span class="muted">Falta repassar</span><b class="num">${comp(Math.max(0,pr[1]-pr[2]))}</b></div></div>`:""}<div id="proj-cidade"><p class="muted">${D.convResumo?"Carregando projetos…":"Projetos ainda não carregados."}</p></div><p class="muted" style="margin:0">${NOTA_PROJ}</p>${pr?trilhaProjetos(m, pr):""}</div>
     ${blocoContratosCidade(cod, m)}
@@ -1048,28 +1065,29 @@ function secaoTendencia(){
   return `<section class="cartao" id="tendencia"><div class="sec-tit"><div><h2>Está subindo ou caindo?</h2><p>${lugar?esc(lugar.nome):"Brasil"} · mês a mês, ${E.ano} comparado com ${E.ano-1}</p></div>
     <div class="seg" role="radiogroup" aria-label="O que comparar"><button role="radio" aria-checked="${met==="execucao"}" data-tend="execucao">Pago pelo governo</button><button role="radio" aria-checked="${met==="transferencias"}" data-tend="transferencias">Transferências</button></div></div>
     ${blocoTendencia(met, esc0, sujeito)}
-    ${vari?`<div class="bloco" style="margin-top:14px"><div class="sec-tit"><div><h2 style="font-size:15px">Por área: o que mais subiu e o que mais caiu</h2><p>Valor pago de ${vari.per}, ${E.ano-1} → ${E.ano}${lugar?` (despesas com local em ${esc(lugar.nome)})`:""}. Áreas com menos de R$ 100 mi no ano anterior não entram.</p></div></div>${vari.html}</div>`:""}
+    ${vari?`<div class="bloco" style="margin-top:14px"><div class="sec-tit"><div><h2 style="font-size:15px">Por área: o que mais subiu e o que mais caiu</h2><p>Valor pago de ${vari.per}, ${E.ano-1} → ${E.ano}${lugar?` (despesas com local em ${esc(lugar.nome)})`:""}. Áreas com menos de R$ 100 mi no ano anterior não entram. A rolagem da dívida fica de fora (é troca de títulos, não gasto da área).</p></div></div>${vari.html}</div>`:""}
   </section>`;
 }
 
 function rankings(){
   const a=A(E.ano);
-  const org = agrupa(a.exe, fExe(E.ano), r=>r[2], 7).slice(0,8).map(x=>({nome:D.dic.orgao[x.k].nome,v:x.v}));
-  const are = agrupa(a.exe, fExe(E.ano), r=>r[3], 7).slice(0,8).map(x=>({nome:D.dic.funcao[x.k].nome,v:x.v,cod:D.dic.funcao[x.k].cod}));
+  const fE = fExe(E.ano), rolOrg = new Map(agrupa(a.exe, r=>fE(r)&&r[8]===1, r=>r[2], 7).map(x=>[x.k,x.v]));
+  const org = agrupa(a.exe, fE, r=>r[2], 7).slice(0,8).map(x=>({nome:D.dic.orgao[x.k].nome,v:x.v,sub:rolOrg.get(x.k)?`dos quais ${comp(rolOrg.get(x.k))} são rolagem da dívida`:""}));
+  const are = areasPagas(E.ano, fE).slice(0,8).map(x=>({nome:nomeArea(x.k),v:x.v,cod:x.k===AREA_ROLAGEM?null:D.dic.funcao[x.k].cod,sub:notaArea(x.k)}));
   const terr = !!(E.uf||E.regiao);
   const prg = terr?[]:agrupa(a.orc, fOrc(), r=>r[2], 3).slice(0,8).map(x=>({nome:D.dic.programa[x.k].nome,v:x.v,sub:`Programa ${D.dic.programa[x.k].cod}`}));
   const u = ufsFiltro();
   const fav = a.favorecidos.filter(r=>!u||u.includes(r[0])).sort((x,y)=>y[3]-x[3]).slice(0,8).map(r=>({nome:r[1],v:r[3],sub:r[2]}));
   const em = a.emendas.filter(fEme()).sort((x,y)=>y[7]-x[7]).slice(0,6).map(r=>({nome:`Emenda ${r[1]} · ${D.dic.autor[r[2]].nome}`,v:r[7],sub:`${r[4]} (${D.ufs[r[3]]?.sigla||"NI"})`}));
   const c = (t, g, corpo, lnk) => `<div class="cartao"><div class="sec-tit"><h2>${t} ${g?ajuda(g):""}</h2>${lnk?`<a href="#${lnk}">Ver todos</a>`:""}</div>${corpo}</div>`;
-  return `<section><h2 style="font-size:18px;margin-bottom:12px">Rankings nacionais</h2><div class="rank">
+  return `<details class="explorar"><summary><h2>Explorar: quem mais pagou, áreas, programas, favorecidos, emendas e empresas</h2><span class="muted">${filtrosAtivos().length?`Com os filtros: ${esc(filtrosAtivos().join(" · "))}`:"Brasil inteiro"} · ${perTxt()} · clique para abrir</span></summary><div class="rank">
     ${c("Órgãos que mais pagaram","",barras(org,comp),"orgaos")}
-    ${c("Áreas com maior volume pago","funcao",barras(are,comp,it=>`funcao:${it.cod}`),"areas")}
+    ${c("Áreas com maior volume pago","funcao",barras(are,comp,it=>it.cod?`funcao:${it.cod}`:"view:areas"),"areas")}
     ${c("Programas com maior orçamento","programa",terr?`<p class="muted">Orçamento não é dividido por estado: ranking indisponível neste recorte.</p>`:barras(prg,comp))}
     ${c("Favorecidos de transferências","",disp(E.ano,"tra")?barras(fav,comp)+`<p class="muted" style="margin:8px 0 0">Pessoas físicas não são listadas. Receber recursos públicos não indica irregularidade.</p>`:`<p class="muted">Transferências ainda não carregadas para ${E.ano}.</p>`)}
     ${c("Emendas com maior valor pago","emenda",disp(E.ano,"emendas")?barras(em,comp):`<p class="muted">Emendas ainda não carregadas para ${E.ano}.</p>`,"emendas")}
-    ${c("Contratos com maiores valores","contrato",`<div class="vazio"><b>Ainda não integrado em lote.</b> Depende do arquivo Contratos dos dados abertos, na próxima etapa. No software, já é possível consultar contratos por órgão na API, com alertas que mostram a regra que os gerou.</div>`)}
-  </div></section>`;
+    ${c("Empresas com mais dinheiro em contratos","contrato",D.contratosResumo?barras(D.contratosResumo.empresas.slice(0,6).map(e=>({nome:e[0],v:e[3],sub:`${e[2]} contrato(s) valendo hoje`})),comp)+`<p class="muted" style="margin:8px 0 0">Valor dos contratos, não o que já foi pago. Sem filtro de estado (veja a aba Contratos).</p>`:`<p class="muted">Contratos ainda não carregados.</p>`,"contratos")}
+  </div></details>`;
 }
 
 function tabela(id, cols, linhas, ordemPad, porPag=20){
