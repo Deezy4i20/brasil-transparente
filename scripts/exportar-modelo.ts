@@ -140,6 +140,24 @@ for (const u of UFS) {
 // Convênios (projetos): resumo por município embutido; listas por UF ficam em arquivos separados.
 const dirConv = join(DIR, "convenios");
 const convResumo = existsSync(join(dirConv, "resumo.json")) ? JSON.parse(readFileSync(join(dirConv, "resumo.json"), "utf8")) : null;
+// "Falta repassar" somado convênio a convênio: max(0, combinado − liberado) em cada um. Subtrair os totais
+// deixaria convênios com liberado acima do combinado abaterem a pendência dos outros (achado da auditoria).
+if (convResumo) {
+  const falta: Record<string, number> = {}, faltaUF: Record<string, number> = {};
+  for (const f of readdirSync(dirConv)) {
+    if (!/^[A-Z]{2}\.json$/.test(f)) continue;
+    const d = JSON.parse(readFileSync(join(dirConv, f), "utf8"));
+    const [iV, iL, iM, iS] = ["valor", "liberado", "municipioCod", "situacao"].map((c) => d.colunas.indexOf(c));
+    for (const c of d.itens) {
+      if (/ANULAD|CANCELAD|EXCLU/i.test(String(c[iS] ?? ""))) continue;
+      const x = Math.max(0, (c[iV] ?? 0) - (c[iL] ?? 0));
+      faltaUF[d.uf] = (faltaUF[d.uf] ?? 0) + x;
+      if (c[iM]) falta[c[iM]] = (falta[c[iM]] ?? 0) + x;
+    }
+  }
+  for (const [k, v] of Object.entries(convResumo.porMunicipio ?? {}) as [string, number[]][]) v[5] = r2(falta[k] ?? 0);
+  for (const [k, v] of Object.entries(convResumo.porUF ?? {}) as [string, number[]][]) v[5] = r2(faltaUF[k] ?? 0);
+}
 
 // Contratos e licitações: resumo embutido (sem a lista por município), listas por UF em arquivos separados.
 const dirContr = join(DIR, "contratos"), dirLic = join(DIR, "licitacoes");

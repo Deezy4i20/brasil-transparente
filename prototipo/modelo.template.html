@@ -334,15 +334,17 @@ lerHash();
 /* ---------- formatação */
 const nf1 = new Intl.NumberFormat("pt-BR",{maximumFractionDigits:1});
 const brl = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
-function comp(v){ if(v==null||!isFinite(v)) return "—"; const a=Math.abs(v), s=v<0?"−":""; if(a>=1e12) return `${s}R$ ${nf1.format(a/1e12)} tri`; if(a>=1e9) return `${s}R$ ${nf1.format(a/1e9)} bi`; if(a>=1e6) return `${s}R$ ${nf1.format(a/1e6)} mi`; if(a>=1e3) return `${s}R$ ${nf1.format(a/1e3)} mil`; return `${s}R$ ${nf1.format(a)}`; }
+/** Escala de exibição: escolhe a unidade DEPOIS de arredondar (999,96 bi vira "1 tri", não "1.000 bi"). */
+const ESCALAS = [[1e12,"tri","trilhão","trilhões"],[1e9,"bi","bilhão","bilhões"],[1e6,"mi","milhão","milhões"]];
+function escala(a){ for(const [b,c,sg,pl] of ESCALAS){ if(Math.round(a/b*10)/10 >= 1) return { x: Math.round(a/b*10)/10, c, sg, pl }; } return null; }
+function comp(v){ if(v==null||!isFinite(v)) return "—"; const a=Math.abs(v), s=v<0?"−":"", e=escala(a); if(e) return `${s}R$ ${nf1.format(e.x)} ${e.c}`; if(Math.round(a/1e3*10)/10>=1) return `${s}R$ ${nf1.format(a/1e3)} mil`; return `${s}R$ ${nf1.format(a)}`; }
 const cheio = v => v==null||!isFinite(v) ? "—" : brl.format(v);
 /** Valor em palavras para leigos: "R$ 6,4 trilhões", "R$ 328 mil", "R$ 23.427". */
 function extenso(v){
   if(v==null||!isFinite(v)) return "—";
-  const a=Math.abs(v), s=v<0?"menos ":"", n=x=>nf1.format(x);
-  if(a>=1e12) return `${s}R$ ${n(a/1e12)} ${a/1e12<2?"trilhão":"trilhões"}`;
-  if(a>=1e9) return `${s}R$ ${n(a/1e9)} ${a/1e9<2?"bilhão":"bilhões"}`;
-  if(a>=1e6) return `${s}R$ ${n(a/1e6)} ${a/1e6<2?"milhão":"milhões"}`;
+  const a=Math.abs(v), s=v<0?"menos ":"", e=escala(a);
+  // Singular só abaixo de 2 depois do arredondamento: "R$ 1,9 trilhão", "R$ 2 trilhões".
+  if(e) return `${s}R$ ${nf1.format(e.x)} ${e.x<2?e.sg:e.pl}`;
   if(a>=1e4) return `${s}R$ ${new Intl.NumberFormat("pt-BR",{maximumFractionDigits:0}).format(a/1e3)} mil`;
   return `${s}R$ ${new Intl.NumberFormat("pt-BR",{maximumFractionDigits:0}).format(a)}`;
 }
@@ -509,7 +511,7 @@ const u0 = m => D.ufs[m.ui]?.nome || "";
 function trilhaProjetos(m, pr){
   const ref = D.convResumo?.referencia;
   const ano = (D.conjuntos||[]).find(c=>c.conjunto==="convenios")?.ano || E.ano;
-  return trilha({ conj:"convenios", ano, col:"VALOR CONVÊNIO e VALOR LIBERADO (R$)", conta:`Contamos os convênios em que quem executa (o convenente) fica em ${m.nome}. Tiramos os anulados, cancelados e excluídos, e os que terminaram antes de 1º de janeiro do ano passado. “Valor combinado” = soma do VALOR CONVÊNIO (${cheio(pr[1])}). “Falta repassar” = combinado − VALOR LIBERADO (${cheio(pr[1])} − ${cheio(pr[2])}). “Ainda vão começar” = início da vigência depois de hoje.`, consulta:{ url:CONSULTA.convenios.url, rot:CONSULTA.convenios.rot, passo:`filtre pelo estado ${u0(m)} e pelo município ${m.nome} do convenente` }, periodo:`Situação na data do arquivo oficial${ref?` (${dataBR(ref)})`:""}; o arquivo de convênios é uma fotografia, não tem meses.`, filtrosExtra:[`cidade: ${m.nome}`], naoAplica:["ano e meses do topo (o arquivo de convênios não é dividido por período)","filtro de área"] }, { v:pr[1], calc:true });
+  return trilha({ conj:"convenios", ano, col:"VALOR CONVÊNIO e VALOR LIBERADO (R$)", conta:`Contamos os convênios em que quem executa (o convenente) fica em ${m.nome}. Tiramos os anulados, cancelados e excluídos, e os que terminaram antes de 1º de janeiro do ano passado. “Valor combinado” = soma do VALOR CONVÊNIO (${cheio(pr[1])}). “Falta repassar” = soma, convênio a convênio, de (VALOR CONVÊNIO − VALOR LIBERADO), contando zero quando já foi liberado tudo (${cheio(faltaRes(pr))}). Alguns convênios têm liberado maior que o combinado; subtrair os totais esconderia parte do que falta. “Ainda vão começar” = início da vigência depois de hoje.`, consulta:{ url:CONSULTA.convenios.url, rot:CONSULTA.convenios.rot, passo:`filtre pelo estado ${u0(m)} e pelo município ${m.nome} do convenente` }, periodo:`Situação na data do arquivo oficial${ref?` (${dataBR(ref)})`:""}; o arquivo de convênios é uma fotografia, não tem meses.`, filtrosExtra:[`cidade: ${m.nome}`], naoAplica:["ano e meses do topo (o arquivo de convênios não é dividido por período)","filtro de área"] }, { v:pr[1], calc:true });
 }
 /* trilha de tabelas inteiras (abas Quem gasta / Com o que se gasta) */
 function trilhaTabela(agrup, colAgrup, terr){
@@ -597,6 +599,8 @@ const CI = { numero:0, mun:1, munNome:2, situacao:3, objeto:4, orgaoSup:5, conce
 function statusProj(c){ if(c[CI.inicio] && c[CI.inicio] > HOJE) return "futuro"; if(!c[CI.fim] || c[CI.fim] >= HOJE) return "andamento"; return "encerrado"; }
 const ROT_STATUS = { futuro: "Ainda vai começar", andamento: "Em andamento", encerrado: "Prazo encerrado" };
 const dataBR = iso => iso ? iso.split("-").reverse().join("/") : "—";
+/** Falta repassar de um resumo [qtd, valor, liberado, futuros, vigentes, falta]: soma convênio a convênio. */
+const faltaRes = pr => pr[5] ?? Math.max(0, pr[1]-pr[2]);
 const aLiberar = c => (c[CI.valor]!=null && c[CI.liberado]!=null) ? Math.max(0, c[CI.valor]-c[CI.liberado]) : null;
 /** Quem pediu o projeto por emenda (deduplicado). Emenda de relator não identifica o parlamentar. */
 function autoresEmenda(c){
@@ -832,7 +836,7 @@ function resumoEmPalavras(){
     if(tra?.v!=null) ps.push(`O governo também <b>enviou ${extenso(tra.v)}</b> a estados, cidades, entidades e pessoas — isso faz parte do que foi pago (deste ano ou de contas de anos anteriores), não é um gasto a mais.`);
   } else {
     if(tra?.v!=null) ps.push(`De janeiro a ${ateMes} de ${E.ano}, ${esc(lugar)} recebeu <b>${extenso(tra.v)}</b> do governo federal em transferências${tra.vr!=null?` — <span class="${tra.vr>=0?"seta-sobe":"seta-cai"} sobe">${pct(Math.abs(tra.vr))} ${tra.vr>=0?"a mais":"a menos"}</span> que no mesmo período de ${E.ano-1}`:""}.`);
-    if(E.uf){ const u=D.ufs.find(x=>x.sigla===E.uf); if(tra?.v!=null) ps.push(`Isso dá cerca de <b>${extenso(tra.v/u.populacao)} por morador</b> do estado.`); const pr=D.convResumo?.porUF?.[E.uf]; if(pr) ps.push(`Há <b>${pr[0].toLocaleString("pt-BR")} projetos</b> com dinheiro federal no estado; ainda falta repassar <b>${extenso(Math.max(0,pr[1]-pr[2]))}</b>.`); }
+    if(E.uf){ const u=D.ufs.find(x=>x.sigla===E.uf); if(tra?.v!=null) ps.push(`Isso dá cerca de <b>${extenso(tra.v/u.populacao)} por morador</b> do estado.`); const pr=D.convResumo?.porUF?.[E.uf]; if(pr) ps.push(`Há <b>${pr[0].toLocaleString("pt-BR")} projetos</b> com dinheiro federal no estado; ainda falta repassar <b>${extenso(faltaRes(pr))}</b>.`); }
   }
   ps.push(`<span class="muted">Clique num estado no mapa, ou aproxime para escolher uma cidade, para ver o que acontece lá.</span>`);
   return `<section class="cartao resumo-texto" aria-label="Resumo em palavras"><h2 class="rotulo" style="margin-bottom:8px">Resumo em palavras</h2>${ps.map(t=>`<p>${t}</p>`).join("")}</section>`;
@@ -850,7 +854,7 @@ function painelMunicipio(){
     <div style="display:flex;justify-content:space-between;gap:8px"><div><button class="voltar" data-acao="voltar-uf">← ${esc(u.nome)}</button><h2 style="font-size:22px">${esc(m.nome)}</h2><div class="muted">Município de ${esc(u.nome)} · código IBGE ${cod}</div></div><button class="botao fechar" aria-label="Fechar painel da cidade" data-acao="fechar">✕</button></div>
     <div><div class="rotulo" style="margin-bottom:8px">Recursos federais identificados na cidade · ${E.ano}</div><div class="metricas">${mets.map(x=>`<button aria-pressed="${x.k===E.metrica}" data-metrica="${x.k}" ${x.ind?"disabled":""}><span class="a"><span>${METRICAS[x.k].rot}</span><b class="num">${x.ind?"não disponível":x.valor?comp(x.valor):"—"}</b></span>${x.ind?"":`<span class="b num"><span>${x.pos?`${x.pos}º de ${x.total} cidades de ${u.sigla} com registro`:"sem registro no período"}</span></span>`}</button>`).join("")}</div><p class="muted" style="margin:6px 0 0">${E.metrica==="transferencias"&&fIdx()==null?`Transferências de ${perTxtTra()}.`:"Valores do ano todo publicado, por município."} Fontes e critérios diferentes: não some as linhas.</p>${trilhaCidade(cod, m, u, mets.find(x=>x.k===E.metrica))}</div>
     ${disp(E.ano,"tra")?`<div class="bloco"><div class="rotulo">Está subindo ou caindo? · transferências</div>${blocoTendencia("transferencias", { mun: cod }, m.nome)}</div>`:""}
-    <div class="bloco"><div class="rotulo">Projetos na cidade ${ajuda("contrato")}</div>${pr?`<div class="resumo-proj" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div><span class="muted">Projetos</span><b class="num">${pr[0]}</b></div><div><span class="muted">Ainda vão começar</span><b class="num">${pr[3]}</b></div><div><span class="muted">Valor combinado</span><b class="num">${comp(pr[1])}</b></div><div><span class="muted">Falta repassar</span><b class="num">${comp(Math.max(0,pr[1]-pr[2]))}</b></div></div>`:""}<div id="proj-cidade"><p class="muted">${D.convResumo?"Carregando projetos…":"Projetos ainda não carregados."}</p></div><p class="muted" style="margin:0">${NOTA_PROJ}</p>${pr?trilhaProjetos(m, pr):""}</div>
+    <div class="bloco"><div class="rotulo">Projetos na cidade ${ajuda("contrato")}</div>${pr?`<div class="resumo-proj" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div><span class="muted">Projetos</span><b class="num">${pr[0]}</b></div><div><span class="muted">Ainda vão começar</span><b class="num">${pr[3]}</b></div><div><span class="muted">Valor combinado</span><b class="num">${comp(pr[1])}</b></div><div><span class="muted">Falta repassar</span><b class="num">${comp(faltaRes(pr))}</b></div></div>`:""}<div id="proj-cidade"><p class="muted">${D.convResumo?"Carregando projetos…":"Projetos ainda não carregados."}</p></div><p class="muted" style="margin:0">${NOTA_PROJ}</p>${pr?trilhaProjetos(m, pr):""}</div>
     ${blocoContratosCidade(cod, m)}
     ${areas.length?`<div class="bloco"><div class="rotulo">Transferências recebidas, por área ${ajuda("funcao")}</div>${barras(areas.slice(0,6).map(x=>({nome:D.dic.funcao[x.k]?.nome,v:x.v})), comp)}</div>`:""}
     <div class="bloco"><div class="rotulo">Emendas com destino à cidade ${ajuda("emenda")}</div>${disp(E.ano,"emendas")?barras(emds.map(r=>({nome:`Emenda ${r[1]} · ${D.dic.autor[r[2]].nome}`,v:r[7],sub:`${D.dic.funcao[r[5]]?.nome||""} · empenhado ${comp(r[6])}`})), comp):`<p class="muted">Emendas não carregadas para ${E.ano}.</p>`}</div>
