@@ -26,29 +26,29 @@ jobs:
           PERIODO: ${{ github.event.inputs.periodo }}
         run: |
           [ -n "$PERIODO" ] || PERIODO=$(TZ=America/Sao_Paulo date -d "$(date +%Y-%m-01) -1 month" +%Y%m)
-          OUT=""
+          OUT=""; mkdir -p amostras
           for S in $SLUGS; do
-            mkdir -p "x/$S"; cd "x/$S"
-            OK=0
-            for P in $PERIODO $(date -d "${PERIODO}01 -1 month" +%Y%m) $(date -d "${PERIODO}01 -2 month" +%Y%m); do
-              for T in 1 2 3; do
-                code=$(curl -sSL -A "Mozilla/5.0 brasil-transparente" -o a.zip -w "%{http_code}" "https://portaldatransparencia.gov.br/download-de-dados/$S/$P" || true)
-                [ "$code" = "200" ] && unzip -tq a.zip >/dev/null 2>&1 && { OK=1; break; }
-                sleep 20
+            for P in $PERIODO; do
+              D="x/$S/$P"; mkdir -p "$D"
+              OK=0
+              for T in 1 2 3 4; do
+                code=$(curl -sSL -A "Mozilla/5.0 brasil-transparente" -o "$D/a.zip" -w "%{http_code}" "https://portaldatransparencia.gov.br/download-de-dados/$S/$P" || true)
+                [ "$code" = "200" ] && unzip -tq "$D/a.zip" >/dev/null 2>&1 && { OK=1; break; }
+                sleep $((T*25))
               done
-              [ "$OK" = "1" ] && { USADO=$P; break; }
+              if [ "$OK" != "1" ]; then OUT="$OUT\n## $S $P: falhou (http $code)"; continue; fi
+              (cd "$D" && unzip -oq a.zip)
+              OUT="$OUT\n## $S $P ($(stat -c%s "$D/a.zip") bytes)"
+              for f in "$D"/*.csv; do
+                b=$(basename "$f")
+                n=$(wc -l < "$f")
+                h=$(head -1 "$f" | iconv -f latin1 -t utf-8)
+                e=$(sed -n '2,3p' "$f" | iconv -f latin1 -t utf-8 | cut -c1-700)
+                OUT="$OUT\n### $b ($n linhas)\nCAB: $h\nEX: $e"
+                head -300 "$f" | iconv -f latin1 -t utf-8 > "amostras/$S-$b"
+              done
+              sleep 5
             done
-            if [ "$OK" != "1" ]; then OUT="$OUT\n## $S: falhou (http $code)"; cd ../..; continue; fi
-            unzip -oq a.zip
-            OUT="$OUT\n## $S $USADO ($(stat -c%s a.zip) bytes)"
-            for f in *.csv; do
-              n=$(wc -l < "$f")
-              h=$(head -1 "$f" | iconv -f latin1 -t utf-8)
-              e=$(sed -n '2,3p' "$f" | iconv -f latin1 -t utf-8 | cut -c1-900)
-              OUT="$OUT\n### $f ($n linhas)\nCAB: $h\nEX: $e"
-              mkdir -p ../../amostras && head -300 "$f" | iconv -f latin1 -t utf-8 > "../../amostras/$S-$f"
-            done
-            cd ../..
           done
           printf "%b" "$OUT"
           printf "%b" "$OUT" > inspecao.txt
@@ -56,5 +56,5 @@ jobs:
         run: |
           git init -q pub && cd pub
           git config user.name "brasil-transparente-bot"; git config user.email "brasil-transparente-bot@users.noreply.github.com"
-          cp ../inspecao.txt . && cp -r ../amostras . 2>/dev/null; git add -A && git commit -qm "Inspeção de fonte"
+          cp ../inspecao.txt . && cp -r ../amostras . ; git add -A && git commit -qm "Inspeção de fonte"
           git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/inspecao
