@@ -169,6 +169,7 @@ ol.barras button.lnk:hover { text-decoration: underline; }
 .seta-cai::before { content: "▼ "; color: #256abf; font-size: .8em; }
 .termo { display: block; font-size: 11px; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--tinta-3); }
 .pbr { font-size: 12.5px; color: var(--tinta-2); }
+.trilhas-tab { display: grid; gap: 4px; margin-top: 8px; }
 .kpi:has(details.trilha[open]) { grid-column: 1 / -1; }
 .trilha details summary { cursor: pointer; text-decoration: underline dotted; }
 .links-p .lnk { border: 0; background: none; padding: 0; color: var(--link, var(--barra)); cursor: pointer; font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
@@ -430,11 +431,12 @@ function trilha(t, i){
   if(!t) return fonte(i.fonte||"", i.calc);
   const selo = OFICIAL ? (i.calc?"Calculado a partir de dado oficial":"Dado oficial") : "Demonstração";
   const cs = (D.conjuntos||[]).filter(c=>c.ano===t.ano && (t.conj==="*"||c.conjunto===t.conj));
-  const m = t.conj==="orcamento"||t.conj==="*" ? null : mesesEf(t.ano, t.campoMeses||"meses");
+  const msAno = A(t.ano)?.[t.campoMeses||"meses"]||[];
+  const m = t.conj==="orcamento"||t.conj==="*"||t.conj==="convenios" ? null : t.anoInteiro ? (msAno.length?[Math.min(...msAno),Math.max(...msAno)]:null) : mesesEf(t.ano, t.campoMeses||"meses");
   const noPeriodo = a => !m || !/^\d{6}$/.test(a.periodo) || (+a.periodo.slice(4) >= m[0] && +a.periodo.slice(4) <= m[1]);
   const arqs = cs.flatMap(c=>(c.arquivos||[]).filter(noPeriodo).map(a=>({...a, conj:c.nome})));
-  const fa = filtrosAtivos();
-  const li = a => `<li><b>${esc(a.nome)}</b>${a.periodo?` · período ${esc(/^\d{6}$/.test(a.periodo)?MESES[+a.periodo.slice(4)-1]+"/"+a.periodo.slice(0,4):a.periodo)}`:""} · baixado em ${diaBR(a.baixadoEm)} · ${Number(a.lidas||0).toLocaleString("pt-BR")} linhas lidas${a.descartadas?` (${Number(a.descartadas).toLocaleString("pt-BR")} descartadas por erro de formato)`:""}${a.url?` · <a href="${esc(a.url)}" rel="noreferrer">baixar o arquivo original</a>`:""}</li>`;
+  const fa = [...filtrosAtivos(), ...(t.filtrosExtra||[])];
+  const li = a => `<li><b>${esc(a.nome)}</b>${a.periodo?` · período ${esc(/^\d{6}$/.test(a.periodo)?MESES[+a.periodo.slice(4)-1]+"/"+a.periodo.slice(0,4):/^\d{8}$/.test(a.periodo)?`arquivo de ${a.periodo.slice(6)}/${a.periodo.slice(4,6)}/${a.periodo.slice(0,4)}`:a.periodo)}`:""} · baixado em ${diaBR(a.baixadoEm)} · ${Number(a.lidas||0).toLocaleString("pt-BR")} linhas lidas${a.descartadas?` (${Number(a.descartadas).toLocaleString("pt-BR")} deixadas de fora pelos critérios da conta ou por erro de formato)`:""}${a.url?` · <a href="${esc(a.url)}" rel="noreferrer">baixar o arquivo original</a>`:""}</li>`;
   const listaArq = arqs.length ? (arqs.length>3 ? `<details><summary>Ver os ${arqs.length} arquivos usados</summary><ul>${arqs.map(li).join("")}</ul></details>` : `<ul>${arqs.map(li).join("")}</ul>`) : `<p class="muted">${OFICIAL?"Lista de arquivos indisponível.":"Modelo com dados fictícios: não há arquivo oficial."}</p>`;
   const c0 = cs[0];
   const consulta = t.consulta || CONSULTA[t.conj];
@@ -442,10 +444,38 @@ function trilha(t, i){
   return `<details class="fonte trilha"><summary><span class="u">Como chegamos a este número</span><span class="selo${i.calc||OFICIAL?" calc":""}">${selo}</span></summary><ol class="passos">
     <li><h4>1. A conta</h4><p>${t.conta}</p>${i.v!=null?`<p>Resultado exato: <b class="num">${i.int?Number(i.v).toLocaleString("pt-BR"):cheio(i.v)}</b>${t.col?` · coluna usada: <code>${esc(t.col)}</code>`:""}</p>`:""}
       <p class="muted">Filtros aplicados: ${fa.length?esc(fa.join(" · ")):"nenhum (Brasil inteiro, todas as áreas)"}.${t.naoAplica?.length?` Não se aplicam aqui: ${esc(t.naoAplica.join("; "))}.`:""}</p></li>
-    <li><h4>2. O período</h4><p>${esc(i.per||perTxt())}${m?` — meses ${MESES[m[0]-1]} a ${MESES[m[1]-1]} de ${t.ano}, os publicados até agora.`:t.conj==="orcamento"?" — valor do ano inteiro, como estava na data do arquivo.":""}</p>${comp0}</li>
+    <li><h4>2. O período</h4><p>${esc(t.periodo||i.per||perTxt())}${t.periodo?"":m?` — meses ${MESES[m[0]-1]} a ${MESES[m[1]-1]} de ${t.ano}, os publicados até agora.`:t.conj==="orcamento"?" — valor do ano inteiro, como estava na data do arquivo.":""}</p>${comp0}</li>
     <li><h4>3. De onde vem</h4><p>${c0?`<a href="${esc(c0.url)}" rel="noreferrer">${esc(t.conj==="*"?"Portal da Transparência — download de dados":c0.nome)}</a>${c0.dicionario&&t.conj!=="*"?` · <a href="${esc(c0.dicionario)}" rel="noreferrer">o que significa cada coluna</a>`:""}`:"Portal da Transparência (CGU)"}. Processado pela plataforma em ${diaBR(D.geradoEm)}.</p>${listaArq}</li>
     ${consulta?`<li><h4>4. Confira você mesmo</h4><p>Abra <a href="${esc(consulta.url)}" rel="noreferrer">Portal da Transparência → ${esc(consulta.rot)}</a> e ${esc(consulta.passo)}${fa.length?`, aplicando os mesmos filtros (${esc(fa.join(", "))})`:""}. O valor deve bater; pequenas diferenças vêm da data de atualização (nossos arquivos foram baixados em ${diaBR(arqs[arqs.length-1]?.baixadoEm||D.geradoEm)}).</p></li>`:""}
   </ol></details>`;
+}
+/* trilhas do painel da cidade */
+function trilhaCidade(cod, m, u, x){
+  if(!x || x.ind) return "";
+  const ms = A(E.ano)?.[E.metrica==="transferencias"?"mesesTra":"meses"]||[];
+  const per = ms.length ? `${MESES[Math.min(...ms)-1]}–${MESES[Math.max(...ms)-1]}/${E.ano}` : String(E.ano);
+  const pos = x.pos ? ` A posição (${x.pos}º de ${x.total}) é a ordem desse valor entre as cidades de ${u.nome} que têm registro.` : "";
+  const T = {
+    transferencias: { conj:"transferencias", col:"VALOR TRANSFERIDO (R$), linhas com UF = "+u.sigla+" e NOME MUNICÍPIO = "+m.nome.toUpperCase(), conta:`Somamos o valor transferido de todas as linhas em que o município de quem recebeu é ${m.nome} (${u.sigla}). O arquivo traz o nome da cidade; ligamos esse nome ao código IBGE ${cod} comparando os nomes sem acentos.${pos}`, campoMeses:"mesesTra", consulta:{ url:CONSULTA.transferencias.url, rot:CONSULTA.transferencias.rot, passo:`escolha o ano ${E.ano}, o estado ${u.nome} e a cidade ${m.nome}` } },
+    execucao: { conj:"execucao", col:"VALOR PAGO (R$), linhas com MUNICÍPIO = "+m.nome.toUpperCase(), conta:`Somamos o valor pago das despesas cujo plano de trabalho indica ${m.nome} (${u.sigla}) como local do gasto. Despesas sem cidade indicada não entram aqui — nunca atribuímos à sede do órgão.${pos}`, consulta:{ url:CONSULTA.execucao.url, rot:CONSULTA.execucao.rot, passo:`escolha o ano ${E.ano} e filtre pela localidade ${m.nome}` } },
+    emendas: { conj:"emendas", col:"VALOR PAGO (R$), emendas com município de destino = "+m.nome.toUpperCase(), conta:`Somamos o valor pago das emendas parlamentares cujo destino informado é ${m.nome} (${u.sigla}).${pos}`, consulta:{ url:CONSULTA.emendas.url, rot:CONSULTA.emendas.rot, passo:`escolha o ano ${E.ano} e filtre pela localidade ${m.nome}` } },
+  }[E.metrica];
+  if(!T) return "";
+  return trilha({ ...T, ano:E.ano, anoInteiro:true, filtrosExtra:[`cidade: ${m.nome}`], naoAplica:["filtro de meses (por cidade mostramos o ano inteiro publicado)"] }, { v:x.valor, per, calc:false });
+}
+const u0 = m => D.ufs[m.ui]?.nome || "";
+function trilhaProjetos(m, pr){
+  const ref = D.convResumo?.referencia;
+  const ano = (D.conjuntos||[]).find(c=>c.conjunto==="convenios")?.ano || E.ano;
+  return trilha({ conj:"convenios", ano, col:"VALOR CONVÊNIO e VALOR LIBERADO (R$)", conta:`Contamos os convênios em que quem executa (o convenente) fica em ${m.nome}. Tiramos os anulados, cancelados e excluídos, e os que terminaram antes de 1º de janeiro do ano passado. “Valor combinado” = soma do VALOR CONVÊNIO (${cheio(pr[1])}). “Falta repassar” = combinado − VALOR LIBERADO (${cheio(pr[1])} − ${cheio(pr[2])}). “Ainda vão começar” = início da vigência depois de hoje.`, consulta:{ url:CONSULTA.convenios.url, rot:CONSULTA.convenios.rot, passo:`filtre pelo estado ${u0(m)} e pelo município ${m.nome} do convenente` }, periodo:`Situação na data do arquivo oficial${ref?` (${dataBR(ref)})`:""}; o arquivo de convênios é uma fotografia, não tem meses.`, filtrosExtra:[`cidade: ${m.nome}`], naoAplica:["ano e meses do topo (o arquivo de convênios não é dividido por período)","filtro de área"] }, { v:pr[1], calc:true });
+}
+/* trilha de tabelas inteiras (abas Quem gasta / Com o que se gasta) */
+function trilhaTabela(agrup, colAgrup, terr){
+  const fa = filtrosAtivos();
+  return `<div class="trilhas-tab">${trilha({ conj:"orcamento", ano:E.ano, col:`ORÇAMENTO ATUALIZADO (R$), agrupado por ${colAgrup}`, conta: terr ? "Com filtro de estado ou região, a coluna de orçamento fica vazia: o arquivo de orçamento não é dividido por estado." : `Coluna “Orç. atualizado”: somamos o ORÇAMENTO ATUALIZADO de cada ${agrup} no arquivo anual.`, naoAplica:["meses (o orçamento é anual)"] }, { per:String(E.ano), calc:false })
+  .replace("Como chegamos a este número","Como chegamos à coluna “Orç. atualizado”")}
+  ${trilha({ conj:"execucao", ano:E.ano, col:`VALOR EMPENHADO, VALOR LIQUIDADO e VALOR PAGO (R$), agrupados por ${colAgrup}`, conta:`Colunas “Empenhado”, “Liquidado” e “Pago”: para cada ${agrup}, somamos cada coluna separadamente em todas as linhas dos arquivos mensais do período. Elas nunca são somadas entre si — são etapas do mesmo gasto.${fa.length?" Com filtro de estado, só entram despesas com UF indicada no plano de trabalho.":""}${agrup==="órgão"?" “% exec.” é conta da plataforma: pago ÷ orçamento atualizado.":""}` }, { per:perTxt(), calc:agrup==="órgão" })
+  .replace("Como chegamos a este número","Como chegamos às colunas “Empenhado”, “Liquidado” e “Pago”")}</div>`;
 }
 /* ---------- entrada para o cidadão: três perguntas */
 function tresPerguntas(){
@@ -754,9 +784,9 @@ function painelMunicipio(){
   const pr = D.convResumo?.porMunicipio?.[cod];
   return `<div class="painel-uf">
     <div style="display:flex;justify-content:space-between;gap:8px"><div><button class="voltar" data-acao="voltar-uf">← ${esc(u.nome)}</button><h2 style="font-size:22px">${esc(m.nome)}</h2><div class="muted">Município de ${esc(u.nome)} · código IBGE ${cod}</div></div><button class="botao fechar" aria-label="Fechar painel da cidade" data-acao="fechar">✕</button></div>
-    <div><div class="rotulo" style="margin-bottom:8px">Recursos federais identificados na cidade · ${E.ano}</div><div class="metricas">${mets.map(x=>`<button aria-pressed="${x.k===E.metrica}" data-metrica="${x.k}" ${x.ind?"disabled":""}><span class="a"><span>${METRICAS[x.k].rot}</span><b class="num">${x.ind?"não disponível":x.valor?comp(x.valor):"—"}</b></span>${x.ind?"":`<span class="b num"><span>${x.pos?`${x.pos}º de ${x.total} cidades de ${u.sigla} com registro`:"sem registro no período"}</span></span>`}</button>`).join("")}</div><p class="muted" style="margin:6px 0 0">Valores do ano todo por município. Fontes e critérios diferentes: não some as linhas.</p></div>
+    <div><div class="rotulo" style="margin-bottom:8px">Recursos federais identificados na cidade · ${E.ano}</div><div class="metricas">${mets.map(x=>`<button aria-pressed="${x.k===E.metrica}" data-metrica="${x.k}" ${x.ind?"disabled":""}><span class="a"><span>${METRICAS[x.k].rot}</span><b class="num">${x.ind?"não disponível":x.valor?comp(x.valor):"—"}</b></span>${x.ind?"":`<span class="b num"><span>${x.pos?`${x.pos}º de ${x.total} cidades de ${u.sigla} com registro`:"sem registro no período"}</span></span>`}</button>`).join("")}</div><p class="muted" style="margin:6px 0 0">Valores do ano todo por município. Fontes e critérios diferentes: não some as linhas.</p>${trilhaCidade(cod, m, u, mets.find(x=>x.k===E.metrica))}</div>
     ${disp(E.ano,"tra")?`<div class="bloco"><div class="rotulo">Está subindo ou caindo? · transferências</div>${blocoTendencia("transferencias", { mun: cod }, m.nome)}</div>`:""}
-    <div class="bloco"><div class="rotulo">Projetos na cidade ${ajuda("contrato")}</div>${pr?`<div class="resumo-proj" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div><span class="muted">Projetos</span><b class="num">${pr[0]}</b></div><div><span class="muted">Ainda vão começar</span><b class="num">${pr[3]}</b></div><div><span class="muted">Valor combinado</span><b class="num">${comp(pr[1])}</b></div><div><span class="muted">Falta repassar</span><b class="num">${comp(Math.max(0,pr[1]-pr[2]))}</b></div></div>`:""}<div id="proj-cidade"><p class="muted">${D.convResumo?"Carregando projetos…":"Projetos ainda não carregados."}</p></div><p class="muted" style="margin:0">${NOTA_PROJ}</p></div>
+    <div class="bloco"><div class="rotulo">Projetos na cidade ${ajuda("contrato")}</div>${pr?`<div class="resumo-proj" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div><span class="muted">Projetos</span><b class="num">${pr[0]}</b></div><div><span class="muted">Ainda vão começar</span><b class="num">${pr[3]}</b></div><div><span class="muted">Valor combinado</span><b class="num">${comp(pr[1])}</b></div><div><span class="muted">Falta repassar</span><b class="num">${comp(Math.max(0,pr[1]-pr[2]))}</b></div></div>`:""}<div id="proj-cidade"><p class="muted">${D.convResumo?"Carregando projetos…":"Projetos ainda não carregados."}</p></div><p class="muted" style="margin:0">${NOTA_PROJ}</p>${pr?trilhaProjetos(m, pr):""}</div>
     ${areas.length?`<div class="bloco"><div class="rotulo">Transferências recebidas, por área ${ajuda("funcao")}</div>${barras(areas.slice(0,6).map(x=>({nome:D.dic.funcao[x.k]?.nome,v:x.v})), comp)}</div>`:""}
     <div class="bloco"><div class="rotulo">Emendas com destino à cidade ${ajuda("emenda")}</div>${disp(E.ano,"emendas")?barras(emds.map(r=>({nome:`Emenda ${r[1]} · ${D.dic.autor[r[2]].nome}`,v:r[7],sub:`${D.dic.funcao[r[5]]?.nome||""} · empenhado ${comp(r[6])}`})), comp):`<p class="muted">Emendas não carregadas para ${E.ano}.</p>`}</div>
   </div>`;
@@ -898,7 +928,7 @@ function viewOrgaos(){
   const linhas=[...ids].map(i=>{ const x=e.get(i)||[0,0,0]; const at=terr?null:(o.get(i)||0); return {nome:D.dic.orgao[i].nome, cod:D.dic.orgao[i].cod, at, emp:x[0], liq:x[1], pago:x[2], ex: at? x[2]/at : null}; });
   return `<div class="titulo-pag"><h1>Quem gasta · ${perTxt()}</h1><p>Órgãos superiores do Poder Executivo federal, com orçamento autorizado e as etapas da execução lado a lado. No software, cada órgão abre unidades, programas, ações e natureza da despesa.</p></div>${filtrosHTML()}
   <section class="cartao"><div class="sec-tit"><div><h2>Órgãos superiores</h2><p>% executado = pago ÷ orçamento atualizado (calculado). ${terr?"Com filtro de estado, o orçamento não é exibido (não é regionalizado).":""}</p></div></div>
-  ${tabela("org",[{k:"nome",t:"Órgão"},{k:"cod",t:"Código"},{k:"at",t:"Orç. atualizado",n:1,f:mo},{k:"emp",t:"Empenhado",n:1,f:mo},{k:"liq",t:"Liquidado",n:1,f:mo},{k:"pago",t:"Pago",n:1,f:mo},{k:"ex",t:"% exec.",n:1,f:v=>v==null?"—":pct(v)}],linhas,"pago")}${fonte("Orçamento da Despesa (anual) e Execução da Despesa (mensal), agrupados por órgão superior. Colunas de arquivos distintos, nunca somadas.")}</section>`;
+  ${tabela("org",[{k:"nome",t:"Órgão"},{k:"cod",t:"Código"},{k:"at",t:"Orç. atualizado",n:1,f:mo},{k:"emp",t:"Empenhado",n:1,f:mo},{k:"liq",t:"Liquidado",n:1,f:mo},{k:"pago",t:"Pago",n:1,f:mo},{k:"ex",t:"% exec.",n:1,f:v=>v==null?"—":pct(v)}],linhas,"pago")}${trilhaTabela("órgão","CÓDIGO/NOME ÓRGÃO SUPERIOR",terr)}</section>`;
 }
 
 function viewAreas(){
@@ -910,8 +940,8 @@ function viewAreas(){
   const cats = CATS.map(([n,fs,nota])=>{ const ps=linhas.filter(l=>fs.includes(l.cod)); return {n,nota,ps,pago:ps.reduce((s,l)=>s+l.pago,0)}; }).filter(c=>c.ps.length);
   const max=Math.max(...cats.map(c=>c.pago),1);
   return `<div class="titulo-pag"><h1>Com o que se gasta · ${perTxt()}</h1><p>Gastos por área de atuação, pela classificação funcional oficial. As categorias agrupam funções oficiais só por correspondência direta de código; as funções originais continuam visíveis.</p></div>${filtrosHTML(["regiao","uf"])}
-  <section class="cartao"><div class="sec-tit"><div><h2>Categorias ${ajuda("funcao")}</h2><p>Valor pago no período.</p></div></div><div class="cats">${cats.map(c=>`<div class="cat"><div class="a"><b>${c.n}</b><b class="num">${comp(c.pago)}</b></div><div class="trilho"><div style="width:${c.pago/max*100}%"></div></div><span class="muted">Funções oficiais: ${c.ps.map(p=>`${p.cod} ${esc(p.nome)}`).join(", ")}</span>${c.nota?`<span class="muted" style="color:var(--aviso)">${c.nota}</span>`:""}</div>`).join("")}</div></section>
-  <section class="cartao"><div class="sec-tit"><h2>Funções oficiais (classificação original)</h2></div>${tabela("fun",[{k:"nome",t:"Função"},{k:"cod",t:"Código"},{k:"at",t:"Orç. atualizado",n:1,f:mo},{k:"emp",t:"Empenhado",n:1,f:mo},{k:"liq",t:"Liquidado",n:1,f:mo},{k:"pago",t:"Pago",n:1,f:mo}],linhas,"pago",30)}${fonte("Classificação funcional oficial. Execução mensal e orçamento anual lado a lado.")}</section>`;
+  <section class="cartao"><div class="sec-tit"><div><h2>Categorias ${ajuda("funcao")}</h2><p>Valor pago no período.</p></div></div><div class="cats">${cats.map(c=>`<div class="cat"><div class="a"><b>${c.n}</b><b class="num">${comp(c.pago)}</b></div><div class="trilho"><div style="width:${c.pago/max*100}%"></div></div><span class="muted">Funções oficiais: ${c.ps.map(p=>`${p.cod} ${esc(p.nome)}`).join(", ")}</span>${c.nota?`<span class="muted" style="color:var(--aviso)">${c.nota}</span>`:""}</div>`).join("")}</div>${trilha({ conj:"execucao", ano:E.ano, col:"VALOR PAGO (R$), agrupado por CÓDIGO FUNÇÃO", conta:"Cada categoria é a soma do VALOR PAGO das funções oficiais listadas embaixo dela (por exemplo, Urbanismo + Habitação + Saneamento). A ligação é feita só pelo código oficial da função; nenhuma despesa é reclassificada."+(terr?" Com filtro de estado, só entram despesas com UF indicada no plano de trabalho.":"") }, { per:perTxt(), calc:true })}</section>
+  <section class="cartao"><div class="sec-tit"><h2>Funções oficiais (classificação original)</h2></div>${tabela("fun",[{k:"nome",t:"Função"},{k:"cod",t:"Código"},{k:"at",t:"Orç. atualizado",n:1,f:mo},{k:"emp",t:"Empenhado",n:1,f:mo},{k:"liq",t:"Liquidado",n:1,f:mo},{k:"pago",t:"Pago",n:1,f:mo}],linhas,"pago",30)}${trilhaTabela("área (função)","CÓDIGO/NOME FUNÇÃO",terr)}</section>`;
 }
 
 function viewEmendas(){
