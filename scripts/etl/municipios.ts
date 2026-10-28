@@ -43,11 +43,26 @@ function variantes(nome: string): string[] {
   return [...v];
 }
 
+/**
+ * Grafias do Portal que não batem com o nome da malha (nomes antigos ou alterados por lei).
+ * Chave: "UF|NOME NORMALIZADO" do Portal → código IBGE. Achados na auditoria de out/2026.
+ */
+export const APELIDOS_MUNICIPIOS: Record<string, string> = {
+  "SP|EMBU DAS ARTES": "3515004", // malha: "Embu"
+  "RJ|PARATI": "3303807", // malha: "Paraty"
+  "SP|MOGI MIRIM": "3530805", // malha: "Moji Mirim"
+  "RS|SANTANA DO LIVRAMENTO": "4317103", // malha: "Sant' Ana do Livramento"
+  "RN|SERRA CAIADA EX PRESIDENTE JUSCELINO": "2410306", // nome atual: Serra Caiada
+  "RN|SERRA CAIADA": "2410306",
+};
+
 export function localizarMunicipio(
   idx: IndiceMunicipios,
   uf: string,
   nome: string,
 ): { cod: string; nome: string; correspondencia: "nome" | "sem_correspondencia" } {
+  const ap = APELIDOS_MUNICIPIOS[`${uf}|${normalizarTexto(nome)}`];
+  if (ap && idx.porCodigo.has(ap)) return { cod: ap, nome: idx.porCodigo.get(ap)!.nome, correspondencia: "nome" };
   for (const v of variantes(nome)) {
     const m = idx.porNome.get(`${uf}|${v}`);
     if (m) return { ...m, correspondencia: "nome" };

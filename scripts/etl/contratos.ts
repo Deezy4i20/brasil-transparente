@@ -34,6 +34,7 @@ import { join } from "node:path";
 import type { ManifestoConjunto } from "../../src/lib/dados/tipos";
 import { UFS } from "../../src/lib/referencia/ufs";
 import { atualizarManifesto } from "./index";
+import { valorImplausivel } from "../../src/lib/auditoria";
 
 export const API = "https://dadosabertos.compras.gov.br";
 export const FONTE_CONTRATOS = {
@@ -159,7 +160,8 @@ export function resumirContratos(porUF: Record<string, (string | number)[][]>, e
     for (const c of itens) {
       total++;
       const st = situacaoContrato(String(c[I.inicio]), String(c[I.fim]), hoje);
-      const v = Number(c[I.valorGlobal]) || 0;
+      const v0 = Number(c[I.valorGlobal]) || 0;
+      const v = valorImplausivel(v0) ? 0 : v0; // provável erro na fonte: fica fora das somas
       const u = (uf[sigla] ??= [0, 0, 0]);
       u[0]++;
       if (sigla === "NI") semLocal++;
@@ -269,6 +271,7 @@ export async function executarContratos(opts: { desde?: string; licitacoesDesde?
   const descartes: Record<string, number> = {};
   const empenhos = { qtd: 0, valor: 0 };
   // Auditoria: detalhamento das notas de empenho (não entram na lista), para entender o que somam.
+  let empenhosImplausiveis = 0;
   const empOrgao = new Map<string, [number, number]>(), empMaiores: (string | number)[][] = [];
   let lidos = 0, falhasOrgao = 0;
   const vencedores = new Map<string, [string, number][]>(); // idCompra → [[empresa, valor]]
@@ -287,7 +290,8 @@ export async function executarContratos(opts: { desde?: string; licitacoesDesde?
           if (idc) { const l = vencedores.get(idc) ?? []; l.push([String(n.linha[I.fornecedor]), Number(n.linha[I.valorGlobal])]); vencedores.set(idc, l); }
           if (n.empenho) {
             const v = Number(n.linha[I.valorGlobal]) || 0;
-            empenhos.qtd++; empenhos.valor += v;
+            empenhos.qtd++;
+            if (valorImplausivel(v)) empenhosImplausiveis++; else empenhos.valor += v; // fora da soma, listado em auditoriaEmpenhos
             const o = empOrgao.get(String(n.linha[I.orgao])) ?? [0, 0]; o[0]++; o[1] += v; empOrgao.set(String(n.linha[I.orgao]), o);
             empMaiores.push([n.linha[I.orgao], n.linha[I.ug], n.linha[I.fornecedor], n.linha[I.objeto], n.linha[I.inicio], n.linha[I.fim], v, n.linha[I.numero]]);
             if (empMaiores.length > 400) { empMaiores.sort((a, b) => Number(b[6]) - Number(a[6])); empMaiores.length = 200; }
@@ -315,6 +319,7 @@ export async function executarContratos(opts: { desde?: string; licitacoesDesde?
   const auditoriaEmpenhos = {
     colunasMaiores: ["orgao", "ug", "fornecedor", "objeto", "inicio", "fim", "valor", "numero"],
     maiores: empMaiores.slice(0, 40),
+    implausiveis: empenhosImplausiveis,
     porOrgao: [...empOrgao.entries()].sort((a, b) => b[1][1] - a[1][1]).slice(0, 25).map(([k, v]) => [k, v[0], Math.round(v[1] * 100) / 100]),
   };
   await writeFile(join(dirC, "resumo.json"), JSON.stringify({ processadoEm, desde, parcial: !!opts.orgaos?.length, orgaosConsultados: orgaos.length, ...resumo, auditoriaEmpenhos }));

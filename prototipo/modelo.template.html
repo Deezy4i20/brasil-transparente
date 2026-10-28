@@ -179,6 +179,7 @@ ol.barras button.lnk:hover { text-decoration: underline; }
 .explorar > summary h2::before { content: "▸ "; }
 .explorar[open] > summary h2::before { content: "▾ "; }
 .explorar[open] > .rank { margin-top: 12px; }
+.erro-fonte { color: var(--aviso, #b45309); font-weight: 600; text-decoration: line-through dotted; text-decoration-thickness: 1px; }
 .aviso-parcial { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; border-left: 4px solid var(--aviso, #c98a00); }
 .aviso-parcial p { margin: 0; flex: 1 1 320px; }
 .links-p .lnk { border: 0; background: none; padding: 0; color: var(--link, var(--barra)); cursor: pointer; font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
@@ -917,6 +918,13 @@ const CR = D.contratosResumo;
 const KC = { id:0, numero:1, orgao:2, ug:3, ibge:4, municipio:5, fornecedor:6, documento:7, tipo:8, categoria:9, modalidade:10, objeto:11, inicio:12, fim:13, valor:14, acumulado:15, idCompra:16, pncp:17 };
 const KL = { id:0, pncp:1, orgao:2, unidade:3, ibge:4, municipio:5, modalidade:6, amparo:7, objeto:8, situacao:9, estimado:10, homologado:11, publicacao:12, abertura:13, srp:14, contratadas:15 };
 const CONTR = {}, LICIT = {};
+/** Mesma regra de src/lib/auditoria.ts: um único registro de R$ 100 bi ou mais é provável erro na fonte e fica fora das somas. */
+const implausivel = v => v!=null && isFinite(v) && Math.abs(v) >= 1e11;
+/** Mesma regra de acumuladoForaDoPadrao (src/lib/auditoria.ts). */
+const acumForaPadrao = (o, a) => implausivel(a) || (o > 0 && a/o > 20 && a - o > 10e6);
+const ERRO_FONTE = v => `<span class="erro-fonte" title="Valor publicado na fonte, provavelmente digitado errado. Não entra nas somas do site.">${comp(v)} · provável erro na fonte</span>`;
+/** Notas de empenho: total sem os registros implausíveis (coletas antigas ainda os somavam). */
+function empenhosPlausiveis(){ const a = CR?.auditoriaEmpenhos, imp = (a?.maiores||[]).filter(x=>implausivel(x[6])); const v = a && a.implausiveis===undefined ? CR.totais.valorEmpenhos - imp.reduce((s,x)=>s+x[6],0) : CR.totais.valorEmpenhos; return { v, imp }; }
 function carregarLista(cache, pasta, uf){ if(!cache[uf]) cache[uf] = fetch(`dados/${pasta}/${uf}.json`).then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }); return cache[uf]; }
 const sitContrato = c => c[KC.inicio] && c[KC.inicio] > HOJE ? "futuro" : !c[KC.fim] || c[KC.fim] >= HOJE ? "vigente" : "encerrado";
 const ROT_SIT_C = { vigente:"Valendo hoje", futuro:"Ainda vai começar", encerrado:"Prazo encerrado" };
@@ -932,23 +940,24 @@ function trContratos(extra){
 }
 function cartaoContrato(c){
   const st = sitContrato(c), dp = disputa(c[KC.modalidade]);
-  const cresc = c[KC.acumulado] > c[KC.valor]*1.001 && c[KC.valor] > 0 ? (c[KC.acumulado]-c[KC.valor])/c[KC.valor] : null;
+  const foraPadrao = acumForaPadrao(c[KC.valor], c[KC.acumulado]);
+  const cresc = !foraPadrao && c[KC.acumulado] > c[KC.valor]*1.001 && c[KC.valor] > 0 ? (c[KC.acumulado]-c[KC.valor])/c[KC.valor] : null;
   const lk = linkPncp(c[KC.pncp], "contratos");
   return `<div class="proj"><div class="t"><span class="obj" title="${esc(c[KC.objeto]||"")}">${esc(c[KC.objeto]||"Objeto não informado")}</span><span class="pill ${st==="vigente"?"andamento":st}">${ROT_SIT_C[st]}</span></div>
   <div class="meta"><b>Empresa contratada:</b> ${esc(c[KC.fornecedor]||"—")}${c[KC.documento]?` <span class="muted">(CNPJ ${esc(fmtDoc(c[KC.documento]))})</span>`:""}</div>
   <div class="meta"><b>Quem contratou:</b> ${esc(c[KC.ug]||"—")} · ${esc(c[KC.orgao]||"")}${c[KC.municipio]?` <span class="muted">(${esc(c[KC.municipio])})</span>`:""}</div>
   <div class="meta"><b>Como a empresa foi escolhida:</b> ${esc(c[KC.modalidade]||"não informado")} — <span class="${dp==="sem"?"":"muted"}">${ROT_DISP[dp]}</span></div>
-  <div class="vals num"><span>Valor do contrato <b>${comp(c[KC.valor])}</b></span>${cresc!=null?`<span>Valor acumulado informado pelo órgão <b>${comp(c[KC.acumulado])}</b> <span class="muted">(pode incluir aditivos, prorrogações e reajustes)</span></span>`:""}</div>
+  <div class="vals num"><span>Valor do contrato <b>${implausivel(c[KC.valor])?ERRO_FONTE(c[KC.valor]):comp(c[KC.valor])}</b></span>${foraPadrao?`<span>Valor acumulado informado <span class="erro-fonte" title="Mais de 20 vezes o valor original: fora do limite legal de aditivos e prorrogações. Provável erro de registro; conferir na fonte.">${comp(c[KC.acumulado])} · fora do padrão, conferir na fonte</span></span>`:""}${cresc!=null?`<span>Valor acumulado informado pelo órgão <b>${comp(c[KC.acumulado])}</b> <span class="muted">(pode incluir aditivos, prorrogações e reajustes)</span></span>`:""}</div>
   <div class="meta muted">${esc(c[KC.tipo]||"Contrato")} nº ${esc(c[KC.numero])} · ${esc(c[KC.categoria]||"")} · vigência ${dataBR(c[KC.inicio])} a ${dataBR(c[KC.fim])}${lk?` · <a href="${lk}" target="_blank" rel="noreferrer">ver no PNCP</a>`:""}</div></div>`;
 }
 function cartaoLicitacao(l){
   const lk = linkPncp(l[KL.pncp], "editais"), dp = disputa(l[KL.modalidade]);
-  const eco = l[KL.estimado] > 0 && l[KL.homologado] > 0 && l[KL.homologado] < l[KL.estimado] ? 1 - l[KL.homologado]/l[KL.estimado] : null;
+  const eco = !implausivel(l[KL.estimado]) && !implausivel(l[KL.homologado]) && l[KL.estimado] > 0 && l[KL.homologado] > 0 && l[KL.homologado] < l[KL.estimado] ? 1 - l[KL.homologado]/l[KL.estimado] : null;
   const ven = l[KL.contratadas]||[];
   return `<div class="proj"><div class="t"><span class="obj" title="${esc(l[KL.objeto]||"")}">${esc(l[KL.objeto]||"Objeto não informado")}</span><span class="pill ${dp==="sem"?"encerrado":"andamento"}">${esc(l[KL.modalidade]||"")}</span></div>
   <div class="meta"><b>Quem está comprando:</b> ${esc(l[KL.unidade]||"—")} · ${esc(l[KL.orgao]||"")}${l[KL.municipio]?` <span class="muted">(${esc(l[KL.municipio])})</span>`:""}</div>
   <div class="meta"><b>Empresa(s) contratada(s):</b> ${ven.length?ven.map(v=>`${esc(v[0])} <span class="muted">(${comp(v[1])})</span>`).join(" · "):`<span class="muted">ainda sem contrato registrado${l[KL.homologado]>0?"":" (pode estar em andamento)"}</span>`}</div>
-  <div class="vals num"><span>Preço estimado <b>${l[KL.estimado]>0?comp(l[KL.estimado]):"sigiloso ou não informado"}</b></span>${l[KL.homologado]>0?`<span>Preço final <b>${comp(l[KL.homologado])}</b></span>`:""}${eco!=null&&eco>0.0005?`<span>Saiu <b>${pct(eco)} mais barato</b> que o estimado</span>`:""}</div>
+  <div class="vals num"><span>Preço estimado <b>${implausivel(l[KL.estimado])?ERRO_FONTE(l[KL.estimado]):l[KL.estimado]>0?comp(l[KL.estimado]):"sigiloso ou não informado"}</b></span>${l[KL.homologado]>0?`<span>Preço final <b>${implausivel(l[KL.homologado])?ERRO_FONTE(l[KL.homologado]):comp(l[KL.homologado])}</b></span>`:""}${eco!=null&&eco>0.0005?`<span>Saiu <b>${pct(eco)} mais barato</b> que o estimado</span>`:""}</div>
   <div class="meta muted">Publicada em ${dataBR(l[KL.publicacao])} · ${esc(l[KL.situacao]||"")} · ${esc(l[KL.amparo]||"")}${l[KL.srp]?" · registro de preços (compra futura, sob demanda)":""}${lk?` · <a href="${lk}" target="_blank" rel="noreferrer">ver no PNCP</a>`:""}</div></div>`;
 }
 function viewContratos(){
@@ -960,7 +969,7 @@ function viewContratos(){
   const opUF = D.ufs.map(u=>`<option value="${u.sigla}" ${uf===u.sigla?"selected":""}>${esc(u.nome)}</option>`).join("") + `<option value="NI" ${uf==="NI"?"selected":""}>Sem estado informado</option>`;
   return `<div class="titulo-pag"><h1>Contratos e licitações federais</h1><p>Com quem o governo federal assina contratos, quanto valem, e como as empresas foram escolhidas. Fonte: Compras.gov.br (contratos) e PNCP (licitações), dados oficiais do governo federal.</p></div>
   <section class="perguntas" aria-label="Três perguntas sobre contratos">
-    ${card(1,"Quantos contratos estão valendo hoje?",`<p class="resp num">${T.vigentes.toLocaleString("pt-BR")}</p><p>contratos federais valendo hoje, somando <b>${extenso(T.valorVigentes)}</b>.</p><p class="muted">Não entram nesta conta ${T.empenhos.toLocaleString("pt-BR")} registros do tipo “nota de empenho” no Contratos.gov.br (${extenso(T.valorEmpenhos)} no total). A nota de empenho reserva dinheiro do orçamento e pode substituir o contrato em compras simples, mas também é usada para despesas que não são contratos com empresas; por isso ela fica fora da lista e da soma.</p>`,
+    ${card(1,"Quantos contratos estão valendo hoje?",`<p class="resp num">${T.vigentes.toLocaleString("pt-BR")}</p><p>contratos federais valendo hoje, somando <b>${extenso(T.valorVigentes)}</b>.</p><p class="muted">Não entram nesta conta ${T.empenhos.toLocaleString("pt-BR")} registros do tipo “nota de empenho” no Contratos.gov.br (${extenso(empenhosPlausiveis().v)} no total${empenhosPlausiveis().imp.length?`, sem contar ${empenhosPlausiveis().imp.length} registro(s) com valor impossível na fonte — por exemplo, ${esc(empenhosPlausiveis().imp[0][0])}: ${extenso(empenhosPlausiveis().imp[0][6])}, provável erro de digitação`:""}). A nota de empenho reserva dinheiro do orçamento e pode substituir o contrato em compras simples, mas também é usada para despesas que não são contratos com empresas; por isso ela fica fora da lista e da soma.</p>`,
       trContratos({ col:"valorGlobal dos contratos com dataVigenciaInicial ≤ hoje ≤ dataVigenciaFinal", conta:`Contamos os contratos de todos os órgãos federais que estão dentro do prazo hoje e somamos o valor global de cada um (${cheio(T.valorVigentes)}). Tiramos contratos excluídos, contratos de receita e registros repetidos. Registros do tipo “Empenho” (notas de empenho) não entram na soma nem na lista.` }), { v:T.valorVigentes, calc:true })}
     ${card(2,"Com quais empresas?",`<ol class="top3">${top5.map(e=>`<li><span>${esc(e[0])} <span class="muted">CNPJ ${esc(fmtDoc(e[1]))}</span></span><b class="num">${comp(e[3])}</b> <span class="muted">em ${e[2]} contrato(s)</span></li>`).join("")}</ol>`,
       trContratos({ col:"valorGlobal agrupado por niFornecedor (CNPJ)", conta:"Juntamos os contratos valendo hoje pelo CNPJ da empresa e somamos o valor global. Pessoas físicas contratadas não aparecem com nome nem CPF." }), { calc:true })}
@@ -1002,27 +1011,28 @@ async function preencherContratos(){
     && (lic || !E.ctr.sit || sitContrato(c)===E.ctr.sit)
     && (!E.ctr.disp || disputa(c[K.modalidade])===E.ctr.disp)
     && (!q || campos.some(i=>norm(c[i]||"").includes(q)) || (!lic && qd.length>=8 && String(c[K.documento]).includes(qd)) || (lic && (c[K.contratadas]||[]).some(v=>norm(v[0]).includes(q)))));
-  const val = c => lic ? (c[K.homologado]||c[K.estimado]||0) : (c[K.valor]||0);
+  const ok = v => implausivel(v) ? 0 : (v||0);
+  const val = c => lic ? (ok(c[K.homologado])||ok(c[K.estimado])) : ok(c[K.valor]);
   const ordF = lic ? (E.ctr.ord==="valor" ? (a,b)=>val(b)-val(a) : (a,b)=>String(b[K.publicacao]).localeCompare(String(a[K.publicacao])))
-    : { valor:(a,b)=>val(b)-val(a), aditivo:(a,b)=>(b[K.acumulado]-b[K.valor])-(a[K.acumulado]-a[K.valor]), fim:(a,b)=>String(a[K.fim]||"9").localeCompare(String(b[K.fim]||"9")), inicio:(a,b)=>String(b[K.inicio]).localeCompare(String(a[K.inicio])) }[E.ctr.ord] || ((a,b)=>val(b)-val(a));
-  if(!lic && E.ctr.ord==="aditivo") itens = itens.filter(c=>c[K.acumulado]>c[K.valor]);
+    : { valor:(a,b)=>val(b)-val(a), aditivo:(a,b)=>(ok(b[K.acumulado])-ok(b[K.valor]))-(ok(a[K.acumulado])-ok(a[K.valor])), fim:(a,b)=>String(a[K.fim]||"9").localeCompare(String(b[K.fim]||"9")), inicio:(a,b)=>String(b[K.inicio]).localeCompare(String(a[K.inicio])) }[E.ctr.ord] || ((a,b)=>val(b)-val(a));
+  if(!lic && E.ctr.ord==="aditivo") itens = itens.filter(c=>!acumForaPadrao(c[K.valor], c[K.acumulado]) && c[K.acumulado]>c[K.valor]);
   if(!lic && E.ctr.ord==="fim") itens = itens.filter(c=>sitContrato(c)==="vigente");
   itens.sort(ordF);
   const pp = 30, pags = Math.max(1, Math.ceil(itens.length/pp)), p = Math.min(E.pag, pags);
   const nUF = D.ufs.find(u=>u.sigla===E.uf)?.nome || "Sem estado informado";
   let resumo;
   if(lic){
-    const t = itens.reduce((s,l)=>{ s.e+=l[K.estimado]||0; s.h+=l[K.homologado]||0; if(disputa(l[K.modalidade])==="com") s.c++; return s; }, {e:0,h:0,c:0});
+    const t = itens.reduce((s,l)=>{ s.e+=ok(l[K.estimado]); s.h+=ok(l[K.homologado]); if(implausivel(l[K.estimado])||implausivel(l[K.homologado])) s.x++; if(disputa(l[K.modalidade])==="com") s.c++; return s; }, {e:0,h:0,c:0,x:0});
     const ult = dados.itens.reduce((m,l)=>l[K.publicacao]>m?l[K.publicacao]:m,"");
     resumo = `<div class="resumo-proj"><div><span class="muted">Processos</span><b class="num">${itens.length.toLocaleString("pt-BR")}</b></div><div><span class="muted">Com disputa</span><b class="num">${t.c.toLocaleString("pt-BR")}</b></div><div><span class="muted">Preço estimado</span><b class="num">${comp(t.e)}</b></div><div><span class="muted">Preço final</span><b class="num">${comp(t.h)}</b></div></div>
-    <p class="muted" style="margin:8px 0 0">Licitações e contratações diretas de órgãos federais em ${esc(nUF)}, publicadas no PNCP desde ${dataBR(D.conjuntos?.find(c=>c.conjunto==="licitacoes")?.arquivos?.[0]?.periodo?.match(/\d{4}-\d{2}-\d{2}/)?.[0])} (pela Lei 14.133). Publicação mais recente na fonte: ${dataBR(ult)} — a API do governo publica com algumas semanas de atraso.</p>`;
+    <p class="muted" style="margin:8px 0 0">Licitações e contratações diretas de órgãos federais em ${esc(nUF)}, publicadas no PNCP desde ${dataBR(D.conjuntos?.find(c=>c.conjunto==="licitacoes")?.arquivos?.[0]?.periodo?.match(/\d{4}-\d{2}-\d{2}/)?.[0])} (pela Lei 14.133). Publicação mais recente na fonte: ${dataBR(ult)} — a API do governo publica com algumas semanas de atraso.${t.x?` ${t.x} processo(s) com valor impossível na fonte (R$ 100 bi ou mais) ficam fora das somas e aparecem marcados.`:""}</p>`;
   } else {
-    const t = itens.reduce((s,c)=>{ s.v+=c[K.valor]||0; if(sitContrato(c)==="vigente") s.g++; s.e.add(c[K.documento]||c[K.fornecedor]); return s; }, {v:0,g:0,e:new Set()});
-    resumo = `<div class="resumo-proj"><div><span class="muted">Contratos</span><b class="num">${itens.length.toLocaleString("pt-BR")}</b></div><div><span class="muted">Valendo hoje</span><b class="num">${t.g.toLocaleString("pt-BR")}</b></div><div><span class="muted">Empresas diferentes</span><b class="num">${t.e.size.toLocaleString("pt-BR")}</b></div><div><span class="muted">Valor dos contratos</span><b class="num">${comp(t.v)}</b></div></div>`;
+    const t = itens.reduce((s,c)=>{ s.v+=ok(c[K.valor]); if(implausivel(c[K.valor])) s.x++; if(sitContrato(c)==="vigente") s.g++; s.e.add(c[K.documento]||c[K.fornecedor]); return s; }, {v:0,g:0,e:new Set(),x:0});
+    resumo = `<div class="resumo-proj"><div><span class="muted">Contratos</span><b class="num">${itens.length.toLocaleString("pt-BR")}</b></div><div><span class="muted">Valendo hoje</span><b class="num">${t.g.toLocaleString("pt-BR")}</b></div><div><span class="muted">Empresas diferentes</span><b class="num">${t.e.size.toLocaleString("pt-BR")}</b></div><div><span class="muted">Valor dos contratos</span><b class="num">${comp(t.v)}</b></div></div>${t.x?`<p class="muted" style="margin:8px 0 0">${t.x} contrato(s) com valor impossível na fonte (R$ 100 bi ou mais) ficam fora da soma e aparecem marcados na lista.</p>`:""}`;
   }
   const trl = lic
     ? trilha({ conj:"licitacoes", ano:Number(HOJE.slice(0,4)), col:"valorTotalEstimado e valorTotalHomologado, por unidadeOrgaoUfSigla", conta:`Listamos as contratações de órgãos federais (esfera F) cuja unidade compradora fica em ${nUF}, de todas as modalidades. “Preço final” é o valor homologado (depois da disputa). “Saiu X% mais barato” = 1 − final ÷ estimado. As empresas contratadas vêm dos contratos que citam o mesmo número de compra (idCompra).`, periodo:"Publicadas desde 1º de janeiro deste ano, até a data mais recente que a API já publicou.", consulta:{ url:"https://pncp.gov.br/app/editais", rot:"PNCP → Editais e avisos", passo:"pesquise pelo número de controle ou pelo órgão" }, naoAplica:["ano e meses do topo"] }, { calc:true })
-    : trilha(trContratos({ col:"valorGlobal, por UF da unidade gestora (consultarUasg)", conta:`Listamos os contratos cuja unidade que assinou fica em ${nUF}. O estado e a cidade vêm do cadastro oficial de unidades compradoras (UASG). “Valor acumulado” é o campo valorAcumulado informado pelo órgão no Contratos.gov.br (pode incluir aditivos, prorrogações e reajustes de todo o histórico do contrato); só aparece quando é maior que o valor original. A plataforma não interpreta a diferença como irregularidade.`, filtrosExtra:[`estado: ${nUF}`] }), { v:itens.reduce((s,c)=>s+(c[K.valor]||0),0), calc:true });
+    : trilha(trContratos({ col:"valorGlobal, por UF da unidade gestora (consultarUasg)", conta:`Listamos os contratos cuja unidade que assinou fica em ${nUF}. O estado e a cidade vêm do cadastro oficial de unidades compradoras (UASG). “Valor acumulado” é o campo valorAcumulado informado pelo órgão no Contratos.gov.br (pode incluir aditivos, prorrogações e reajustes de todo o histórico do contrato); só aparece quando é maior que o valor original. A plataforma não interpreta a diferença como irregularidade.`, filtrosExtra:[`estado: ${nUF}`] }), { v:itens.reduce((s,c)=>s+ok(c[K.valor]),0), calc:true });
   el.innerHTML = `${resumo}${trl}
   <div class="projs" style="margin-top:14px">${itens.slice((p-1)*pp, p*pp).map(lic?cartaoLicitacao:cartaoContrato).join("") || `<p class="muted">Nada encontrado com esses filtros.</p>`}</div>
   ${pags>1?`<nav class="pag" aria-label="Paginação"><button class="botao" data-pag="${p-1}" ${p===1?"disabled":""}>Anterior</button><span class="num">${p} de ${pags}</span><button class="botao" data-pag="${p+1}" ${p===pags?"disabled":""}>Próxima</button></nav>`:""}`;

@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import vm from "node:vm";
 import { describe, expect, it } from "vitest";
-import { variacao as variacaoTS } from "../src/lib/auditoria";
+import { acumuladoForaDoPadrao, valorImplausivel, variacao as variacaoTS } from "../src/lib/auditoria";
 
 const html = readFileSync(join(__dirname, "..", "prototipo", "modelo.template.html"), "utf8");
 const trecho = (de: string, ate: string) => { const i = html.indexOf(de), j = html.indexOf(ate, i); if (i < 0 || j < 0) throw new Error(`trecho não encontrado: ${de}`); return html.slice(i, j); };
@@ -20,10 +20,12 @@ const codigo = [
   linha("function temParcial("),
   linha("function cobre("),
   linha("function mesesEf("),
+  linha("const implausivel ="),
+  linha("const acumForaPadrao ="),
 ].join("\n");
 const ctx: Record<string, unknown> = { Intl, isFinite, Math, E: { mi: 1, mf: 12, incluirParcial: false }, D: { porAno: {} } };
 vm.createContext(ctx);
-vm.runInContext(codigo + "\nthis.f = { comp, extenso, pct, cheio, variacao, mesesUsaveis, temParcial, cobre, mesesEf }; this.A = ano => D.porAno[ano];", ctx);
+vm.runInContext(codigo + "\nthis.f = { comp, extenso, pct, cheio, variacao, mesesUsaveis, temParcial, cobre, mesesEf, implausivel, acumForaPadrao }; this.A = ano => D.porAno[ano];", ctx);
 vm.runInContext("var A = this.A;", ctx);
 const f = ctx.f as Record<string, (...a: unknown[]) => unknown>;
 const nb = (s: unknown) => String(s).replace(/ /g, " ");
@@ -83,5 +85,17 @@ describe("meses incompletos e comparações", () => {
   it("ano anterior sem os mesmos meses não é comparável", () => {
     preparar(false);
     expect(f.cobre(2026, [1, 12], "meses")).toBe(false);
+  });
+});
+
+describe("valor implausível (página = regra auditada)", () => {
+  it("mesmo resultado da função de src/lib/auditoria.ts", () => {
+    for (const v of [2.809e12, 100e9, 99.9e9, 55.8e9, 0, null, -2e11]) expect(f.implausivel(v)).toBe(valorImplausivel(v as number | null));
+  });
+});
+
+describe("acumulado fora do padrão (página = regra auditada)", () => {
+  it("mesmo resultado", () => {
+    for (const [o, a] of [[189_500, 29.7e9], [3.42e6, 10.3e6], [160.4e6, 1.9e9], [100_000, 2.5e6], [0, 5e9], [1e6, 2e11]]) expect(f.acumForaPadrao(o, a)).toBe(acumuladoForaDoPadrao(o, a));
   });
 });

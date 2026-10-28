@@ -50,3 +50,34 @@ describe("variação percentual", () => {
     expect(variacao(-50, -100)).toBeCloseTo(0.5);
   });
 });
+
+import { carregarIndiceMunicipios, localizarMunicipio } from "../scripts/etl/municipios";
+describe("municípios com grafia diferente entre Portal e IBGE", () => {
+  const idx = carregarIndiceMunicipios();
+  it.each([["SP", "EMBU DAS ARTES", "3515004"], ["RJ", "PARATI", "3303807"], ["SP", "MOGI MIRIM", "3530805"], ["RS", "SANTANA DO LIVRAMENTO", "4317103"], ["RN", "SERRA CAIADA (EX-PRESIDENTE JUSCELINO)", "2410306"], ["RJ", "RIO DE JANEIRO", "3304557"], ["ES", "VITORIA", "3205309"]])("%s %s", (uf, nome, cod) => {
+    expect(localizarMunicipio(idx, uf, nome).cod).toBe(cod);
+  });
+});
+
+import { valorImplausivel } from "../src/lib/auditoria";
+describe("valores implausíveis na fonte", () => {
+  it("marca registros de R$ 100 bi ou mais", () => {
+    expect(valorImplausivel(2_809_000_000_000)).toBe(true);
+    expect(valorImplausivel(100e9)).toBe(true);
+  });
+  it("não marca contratos grandes mas possíveis", () => {
+    expect(valorImplausivel(10e9)).toBe(false);
+    expect(valorImplausivel(55.8e9)).toBe(false);
+    expect(valorImplausivel(null)).toBe(false);
+  });
+});
+
+import { acumuladoForaDoPadrao } from "../src/lib/auditoria";
+describe("valor acumulado fora do padrão", () => {
+  it("contrato de R$ 189 mil com acumulado de R$ 29,7 bi", () => expect(acumuladoForaDoPadrao(189_500, 29.7e9)).toBe(true));
+  it("renovações normais não são marcadas", () => {
+    expect(acumuladoForaDoPadrao(3.42e6, 10.3e6)).toBe(false); // ~3x
+    expect(acumuladoForaDoPadrao(160.4e6, 1.9e9)).toBe(false); // ~12x (plano de saúde renovado anualmente)
+    expect(acumuladoForaDoPadrao(100_000, 2.5e6)).toBe(false); // 25x mas diferença pequena
+  });
+});

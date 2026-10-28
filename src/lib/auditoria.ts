@@ -44,3 +44,25 @@ export function variacao(atual: number | null | undefined, anterior: number | nu
   if (atual == null || anterior == null || !Number.isFinite(atual) || !Number.isFinite(anterior) || anterior === 0) return null;
   return (atual - anterior) / Math.abs(anterior);
 }
+
+/**
+ * Valor de um único registro (contrato, nota de empenho, licitação) acima do plausível.
+ * Referência: R$ 100 bi num só registro é maior que o orçamento anual de quase todos os ministérios;
+ * os maiores contratos federais vigentes ficam abaixo de R$ 15 bi. Achados na fonte (out/2026):
+ * nota de empenho de R$ 2,8 tri (instituto federal), licitação estimada em R$ 8 tri, valor acumulado de R$ 26 tri.
+ * Esses registros NÃO são corrigidos: ficam fora das somas e aparecem marcados como "provável erro na fonte".
+ */
+export const LIMITE_PLAUSIVEL = 100e9;
+export function valorImplausivel(v: number | null | undefined): boolean {
+  return v != null && Number.isFinite(v) && Math.abs(v) >= LIMITE_PLAUSIVEL;
+}
+
+/**
+ * Valor acumulado fora do padrão: mais de 20 vezes o valor original (e diferença acima de R$ 10 mi).
+ * A Lei 14.133 limita acréscimos a 25% (50% em reformas) e prorrogações de serviços contínuos a 10 anos,
+ * então um acumulado tão maior indica provável erro de registro. Só marca para conferência; não altera valores.
+ */
+export function acumuladoForaDoPadrao(original: number, acumulado: number): boolean {
+  if (valorImplausivel(acumulado)) return true;
+  return original > 0 && acumulado / original > 20 && acumulado - original > 10e6;
+}

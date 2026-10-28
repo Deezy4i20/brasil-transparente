@@ -59,8 +59,19 @@ Cada regra tem a evidência que a sustenta e onde está testada. Revisado na aud
 - O local dos contratos é o da unidade que assinou, não o do serviço. Por isso os contratos não entram no mapa.
 - Convênios: “falta repassar” é somado **convênio a convênio** (max(0, combinado − liberado)). 29 convênios têm liberado acima do combinado; o dicionário da CGU informa que os dois valores incluem rendimentos de aplicação (parcela 999).
 
+## Valores impossíveis na fonte
+
+- Um único registro de **R$ 100 bi ou mais** (contrato, nota de empenho ou licitação) é tratado como provável erro na fonte: **não é corrigido**, fica fora das somas e aparece marcado na lista. Casos encontrados em out/2026: nota de empenho de R$ 2,8 tri de um instituto federal (era 99,7% de todo o valor das notas de empenho), licitações estimadas em R$ 8 tri e R$ 4,2 tri, e um valor acumulado de R$ 26 tri.
+- Valor acumulado de contrato **mais de 20 vezes** o valor original (e diferença acima de R$ 10 mi) é marcado como “fora do padrão, conferir na fonte”, porque a Lei 14.133 limita acréscimos (25%, ou 50% em reformas) e prorrogações (10 anos em serviços contínuos). Não é somado nem usado na ordenação.
+- Regras: `valorImplausivel` e `acumuladoForaDoPadrao` em `src/lib/auditoria.ts`; a cópia na página é testada contra elas.
+
+## Nomes de municípios
+
+- Algumas grafias do Portal diferem das da malha (Parati/Paraty, Embu das Artes/Embu, Mogi Mirim/Moji Mirim, Santana do Livramento/Sant'Ana do Livramento, Serra Caiada/Presidente Juscelino). Há uma tabela de equivalências em `scripts/etl/municipios.ts` (`APELIDOS_MUNICIPIOS`), testada. Depois da correção das malhas, o valor de transferências sem cidade identificada caiu de 4,5% para 0,17%; as equivalências cobrem a maior parte do restante a partir da próxima atualização.
+
 ## Limitações conhecidas
 
 - População do Censo 2022 para todos os anos (o IBGE publica estimativas anuais mais recentes).
-- O app Next.js (`src/`) não é o site publicado e não recebeu as regras desta revisão (rolagem, mês incompleto, restos a pagar).
+- O app Next.js (`src/`) não é o site publicado e não recebeu as regras desta revisão (rolagem, mês incompleto, restos a pagar, valores implausíveis).
+- A API de malhas do IBGE não respondeu ao GitHub Actions; a malha usada é um espelho sem 6 municípios criados depois de 2010 (ex.: Mojuí dos Campos/PA, Pescaria Brava/SC). Valores dessas cidades ficam como “sem município identificado”.
 - Andamento físico de obras, cartões, viagens, receitas e renúncias ainda não estão integrados.
