@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-28T00:47:26.922Z",
+  "geradoEm": "2026-10-28T02:41:10.392Z",
   "modo": "oficial",
   "conjuntos": [
     {
@@ -709,6 +709,69 @@
         "Linhas sem UF identificável classificadas como \"Localização não identificada\": Sem informação (585), Múltiplo (59)."
       ],
       "linhasAgregadas": 5754
+    },
+    {
+      "conjunto": "contratos",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Contratos — Compras.gov.br (Ministério da Gestão), API de Dados Abertos",
+        "url": "https://dadosabertos.compras.gov.br/swagger-ui/index.html#/02%20-%20Contratos",
+        "dicionario": "https://www.gov.br/compras/pt-br/acesso-a-informacao/manuais/manual-dados-abertos/manual-api-compras.pdf"
+      },
+      "arquivos": [
+        {
+          "nome": "API 1.2_consultarContratos_FimVigencia",
+          "url": "https://dadosabertos.compras.gov.br/modulo-contratos/1.2_consultarContratos_FimVigencia?dataVigenciaFinalMin=2025-01-01",
+          "periodo": "fim de vigência desde 2025-01-01",
+          "baixadoEm": "2026-10-28T02:35:16.413Z",
+          "bytes": 0,
+          "linhasLidas": 34586,
+          "linhasDescartadas": 28128,
+          "motivosDescarte": {
+            "contrato de receita (o governo recebe)": 88,
+            "registro repetido": 4951,
+            "contrato excluído": 44,
+            "nota de empenho (só no resumo)": 23045
+          }
+        }
+      ],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-28T02:35:16.413Z",
+      "linhasAgregadas": 6458,
+      "avisos": [
+        "Consultados 2 órgãos federais; 0 falharam.",
+        "0 contratos sem UF da unidade contratante (lista \"NI\").",
+        "O local é o da unidade que assinou o contrato, não necessariamente onde o serviço é prestado."
+      ]
+    },
+    {
+      "conjunto": "licitacoes",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Licitações e contratações (PNCP, Lei 14.133) — Compras.gov.br, API de Dados Abertos",
+        "url": "https://dadosabertos.compras.gov.br/swagger-ui/index.html#/05%20-%20Contrata%C3%A7%C3%B5es",
+        "dicionario": "https://www.gov.br/compras/pt-br/acesso-a-informacao/manuais/manual-dados-abertos/manual-api-compras.pdf"
+      },
+      "arquivos": [
+        {
+          "nome": "API 1_consultarContratacoes_PNCP_14133",
+          "url": "https://dadosabertos.compras.gov.br/modulo-contratacoes/1_consultarContratacoes_PNCP_14133?dataPublicacaoPncpInicial=2026-10-01",
+          "periodo": "publicadas desde 2026-10-01",
+          "baixadoEm": "2026-10-28T02:35:16.413Z",
+          "bytes": 0,
+          "linhasLidas": 0,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-28T02:35:16.413Z",
+      "linhasAgregadas": 0,
+      "avisos": [
+        "Inclui licitações (pregão, concorrência…) e contratações diretas (dispensa, inexigibilidade) publicadas no PNCP pela Lei 14.133. Processos pela lei antiga (8.666) não entram."
+      ]
     }
   ]
 }
