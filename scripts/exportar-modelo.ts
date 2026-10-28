@@ -134,8 +134,11 @@ const dados = {
     .sort((a, b) => b.ano - a.ano || a.conjunto.localeCompare(b.conjunto))
     .map((c) => ({
       ano: c.ano,
+      conjunto: c.conjunto,
       nome: c.fonte.nome,
       url: c.fonte.url,
+      dicionario: c.fonte.dicionario || null,
+      arquivos: c.arquivos.map((a) => ({ nome: a.nome, url: a.url, periodo: a.periodo, baixadoEm: a.baixadoEm, lidas: a.linhasLidas, descartadas: a.linhasDescartadas })),
       meses: c.mesesDisponiveis,
       lidas: c.arquivos.reduce((s, a) => s + a.linhasLidas, 0),
       descartadas: c.arquivos.reduce((s, a) => s + a.linhasDescartadas, 0),

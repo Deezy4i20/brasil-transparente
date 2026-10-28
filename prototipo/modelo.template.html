@@ -169,6 +169,26 @@ ol.barras button.lnk:hover { text-decoration: underline; }
 .seta-cai::before { content: "▼ "; color: #256abf; font-size: .8em; }
 .termo { display: block; font-size: 11px; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--tinta-3); }
 .pbr { font-size: 12.5px; color: var(--tinta-2); }
+.kpi:has(details.trilha[open]) { grid-column: 1 / -1; }
+.trilha details summary { cursor: pointer; text-decoration: underline dotted; }
+.links-p .lnk { border: 0; background: none; padding: 0; color: var(--link, var(--barra)); cursor: pointer; font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.trilha .passos { list-style: none; margin: 8px 0 0; padding: 10px 12px; display: grid; gap: 10px; background: var(--sup-2); border: 1px solid var(--borda); border-radius: 8px; color: var(--tinta-2); font-size: 12.5px; }
+.trilha .passos h4 { margin: 0 0 2px; font-size: 12.5px; color: var(--tinta); }
+.trilha .passos p { margin: 2px 0; }
+.trilha .passos ul { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 3px; }
+.trilha .passos code { font-size: 11.5px; background: var(--sup); border: 1px solid var(--borda); border-radius: 4px; padding: 0 4px; overflow-wrap: anywhere; }
+.trilha .passos a { overflow-wrap: anywhere; }
+.perguntas { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+@media (max-width: 900px) { .perguntas { grid-template-columns: 1fr; } }
+.pergunta { display: flex; flex-direction: column; gap: 6px; }
+.pergunta h2 { font-size: 17px; margin: 0 0 4px; display: flex; gap: 10px; align-items: center; }
+.pergunta .nq { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--barra); color: #fff; display: grid; place-items: center; font-size: 14px; }
+.pergunta p { margin: 0; }
+.pergunta .resp { font-size: 26px; font-weight: 700; line-height: 1.15; color: var(--tinta); }
+.pergunta .top3 { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.pergunta .top3 li span { display: block; }
+.pergunta .top3 b { font-size: 15px; }
+.pergunta .links-p { margin-top: 4px; }
 .como-ler summary { cursor: pointer; font-weight: 600; }
 .como-ler ol { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 4px; color: var(--tinta-2); }
 .tend { display: grid; gap: 8px; }
@@ -359,22 +379,22 @@ function indicadores(){
   const [atualA, empA] = ant && disp(ano-1,"orc") ? soma(ant.orc, fOrc(), [3,4]) : [null,null];
   const indisp = !disp(ano,"orc") ? naoCarregado("orçamento") : "O arquivo de orçamento não é dividido por estado; não há valor estadual equivalente.";
   const semOrc = terr || !disp(ano,"orc");
-  out.push({ t:"Autorizado para gastar no ano", termo:"orçamento atualizado", g:"orcamento", v: semOrc?null:atual, vr: semOrc||!atualA?null:(atual-atualA)/Math.abs(atualA), vrRot:`vs. orçamento de ${ano-1}`, per:String(ano), exp:"É o teto: quanto o governo pode gastar no ano. Ainda não é dinheiro gasto.", ind: semOrc?indisp:null, fonte:"Arquivo Orçamento da Despesa (anual). O filtro de meses não se aplica." });
-  out.push({ t:"Ainda não reservado", termo:"saldo para empenho", g:"saldo", v: semOrc?null:atual-emp, vr:null, per:String(ano), exp:"Parte do valor autorizado que ainda não foi reservada para nenhum gasto. Conta feita pela plataforma: autorizado menos reservado.", ind: semOrc?indisp:null, calc:true, fonte:"Orçamento atualizado − empenhado, do mesmo arquivo. Sem variação: é uma fotografia da data de extração." });
+  out.push({ t:"Autorizado para gastar no ano", termo:"orçamento atualizado", g:"orcamento", v: semOrc?null:atual, vr: semOrc||!atualA?null:(atual-atualA)/Math.abs(atualA), vrRot:`vs. orçamento de ${ano-1}`, per:String(ano), exp:"É o teto: quanto o governo pode gastar no ano. Ainda não é dinheiro gasto.", ind: semOrc?indisp:null, fonte:"Arquivo Orçamento da Despesa (anual). O filtro de meses não se aplica.", tr:{ conj:"orcamento", ano, col:"ORÇAMENTO ATUALIZADO (R$)", conta:"Somamos a coluna ORÇAMENTO ATUALIZADO de todas as linhas do arquivo anual"+(fIdx()!=null?", só nas linhas da área escolhida":"")+".", base:atualA, naoAplica:["meses (o orçamento é anual)","estado/região (o arquivo não é dividido por estado)"] } });
+  out.push({ t:"Ainda não reservado", termo:"saldo para empenho", g:"saldo", v: semOrc?null:atual-emp, vr:null, per:String(ano), exp:"Parte do valor autorizado que ainda não foi reservada para nenhum gasto. Conta feita pela plataforma: autorizado menos reservado.", ind: semOrc?indisp:null, calc:true, fonte:"Orçamento atualizado − empenhado, do mesmo arquivo. Sem variação: é uma fotografia da data de extração.", tr:{ conj:"orcamento", ano, col:"ORÇAMENTO ATUALIZADO (R$) e ORÇAMENTO EMPENHADO (R$)", conta: semOrc?"":`Conta da plataforma: ${cheio(atual)} (autorizado) − ${cheio(emp)} (reservado) = ${cheio(atual-emp)}.`, naoAplica:["meses (o orçamento é anual)","estado/região"] } });
   const [e,l,p] = soma(a.exe, fExe(ano), [5,6,7]);
   const [eA,lA,pA] = ant ? soma(ant.exe, fExe(ano-1, false, m), [5,6,7]) : [null,null,null];
   const semExe = !disp(ano,"exe") ? naoCarregado("execução da despesa") : null;
   const lim = terr ? " Com filtro de estado, só entram despesas com UF indicada no plano de trabalho." : "";
-  out.push({ t:"Reservado para gastos", termo:"empenhado", g:"empenho", ind:semExe, v:semExe?null:e, vr:varr(e,eA), per, exp:"Dinheiro separado para pagar algo específico (uma obra, uma compra, um salário). Ainda pode não ter sido pago.", fonte:"Arquivos mensais de Execução da Despesa, coluna Valor Empenhado."+lim });
-  out.push({ t:"Entregue e conferido", termo:"liquidado", g:"liquidacao", ind:semExe, v:semExe?null:l, vr:varr(l,lA), per, exp:"O produto foi entregue ou o serviço foi feito, e o governo conferiu. Falta só pagar.", fonte:"Execução da Despesa, coluna Valor Liquidado."+lim });
-  out.push({ t:"Pago de fato", termo:"pago", pbr:true, g:"pagamento", ind:semExe, v:semExe?null:p, vr:varr(p,pA), per, exp:"Dinheiro que realmente saiu do caixa do governo. Reservado, conferido e pago são etapas do mesmo gasto: não some os três.", fonte:"Execução da Despesa, coluna Valor Pago."+lim });
+  out.push({ t:"Reservado para gastos", termo:"empenhado", g:"empenho", ind:semExe, v:semExe?null:e, vr:varr(e,eA), per, exp:"Dinheiro separado para pagar algo específico (uma obra, uma compra, um salário). Ainda pode não ter sido pago.", fonte:"Arquivos mensais de Execução da Despesa, coluna Valor Empenhado."+lim, tr:{ conj:"execucao", ano, col:"VALOR EMPENHADO (R$)", conta:"Somamos a coluna VALOR EMPENHADO de todas as linhas dos arquivos mensais do período."+lim, base:eA } });
+  out.push({ t:"Entregue e conferido", termo:"liquidado", g:"liquidacao", ind:semExe, v:semExe?null:l, vr:varr(l,lA), per, exp:"O produto foi entregue ou o serviço foi feito, e o governo conferiu. Falta só pagar.", fonte:"Execução da Despesa, coluna Valor Liquidado."+lim, tr:{ conj:"execucao", ano, col:"VALOR LIQUIDADO (R$)", conta:"Somamos a coluna VALOR LIQUIDADO de todas as linhas dos arquivos mensais do período."+lim, base:lA } });
+  out.push({ t:"Pago de fato", termo:"pago", pbr:true, g:"pagamento", ind:semExe, v:semExe?null:p, vr:varr(p,pA), per, exp:"Dinheiro que realmente saiu do caixa do governo. Reservado, conferido e pago são etapas do mesmo gasto: não some os três.", fonte:"Execução da Despesa, coluna Valor Pago."+lim, tr:{ conj:"execucao", ano, col:"VALOR PAGO (R$)", conta:"Somamos a coluna VALOR PAGO de todas as linhas dos arquivos mensais do período."+lim, base:pA } });
   const mT = mesesEf(ano,"mesesTra"); const perT = mT ? (mT[0]===1&&mT[1]===12? String(ano) : `${MESES[mT[0]-1]}–${MESES[mT[1]-1]}/${ano}`) : String(ano);
   const [t] = soma(a.tra, fTra(ano), [4]); const [tA] = ant ? soma(ant.tra, fTra(ano-1, false, mT), [4]) : [null];
   const semTra = !disp(ano,"tra") ? naoCarregado("transferências") : null;
-  out.push({ t:"Enviado a estados, cidades e pessoas", termo:"transferências", pbr:true, g:"transferencia", ind:semTra, v:semTra?null:t, vr:varr(t,tA,"mesesTra"), per:perT, exp:"Dinheiro federal repassado a governos estaduais, prefeituras, entidades e pessoas. Esse dinheiro também está dentro de “Pago de fato”: não some.", fonte:"Arquivos mensais de Recursos Transferidos, coluna Valor Transferido." });
+  out.push({ t:"Enviado a estados, cidades e pessoas", termo:"transferências", pbr:true, g:"transferencia", ind:semTra, v:semTra?null:t, vr:varr(t,tA,"mesesTra"), per:perT, exp:"Dinheiro federal repassado a governos estaduais, prefeituras, entidades e pessoas. Esse dinheiro também está dentro de “Pago de fato”: não some.", fonte:"Arquivos mensais de Recursos Transferidos, coluna Valor Transferido.", tr:{ conj:"transferencias", ano, col:"VALOR TRANSFERIDO (R$)", conta:"Somamos a coluna VALOR TRANSFERIDO de todas as linhas dos arquivos mensais do período. O estado é o de quem recebeu o dinheiro.", base:tA, campoMeses:"mesesTra" } });
   out.push({ t:"Contratos ativos", termo:"contratos", g:"contrato", v:null, ind:"Ainda não integrado em lote. Entra com o arquivo Contratos (compras); por enquanto, consulta por órgão na API." });
   const lidas = (D.conjuntos||[]).filter(c=>c.ano===ano).reduce((s,c)=>s+c.lidas,0);
-  out.push({ t:"Linhas de dados oficiais lidas", termo:"registros analisados", v: OFICIAL ? lidas : a.exe.length + a.tra.length + a.emendas.length, int:true, vr:null, per:String(ano), exp: OFICIAL ? "Linhas dos arquivos oficiais lidas para montar este painel no ano." : "Linhas agregadas usadas neste painel no ano.", calc:true, fonte: OFICIAL ? "Soma das linhas lidas nos arquivos oficiais processados (veja “Sobre”)." : "Contagem de linhas dos conjuntos carregados." });
+  out.push({ t:"Linhas de dados oficiais lidas", termo:"registros analisados", v: OFICIAL ? lidas : a.exe.length + a.tra.length + a.emendas.length, int:true, vr:null, per:String(ano), exp: OFICIAL ? "Linhas dos arquivos oficiais lidas para montar este painel no ano." : "Linhas agregadas usadas neste painel no ano.", calc:true, fonte: OFICIAL ? "Soma das linhas lidas nos arquivos oficiais processados (veja “Sobre”)." : "Contagem de linhas dos conjuntos carregados.", tr:{ conj:"*", ano, col:"(todas as linhas)", conta:"Contamos as linhas de todos os arquivos oficiais do ano que foram lidos para montar o painel." } });
   return out;
 }
 
@@ -389,6 +409,69 @@ function fonte(txt, calc){
   const selo = OFICIAL ? (calc?"Calculado":"Dado oficial") : (calc?"Calculado · demo":"Demonstração");
   const rod = OFICIAL ? `Fonte: Portal da Transparência (CGU), dados abertos. Processado em ${new Date(D.geradoEm).toLocaleString("pt-BR")}.` : "Valores fictícios do modelo.";
   return `<details class="fonte"><summary><span class="u">Fonte e metodologia</span><span class="selo${calc||OFICIAL?" calc":""}">${selo}</span></summary><div>${txt}<span>Período: ${perTxt()} · ${rod}</span></div></details>`; }
+/* ---------- trilha de verificação: conta → período → fonte → registro oficial */
+const CONSULTA = {
+  orcamento: { url:"https://portaldatransparencia.gov.br/orcamento", rot:"Orçamento Anual", passo:"escolha o ano e veja o valor “Orçamento atualizado”" },
+  execucao: { url:"https://portaldatransparencia.gov.br/despesas/visao-geral", rot:"Despesas Públicas", passo:"escolha o ano e compare os totais empenhado, liquidado e pago" },
+  transferencias: { url:"https://portaldatransparencia.gov.br/transferencias", rot:"Recursos Transferidos", passo:"escolha o ano e, se quiser, o estado ou a cidade" },
+  emendas: { url:"https://portaldatransparencia.gov.br/emendas", rot:"Emendas Parlamentares", passo:"pesquise pelo número da emenda ou pelo autor" },
+  convenios: { url:"https://portaldatransparencia.gov.br/convenios/consulta", rot:"Convênios", passo:"pesquise pelo número do convênio" },
+};
+const diaBR = iso => iso ? new Date(iso).toLocaleDateString("pt-BR") : "—";
+function filtrosAtivos(){
+  const f = [];
+  if(E.regiao) f.push(`região ${E.regiao}`);
+  if(E.uf) f.push(`estado: ${D.ufs.find(u=>u.sigla===E.uf)?.nome}`);
+  if(E.funcao) f.push(`área: ${D.dic.funcao.find(x=>x.cod===E.funcao)?.nome}`);
+  return f;
+}
+/** t = { conj, ano, col, conta, base, naoAplica, campoMeses, consulta }; i = { v, vr, per, calc } */
+function trilha(t, i){
+  if(!t) return fonte(i.fonte||"", i.calc);
+  const selo = OFICIAL ? (i.calc?"Calculado a partir de dado oficial":"Dado oficial") : "Demonstração";
+  const cs = (D.conjuntos||[]).filter(c=>c.ano===t.ano && (t.conj==="*"||c.conjunto===t.conj));
+  const m = t.conj==="orcamento"||t.conj==="*" ? null : mesesEf(t.ano, t.campoMeses||"meses");
+  const noPeriodo = a => !m || !/^\d{6}$/.test(a.periodo) || (+a.periodo.slice(4) >= m[0] && +a.periodo.slice(4) <= m[1]);
+  const arqs = cs.flatMap(c=>(c.arquivos||[]).filter(noPeriodo).map(a=>({...a, conj:c.nome})));
+  const fa = filtrosAtivos();
+  const li = a => `<li><b>${esc(a.nome)}</b>${a.periodo?` · período ${esc(/^\d{6}$/.test(a.periodo)?MESES[+a.periodo.slice(4)-1]+"/"+a.periodo.slice(0,4):a.periodo)}`:""} · baixado em ${diaBR(a.baixadoEm)} · ${Number(a.lidas||0).toLocaleString("pt-BR")} linhas lidas${a.descartadas?` (${Number(a.descartadas).toLocaleString("pt-BR")} descartadas por erro de formato)`:""}${a.url?` · <a href="${esc(a.url)}" rel="noreferrer">baixar o arquivo original</a>`:""}</li>`;
+  const listaArq = arqs.length ? (arqs.length>3 ? `<details><summary>Ver os ${arqs.length} arquivos usados</summary><ul>${arqs.map(li).join("")}</ul></details>` : `<ul>${arqs.map(li).join("")}</ul>`) : `<p class="muted">${OFICIAL?"Lista de arquivos indisponível.":"Modelo com dados fictícios: não há arquivo oficial."}</p>`;
+  const c0 = cs[0];
+  const consulta = t.consulta || CONSULTA[t.conj];
+  const comp0 = t.base!=null && i.vr!=null ? `<p>Para dizer se subiu ou caiu, comparamos com ${t.conj==="orcamento"?`o orçamento atualizado de ${t.ano-1}`:`<b>os mesmos meses de ${t.ano-1}</b>`}: ${cheio(t.base)}. Conta: (${cheio(i.v)} − ${cheio(t.base)}) ÷ ${cheio(t.base)} = <b>${i.vr>=0?"+":"−"}${pct(Math.abs(i.vr))}</b>.</p>` : (t.base===undefined ? "" : `<p class="muted">Sem comparação: o ano anterior não tem os mesmos meses publicados.</p>`);
+  return `<details class="fonte trilha"><summary><span class="u">Como chegamos a este número</span><span class="selo${i.calc||OFICIAL?" calc":""}">${selo}</span></summary><ol class="passos">
+    <li><h4>1. A conta</h4><p>${t.conta}</p>${i.v!=null?`<p>Resultado exato: <b class="num">${i.int?Number(i.v).toLocaleString("pt-BR"):cheio(i.v)}</b>${t.col?` · coluna usada: <code>${esc(t.col)}</code>`:""}</p>`:""}
+      <p class="muted">Filtros aplicados: ${fa.length?esc(fa.join(" · ")):"nenhum (Brasil inteiro, todas as áreas)"}.${t.naoAplica?.length?` Não se aplicam aqui: ${esc(t.naoAplica.join("; "))}.`:""}</p></li>
+    <li><h4>2. O período</h4><p>${esc(i.per||perTxt())}${m?` — meses ${MESES[m[0]-1]} a ${MESES[m[1]-1]} de ${t.ano}, os publicados até agora.`:t.conj==="orcamento"?" — valor do ano inteiro, como estava na data do arquivo.":""}</p>${comp0}</li>
+    <li><h4>3. De onde vem</h4><p>${c0?`<a href="${esc(c0.url)}" rel="noreferrer">${esc(t.conj==="*"?"Portal da Transparência — download de dados":c0.nome)}</a>${c0.dicionario&&t.conj!=="*"?` · <a href="${esc(c0.dicionario)}" rel="noreferrer">o que significa cada coluna</a>`:""}`:"Portal da Transparência (CGU)"}. Processado pela plataforma em ${diaBR(D.geradoEm)}.</p>${listaArq}</li>
+    ${consulta?`<li><h4>4. Confira você mesmo</h4><p>Abra <a href="${esc(consulta.url)}" rel="noreferrer">Portal da Transparência → ${esc(consulta.rot)}</a> e ${esc(consulta.passo)}${fa.length?`, aplicando os mesmos filtros (${esc(fa.join(", "))})`:""}. O valor deve bater; pequenas diferenças vêm da data de atualização (nossos arquivos foram baixados em ${diaBR(arqs[arqs.length-1]?.baixadoEm||D.geradoEm)}).</p></li>`:""}
+  </ol></details>`;
+}
+/* ---------- entrada para o cidadão: três perguntas */
+function tresPerguntas(){
+  const k = indicadores(), g = id => k.find(x=>x.g===id);
+  const lugar = E.uf ? D.ufs.find(u=>u.sigla===E.uf).nome : E.regiao ? `região ${E.regiao}` : null;
+  const a = A(E.ano);
+  // 1. Quanto foi pago?
+  const i1 = lugar ? g("transferencia") : g("pagamento");
+  const pop = E.uf ? D.ufs.find(u=>u.sigla===E.uf).populacao : E.regiao ? D.ufs.filter(u=>u.regiao===E.regiao).reduce((s,u)=>s+u.populacao,0) : POP_BR;
+  const r1 = i1?.v!=null ? `<p class="resp num">${extenso(i1.v)}</p><p>${lugar?`enviados pelo governo federal em transferências · ${esc(lugar)}, ${esc(i1.per)}`:`pagos pelo governo federal de ${esc(i1.per)}`}.</p><p class="muted">Dá cerca de <b>${extenso(i1.v/pop)}</b> por ${lugar?"morador":"brasileiro"}.${lugar?"":" Antes de pagar, o dinheiro é reservado e o serviço é conferido."}</p>` : `<p class="muted">${esc(i1?.ind||"Sem dados para este período.")}</p>`;
+  // 2. Em que foi gasto?
+  let top = [], tot = 0;
+  if(a){ if(lugar){ if(disp(E.ano,"tra")) top = agrupa(a.tra, fTra(E.ano), r=>r[2], 4); } else if(disp(E.ano,"exe")) top = agrupa(a.exe, fExe(E.ano), r=>r[3], 7); }
+  tot = top.reduce((s,x)=>s+x.v,0);
+  const r2 = top.length ? `<ol class="top3">${top.slice(0,3).map(x=>{ const nome=D.dic.funcao[x.k]?.nome||"Sem área informada"; return `<li><span>${esc(nome)}${/encargos/i.test(nome)?`<span class="muted"> (inclui dívida pública e repasses obrigatórios)</span>`:""}</span><b class="num">${tot?Math.round(x.v/tot*100):0} de cada R$ 100</b></li>`; }).join("")}</ol><p class="muted">Das ${top.length} áreas de governo, essas três somam ${extenso(top.slice(0,3).reduce((s,x)=>s+x.v,0))}.</p>` : `<p class="muted">Sem dados por área para este período.</p>`;
+  const t2 = top.length ? { conj: lugar?"transferencias":"execucao", ano:E.ano, col: lugar?"VALOR TRANSFERIDO (R$) agrupado por NOME FUNÇÃO":"VALOR PAGO (R$) agrupado por NOME FUNÇÃO", conta:`Separamos as linhas pela coluna da área de governo (função) e somamos ${lugar?"o valor transferido":"o valor pago"} de cada uma. “De cada R$ 100” = valor da área ÷ total de todas as áreas (${cheio(tot)}) × 100.`, campoMeses: lugar?"mesesTra":"meses" } : null;
+  // 3. O que mudou?
+  const vari = lugar ? null : variacoesPorArea();
+  const r3 = i1?.vr!=null ? `<p class="resp"><span class="${i1.vr>=0?"seta-sobe":"seta-cai"} sobe">${i1.vr>=0?"Subiu":"Caiu"} ${pct(Math.abs(i1.vr))}</span></p><p>${lugar?`O valor recebido por ${esc(lugar)}`:"O que o governo pagou"} de ${esc(i1.per)} foi ${extenso(Math.abs(i1.v-i1.tr.base))} ${i1.vr>=0?"a mais":"a menos"} que nos mesmos meses de ${E.ano-1}.</p>${vari?.sobe?.[0]||vari?.cai?.[0]?`<p class="muted">${vari.sobe[0]?`Mais subiu: <b>${esc(vari.sobe[0].nome)}</b> (+${pct(vari.sobe[0].p)}).`:""} ${vari.cai[0]?`Mais caiu: <b>${esc(vari.cai[0].nome)}</b> (−${pct(Math.abs(vari.cai[0].p))}).`:""}</p>`:""}` : `<p class="muted">Ainda não dá para comparar: ${E.ano-1} não tem os mesmos meses publicados.</p>`;
+  const card = (n, q, corpo, links, tr, iv) => `<article class="cartao pergunta"><h2><span class="nq">${n}</span>${q}</h2>${corpo}<div class="links-p">${links}</div>${tr?trilha(tr, iv):""}</article>`;
+  return `<section class="perguntas" aria-label="Três perguntas">
+    ${card(1, lugar?(E.uf?"Quanto chegou ao estado?":"Quanto chegou à região?"):"Quanto foi pago?", r1, `<button class="lnk" data-acao="ir:kpis">Ver as etapas do gasto →</button>`, i1?.tr, i1||{})}
+    ${card(2, "Em que foi gasto?", r2, `<button class="lnk" data-acao="view:areas">Ver todas as áreas →</button>`, t2, { v: tot, per: i1?.per })}
+    ${card(3, "O que mudou em relação ao ano passado?", r3, `<button class="lnk" data-acao="ir:tendencia">Ver o gráfico mês a mês →</button>`, i1?.tr, i1||{})}
+  </section>`;
+}
 function perTxt(){ const m=mesesEf(E.ano); return m?(m[0]===1&&m[1]===12?String(E.ano):`${MESES[m[0]-1]}–${MESES[m[1]-1]}/${E.ano}`):String(E.ano); }
 function graficoBarras(dados, rot){
   const W=520,H=170,pl=44,pb=22,pt=8; const max=Math.max(...dados.map(d=>d.v||0),1);
@@ -639,7 +722,7 @@ function variacoesPorArea(){
   const lin = [...g1].map(([k,v])=>{ const cod=D.dic.funcao[k]?.cod; const v0=g0.get(cod)||0; return { nome: D.dic.funcao[k]?.nome, v, v0, d: v-v0, p: v0>0?(v-v0)/v0:null }; }).filter(x=>x.v0 >= 1e8 && x.p!=null);
   const sobe = [...lin].sort((a,b)=>b.d-a.d).filter(x=>x.d>0).slice(0,5), cai = [...lin].sort((a,b)=>a.d-b.d).filter(x=>x.d<0).slice(0,5);
   const li = x => `<li><span>${esc(x.nome)}<br><span class="muted">${comp(x.v0)} → ${comp(x.v)}</span></span><span class="${x.d>0?"seta-sobe":"seta-cai"} sobe">${x.d>0?"+":"−"}${comp(Math.abs(x.d)).replace("R$ ","R$ ")}<br><span class="muted">${x.d>0?"+":"−"}${pct(Math.abs(x.p))}</span></span></li>`;
-  return { per: `${MESES[m[0]-1]}–${MESES[m[1]-1]}`, html: `<div class="variacoes"><div><h3 class="rotulo" style="margin-bottom:8px">O que mais subiu</h3><ul>${sobe.map(li).join("")||"<li>Nenhuma área subiu.</li>"}</ul></div><div><h3 class="rotulo" style="margin-bottom:8px">O que mais caiu</h3><ul>${cai.map(li).join("")||"<li>Nenhuma área caiu.</li>"}</ul></div></div>` };
+  return { sobe, cai, per: `${MESES[m[0]-1]}–${MESES[m[1]-1]}`, html: `<div class="variacoes"><div><h3 class="rotulo" style="margin-bottom:8px">O que mais subiu</h3><ul>${sobe.map(li).join("")||"<li>Nenhuma área subiu.</li>"}</ul></div><div><h3 class="rotulo" style="margin-bottom:8px">O que mais caiu</h3><ul>${cai.map(li).join("")||"<li>Nenhuma área caiu.</li>"}</ul></div></div>` };
 }
 /** Resumo em palavras simples, no topo do painel. */
 function resumoEmPalavras(){
@@ -745,11 +828,13 @@ function viewPainel(){
     <li>Entre os dois existem etapas: primeiro o dinheiro é <b>reservado</b>, depois o serviço é <b>entregue e conferido</b>, e só então é <b>pago</b>. É o mesmo dinheiro passando pelas etapas: nunca some essas caixas.</li>
     <li><span class="seta-sobe">Subiu</span> e <span class="seta-cai">Caiu</span> comparam com os <b>mesmos meses do ano anterior</b>.</li>
     <li>No mapa, cores mais escuras = mais dinheiro. Clique num estado; aproxime para ver as cidades e clique numa delas.</li>
-    <li>Todo número tem <b>“Fonte e metodologia”</b>: de onde veio e como foi calculado. Os dados são oficiais do Portal da Transparência.</li>
+    <li>Comece pelas <b>três perguntas</b> logo abaixo. Para os detalhes, desça a página.</li>
+    <li>Todo número principal tem <b>“Como chegamos a este número”</b>: a conta feita, o período, o arquivo oficial de onde veio (com link para baixar) e onde conferir no Portal da Transparência.</li>
   </ol></details>
+  ${tresPerguntas()}
   ${resumoEmPalavras()}
   ${filtrosHTML()}
-  <section class="kpis" aria-label="Indicadores principais">${k.map(i=>`<article class="cartao kpi"><h3 class="rotulo" style="display:block">${i.t} ${i.g?ajuda(i.g):""}${i.termo?`<span class="termo">nome técnico: ${i.termo}</span>`:""}</h3><div class="v num" title="${i.v!=null&&!i.int?cheio(i.v):""}">${i.v==null?"—":i.int?i.v.toLocaleString("pt-BR"):comp(i.v)}</div>${i.pbr&&i.v!=null&&!E.uf&&!E.regiao?`<div class="pbr num">≈ ${cheio(i.v/POP_BR)} por brasileiro</div>`:""}${i.ind?`<p class="ind">${i.ind}</p>`:`<div class="var num">${i.vr==null?(i.int?"":"sem base comparável com o ano anterior"):`<span class="${i.vr>=0?"seta-sobe":"seta-cai"}">${i.vr>=0?"Subiu":"Caiu"} ${pct(Math.abs(i.vr))}</span> <span class="muted">${i.vrRot||"em relação ao mesmo período do ano anterior"}</span>`}</div><p>${i.exp}</p><p class="muted">Período: ${i.per}</p>${fonte(i.fonte,i.calc)}`}</article>`).join("")}</section>
+  <section class="kpis" id="kpis" aria-label="Indicadores principais">${k.map(i=>`<article class="cartao kpi" id="kpi-${i.g||"x"}"><h3 class="rotulo" style="display:block">${i.t} ${i.g?ajuda(i.g):""}${i.termo?`<span class="termo">nome técnico: ${i.termo}</span>`:""}</h3><div class="v num" title="${i.v!=null&&!i.int?cheio(i.v):""}">${i.v==null?"—":i.int?i.v.toLocaleString("pt-BR"):comp(i.v)}</div>${i.pbr&&i.v!=null&&!E.uf&&!E.regiao?`<div class="pbr num">≈ ${cheio(i.v/POP_BR)} por brasileiro</div>`:""}${i.ind?`<p class="ind">${i.ind}</p>`:`<div class="var num">${i.vr==null?(i.int?"":"sem base comparável com o ano anterior"):`<span class="${i.vr>=0?"seta-sobe":"seta-cai"}">${i.vr>=0?"Subiu":"Caiu"} ${pct(Math.abs(i.vr))}</span> <span class="muted">${i.vrRot||"em relação ao mesmo período do ano anterior"}</span>`}</div><p>${i.exp}</p><p class="muted">Período: ${i.per}</p>${trilha(i.tr,i)}`}</article>`).join("")}</section>
   <section class="grade-mapa">
     <div class="cartao"><div class="sec-tit"><div><h2>Para onde vai o dinheiro · ${METRICAS[E.metrica].rot.toLowerCase()}</h2><p>${METRICAS[E.metrica].desc}</p></div></div>
       <div class="ctrl"><div class="seg" role="radiogroup" aria-label="O que o mapa mostra">${Object.keys(METRICAS).map(m=>{ const c=m==="transferencias"?"tra":m==="execucao"?"exe":"emendas"; const ok=disp(E.ano,c); return `<button role="radio" aria-checked="${E.metrica===m}" data-metrica="${m}" ${ok?"":`disabled title="Ainda não carregado para ${E.ano}"`}>${METRICAS[m].curto}</button>`; }).join("")}</div><div class="seg" role="radiogroup" aria-label="Escala"><button role="radio" aria-checked="${E.modo==="absoluto"}" data-modo="absoluto">Total</button><button role="radio" aria-checked="${E.modo==="per_capita"}" data-modo="per_capita">Por habitante</button></div><button class="botao" data-acao="tabela" aria-pressed="${E.tabela}">${E.tabela?"Ver mapa":"Ver como tabela"}</button>${E.uf&&!E.tabela?`<button class="botao" data-acao="munis" aria-pressed="${E.munis}">${E.munis?"Ver estados":"Ver municípios de "+E.uf}</button>`:""}</div>
@@ -766,7 +851,7 @@ function secaoTendencia(){
   const esc0 = lugar ? { ui: D.ufs.indexOf(lugar) } : {};
   const sujeito = lugar ? (met==="execucao" ? `o governo federal, em despesas com local em ${lugar.nome},` : lugar.nome) : "o governo federal";
   const vari = variacoesPorArea();
-  return `<section class="cartao"><div class="sec-tit"><div><h2>Está subindo ou caindo?</h2><p>${lugar?esc(lugar.nome):"Brasil"} · mês a mês, ${E.ano} comparado com ${E.ano-1}</p></div>
+  return `<section class="cartao" id="tendencia"><div class="sec-tit"><div><h2>Está subindo ou caindo?</h2><p>${lugar?esc(lugar.nome):"Brasil"} · mês a mês, ${E.ano} comparado com ${E.ano-1}</p></div>
     <div class="seg" role="radiogroup" aria-label="O que comparar"><button role="radio" aria-checked="${met==="execucao"}" data-tend="execucao">Pago pelo governo</button><button role="radio" aria-checked="${met==="transferencias"}" data-tend="transferencias">Transferências</button></div></div>
     ${blocoTendencia(met, esc0, sujeito)}
     ${vari?`<div class="bloco" style="margin-top:14px"><div class="sec-tit"><div><h2 style="font-size:15px">Por área: o que mais subiu e o que mais caiu</h2><p>Valor pago de ${vari.per}, ${E.ano-1} → ${E.ano}${lugar?` (despesas com local em ${esc(lugar.nome)})`:""}. Áreas com menos de R$ 100 mi no ano anterior não entram.</p></div></div>${vari.html}</div>`:""}
@@ -879,6 +964,7 @@ function acao(a){
   else if(t==="funcao"){ E.funcao=v; render(); }
   else if(t==="emenda"){ E.q=v; E.pag=1; irPara("emendas"); }
   else if(t==="view"){ irPara(v); }
+  else if(t==="ir"){ document.getElementById(v)?.scrollIntoView({behavior:"smooth", block:"start"}); }
   else if(t==="cidade"){ const m=MUN[Number(v)]; if(m){ E.mun=Number(v); E.uf=m.uf; E.regiao=null; E.munis=false; ultimoTransform=null; irPara("painel"); } }
   else if(t==="projetos-cidade"){ const m=MUN[Number(v)]; if(m){ E.uf=m.uf; E.proj.mun=String(v); E.proj.sit=""; E.pag=1; irPara("projetos"); } }
 }
