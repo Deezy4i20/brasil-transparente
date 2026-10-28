@@ -25,7 +25,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: atualizar-dados
+  group: dados-oficiais
   cancel-in-progress: false
 
 jobs:
@@ -103,7 +103,7 @@ jobs:
             echo "Sem mudanças nos dados."
           else
             git commit -m "Dados oficiais atualizados em $(TZ=America/Sao_Paulo date '+%d/%m/%Y %H:%M')"
-            git push
+            for i in 1 2 3; do git pull --rebase origin main && git push && break; sleep 15; done
           fi
 
       - name: Sinalizar falha parcial

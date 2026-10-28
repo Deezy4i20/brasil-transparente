@@ -15,7 +15,8 @@
     "demo": "tsx scripts/gerar-demo.ts",
     "verificar:api": "tsx scripts/verificar-api.ts",
     "modelo": "tsx scripts/exportar-modelo.ts",
-    "etl:convenios": "tsx scripts/etl/convenios.ts"
+    "etl:convenios": "tsx scripts/etl/convenios.ts",
+    "etl:contratos": "tsx scripts/etl/contratos.ts"
   },
   "engines": {
     "node": ">=20"
