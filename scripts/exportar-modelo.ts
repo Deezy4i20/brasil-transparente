@@ -115,6 +115,15 @@ for (const u of UFS) {
 const dirConv = join(DIR, "convenios");
 const convResumo = existsSync(join(dirConv, "resumo.json")) ? JSON.parse(readFileSync(join(dirConv, "resumo.json"), "utf8")) : null;
 
+// Contratos e licitações: resumo embutido (sem a lista por município), listas por UF em arquivos separados.
+const dirContr = join(DIR, "contratos"), dirLic = join(DIR, "licitacoes");
+const contratosResumo = existsSync(join(dirContr, "resumo.json")) ? JSON.parse(readFileSync(join(dirContr, "resumo.json"), "utf8")) : null;
+function copiarPasta(origem: string, destino: string) {
+  if (!existsSync(origem)) return;
+  mkdirSync(destino, { recursive: true });
+  for (const f of readdirSync(origem)) if (f.endsWith(".json")) writeFileSync(join(destino, f), readFileSync(join(origem, f)));
+}
+
 /** Ligações emenda → convênio só dos convênios que aparecem no site, sem autor "Sem informação". */
 function emendasConvReduzido(): string {
   const arq = join(dirConv, "emendas.json");
@@ -129,6 +138,7 @@ function emendasConvReduzido(): string {
 
 const dados = {
   convResumo,
+  contratosResumo,
   modo: oficial ? "oficial" : "demonstracao",
   conjuntos: manifesto.conjuntos
     .sort((a, b) => b.ano - a.ano || a.conjunto.localeCompare(b.conjunto))
@@ -164,6 +174,8 @@ if (existsSync(dirConv)) {
   for (const f of readdirSync(dirConv)) if (f !== "emendas.json") writeFileSync(join(OUT, "dados", "convenios", f), readFileSync(join(dirConv, f)));
   writeFileSync(join(OUT, "dados", "convenios", "emendas.json"), emendasConvReduzido());
 }
+copiarPasta(dirContr, join(OUT, "dados", "contratos"));
+copiarPasta(dirLic, join(OUT, "dados", "licitacoes"));
 console.log(`Modelo gerado: prototipo/brasil-transparente-modelo.html (${(json.length / 1e6).toFixed(1)} MB de dados)`);
 
 // --site: gera também a página completa (com <head>) para publicar no GitHub Pages.
@@ -194,6 +206,8 @@ ${readFileSync(join(OUT, "brasil-transparente-modelo.html"), "utf8")}
     for (const f of readdirSync(dirConv)) if (f !== "emendas.json") writeFileSync(join(SITE, "dados", "convenios", f), readFileSync(join(dirConv, f)));
     writeFileSync(join(SITE, "dados", "convenios", "emendas.json"), emendasConvReduzido());
   }
+  copiarPasta(dirContr, join(SITE, "dados", "contratos"));
+  copiarPasta(dirLic, join(SITE, "dados", "licitacoes"));
   writeFileSync(join(SITE, ".nojekyll"), "");
   console.log("Site gerado: site/index.html");
 }
