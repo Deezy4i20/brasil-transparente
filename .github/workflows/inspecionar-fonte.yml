@@ -1,0 +1,54 @@
+# Baixa um arquivo do Portal e publica nomes, cabeçalhos e exemplos como anotação.
+# Serve para conferir o formato real de um conjunto antes de escrever o processador.
+name: Inspecionar fonte
+
+on:
+  workflow_dispatch:
+    inputs:
+      slugs:
+        description: "Slugs de download-de-dados (separados por espaço)"
+        default: "compras licitacoes"
+      periodo:
+        description: "Período (AAAAMM)"
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  inspecionar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Baixar e descrever
+        env:
+          SLUGS: ${{ github.event.inputs.slugs }}
+          PERIODO: ${{ github.event.inputs.periodo }}
+        run: |
+          [ -n "$PERIODO" ] || PERIODO=$(TZ=America/Sao_Paulo date -d "$(date +%Y-%m-01) -1 month" +%Y%m)
+          OUT=""
+          for S in $SLUGS; do
+            mkdir -p "x/$S"; cd "x/$S"
+            OK=0
+            for P in $PERIODO $(date -d "${PERIODO}01 -1 month" +%Y%m) $(date -d "${PERIODO}01 -2 month" +%Y%m); do
+              for T in 1 2 3; do
+                code=$(curl -sSL -A "Mozilla/5.0 brasil-transparente" -o a.zip -w "%{http_code}" "https://portaldatransparencia.gov.br/download-de-dados/$S/$P" || true)
+                [ "$code" = "200" ] && unzip -tq a.zip >/dev/null 2>&1 && { OK=1; break; }
+                sleep 20
+              done
+              [ "$OK" = "1" ] && { USADO=$P; break; }
+            done
+            if [ "$OK" != "1" ]; then OUT="$OUT\n## $S: falhou (http $code)"; cd ../..; continue; fi
+            unzip -oq a.zip
+            OUT="$OUT\n## $S $USADO ($(stat -c%s a.zip) bytes)"
+            for f in *.csv; do
+              n=$(wc -l < "$f")
+              h=$(head -1 "$f" | iconv -f latin1 -t utf-8)
+              e=$(sed -n '2,3p' "$f" | iconv -f latin1 -t utf-8 | cut -c1-900)
+              OUT="$OUT\n### $f ($n linhas)\nCAB: $h\nEX: $e"
+            done
+            cd ../..
+          done
+          printf "%b" "$OUT"
+          MSG=$(printf "%b" "$OUT" | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')
+          echo "::notice title=INSPECAO::$MSG"
