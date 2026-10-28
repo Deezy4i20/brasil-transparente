@@ -341,7 +341,7 @@ export class ProcessadorEmendas extends Processador {
   vinculosComAutor(): Record<string, [string, string, string, string][]> {
     const out: Record<string, [string, string, string, string][]> = {};
     for (const [conv, cods] of this.vinculos) {
-      const l = [...cods].map((c) => [c, ...(this.autores.get(c) ?? ["", "", ""])] as [string, string, string, string]).filter((x) => x[1]);
+      const l = [...cods].map((c) => [c, ...(this.autores.get(c) ?? ["", "", ""])] as [string, string, string, string]).filter((x) => x[1] && !/sem informa/i.test(x[1]));
       if (l.length) out[conv] = l;
     }
     return out;

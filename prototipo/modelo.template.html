@@ -302,6 +302,16 @@ const nf1 = new Intl.NumberFormat("pt-BR",{maximumFractionDigits:1});
 const brl = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
 function comp(v){ if(v==null||!isFinite(v)) return "—"; const a=Math.abs(v), s=v<0?"−":""; if(a>=1e12) return `${s}R$ ${nf1.format(a/1e12)} tri`; if(a>=1e9) return `${s}R$ ${nf1.format(a/1e9)} bi`; if(a>=1e6) return `${s}R$ ${nf1.format(a/1e6)} mi`; if(a>=1e3) return `${s}R$ ${nf1.format(a/1e3)} mil`; return `${s}R$ ${nf1.format(a)}`; }
 const cheio = v => v==null||!isFinite(v) ? "—" : brl.format(v);
+/** Valor em palavras para leigos: "R$ 6,4 trilhões", "R$ 328 mil", "R$ 23.427". */
+function extenso(v){
+  if(v==null||!isFinite(v)) return "—";
+  const a=Math.abs(v), s=v<0?"menos ":"", n=x=>nf1.format(x);
+  if(a>=1e12) return `${s}R$ ${n(a/1e12)} ${a/1e12<2?"trilhão":"trilhões"}`;
+  if(a>=1e9) return `${s}R$ ${n(a/1e9)} ${a/1e9<2?"bilhão":"bilhões"}`;
+  if(a>=1e6) return `${s}R$ ${n(a/1e6)} ${a/1e6<2?"milhão":"milhões"}`;
+  if(a>=1e4) return `${s}R$ ${new Intl.NumberFormat("pt-BR",{maximumFractionDigits:0}).format(a/1e3)} mil`;
+  return `${s}R$ ${new Intl.NumberFormat("pt-BR",{maximumFractionDigits:0}).format(a)}`;
+}
 const pct = v => v==null||!isFinite(v) ? "—" : `${nf1.format(v*100)}%`;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const norm = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
@@ -414,12 +424,20 @@ function statusProj(c){ if(c[CI.inicio] && c[CI.inicio] > HOJE) return "futuro";
 const ROT_STATUS = { futuro: "Ainda vai começar", andamento: "Em andamento", encerrado: "Prazo encerrado" };
 const dataBR = iso => iso ? iso.split("-").reverse().join("/") : "—";
 const aLiberar = c => (c[CI.valor]!=null && c[CI.liberado]!=null) ? Math.max(0, c[CI.valor]-c[CI.liberado]) : null;
+/** Quem pediu o projeto por emenda (deduplicado). Emenda de relator não identifica o parlamentar. */
+function autoresEmenda(c){
+  const l = EMC[c[CI.numero]] || []; if(!l.length) return "";
+  const por = new Map(); for(const e of l){ const k=e[1]; const x = por.get(k) || { tipo:e[2], anos:new Set(), n:0 }; x.n++; if(e[3]) x.anos.add(e[3]); por.set(k,x); }
+  const itens = [...por].map(([nome,x]) => `${esc(nome)} <span style="opacity:.75">(${esc(x.tipo||"emenda")}${x.anos.size?`, ${[...x.anos].sort().join(", ")}`:""}${x.n>1?` · ${x.n} emendas`:""})</span>`);
+  const relator = [...por.keys()].some(n => /relator/i.test(n));
+  return `<div class="emenda-autor"><b>Pedido por emenda de:</b> ${itens.join("; ")}${relator?`<br><span style="opacity:.8">“Relator geral” é a emenda de relator: o nome do parlamentar que pediu não é publicado nesta fonte.</span>`:""}</div>`;
+}
 function cartaoProjeto(c, comMun){
   const st = statusProj(c), al = aLiberar(c);
   return `<div class="proj"><div class="t"><span class="obj" title="${esc(c[CI.objeto]||"")}">${esc(c[CI.objeto]||"Objeto não informado")}</span><span class="pill ${st}">${ROT_STATUS[st]}</span></div>
   <div class="meta"><b>Quem faz (ganhou o recurso):</b> ${esc(c[CI.convenente]||"—")}${c[CI.tipoConv]?` <span class="muted">(${esc(c[CI.tipoConv])})</span>`:""}</div>
   <div class="meta"><b>Quem paga (governo federal):</b> ${esc(c[CI.concedente]||"—")}${c[CI.orgaoSup]&&c[CI.orgaoSup]!==c[CI.concedente]?` · ${esc(c[CI.orgaoSup])}`:""}</div>
-  ${(EMC[c[CI.numero]]||[]).length?`<div class="emenda-autor"><b>Pedido por emenda de:</b> ${EMC[c[CI.numero]].map(e=>`${esc(e[1])} <span style="opacity:.75">(${esc(e[2]||"emenda")}${e[3]?`, ${e[3]}`:""})</span>`).join("; ")}</div>`:""}
+  ${autoresEmenda(c)}
   <div class="vals num"><span>Combinado <b>${comp(c[CI.valor])}</b></span><span>Já repassado <b>${comp(c[CI.liberado])}</b></span><span>Falta repassar <b>${comp(al)}</b></span>${c[CI.contrapartida]?`<span>Parte de quem faz <b>${comp(c[CI.contrapartida])}</b></span>`:""}</div>
   <div class="meta muted">${comMun?`${esc(c[CI.munNome]||"Município não identificado")} · `:""}${c[CI.instrumento] && !/n[aã]o se aplica/i.test(c[CI.instrumento]) ? esc(c[CI.instrumento][0] + c[CI.instrumento].slice(1).toLowerCase()) + " " : ""}nº ${esc(c[CI.numero])} · vigência ${dataBR(c[CI.inicio])} a ${dataBR(c[CI.fim])} · situação oficial: ${esc(c[CI.situacao]||"—")}</div></div>`;
 }
@@ -582,7 +600,7 @@ function graficoLinhas(series, rotulo){
   const x = i => pl + i*(W-pl-pr)/11, y = v => pt + (H-pt-pb)*(1-v/top);
   const linha = d => { let p="", on=false; d.forEach((v,i)=>{ if(v==null){ on=false; return; } p += `${on?"L":"M"}${x(i).toFixed(1)},${y(v).toFixed(1)} `; on=true; }); return p; };
   const ultimo = d => { for(let i=11;i>=0;i--) if(d[i]!=null) return i; return -1; };
-  return `<figure style="margin:0"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(rotulo)}" style="width:100%;height:auto">
+  return `<figure style="margin:0;max-width:760px"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(rotulo)}" style="width:100%;height:auto">
     ${ticks.map(t=>`<line x1="${pl}" x2="${W-pr}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grade)"/><text x="${pl-6}" y="${y(t)+4}" text-anchor="end" font-size="10.5" fill="var(--tinta-3)">${comp(t).replace("R$ ","")}</text>`).join("")}
     ${MESES.map((m,i)=>`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="10.5" fill="var(--tinta-3)">${m}</text>`).join("")}
     ${series.map(s=>`<path d="${linha(s.dados)}" fill="none" stroke="${s.cor}" stroke-width="2.5" ${s.tracejado?'stroke-dasharray="5 4"':""} stroke-linejoin="round" stroke-linecap="round"/>
@@ -600,10 +618,10 @@ function blocoTendencia(metrica, esc, sujeito){
   const ultimoMes = mesesAtual[mesesAtual.length-1];
   const verbo = metrica==="transferencias" ? (esc.mun||esc.ui!=null ? "recebeu" : "repassou") : "pagou";
   const oque = metrica==="transferencias" ? (esc.mun||esc.ui!=null ? "do governo federal em transferências" : "a estados, cidades e pessoas") : "em gastos";
-  let frase = `De janeiro a ${MESES_LONGOS[ultimoMes]} de ${E.ano}, ${sujeito} ${verbo} <b>${cheio(somaM(atual, mesesAtual))}</b> ${oque}.`;
+  let frase = `De janeiro a ${MESES_LONGOS[ultimoMes]} de ${E.ano}, ${sujeito} ${verbo} <b>${extenso(somaM(atual, mesesAtual))}</b> ${oque}.`;
   if(comuns.length){
     const a1 = somaM(atual, comuns), a0 = somaM(ant, comuns);
-    if(a0 > 0){ const v = (a1-a0)/a0; frase += ` No mesmo período de ${E.ano-1} foram <b>${cheio(a0)}</b>. ` + (Math.abs(v) < 0.005 ? `Ficou praticamente igual.` : `Isso é <span class="${v>0?"seta-sobe":"seta-cai"} sobe">${pct(Math.abs(v))} ${v>0?"a mais":"a menos"}</span>.`); }
+    if(a0 > 0){ const v = (a1-a0)/a0; frase += ` No mesmo período de ${E.ano-1} foram <b>${extenso(a0)}</b>. ` + (Math.abs(v) < 0.005 ? `Ficou praticamente igual.` : `Isso é <span class="${v>0?"seta-sobe":"seta-cai"} sobe">${pct(Math.abs(v))} ${v>0?"a mais":"a menos"}</span>.`); }
   } else if(ant===null || !ant) frase += ` Ainda não há dados de ${E.ano-1} para comparar.`;
   const series = [];
   if(ant) series.push({ nome: String(E.ano-1), dados: ant, cor: "var(--tinta-3)", tracejado: true });
@@ -631,13 +649,13 @@ function resumoEmPalavras(){
   const lugar = E.uf ? D.ufs.find(u=>u.sigla===E.uf).nome : E.regiao ? `a região ${E.regiao}` : null;
   const ps = [];
   if(!lugar){
-    if(orc?.v!=null) ps.push(`Em <b>${E.ano}</b>, o governo federal pode gastar até <b>${cheio(orc.v)}</b>. Esse é o teto do ano (o “orçamento”).`);
-    if(pago?.v!=null){ let t = `De janeiro a ${ateMes}, já <b>pagou ${cheio(pago.v)}</b>`; if(orc?.v) t += ` — de cada R$ 100 autorizados, R$ ${Math.round(pago.v/orc.v*100)} já foram pagos`; t += `. Dividindo por todos os brasileiros, dá cerca de <b>${cheio(pago.v/POP_BR)} por pessoa</b>.`; if(pago.vr!=null) t += ` Comparado ao mesmo período de ${E.ano-1}, o governo pagou <span class="${pago.vr>=0?"seta-sobe":"seta-cai"} sobe">${pct(Math.abs(pago.vr))} ${pago.vr>=0?"a mais":"a menos"}</span>.`; ps.push(t); }
-    const a = A(E.ano); if(a && disp(E.ano,"exe")){ const top = agrupa(a.exe, fExe(E.ano), r=>r[3], 7)[0]; if(top){ const nome = D.dic.funcao[top.k]?.nome||""; ps.push(`A maior parte foi para <b>${esc(nome)}</b> (${comp(top.v)})${/encargos/i.test(nome)?", que reúne principalmente o pagamento da dívida pública e repasses obrigatórios a estados e municípios":""}.`); } }
-    if(tra?.v!=null) ps.push(`O governo também <b>enviou ${comp(tra.v)}</b> a estados, cidades, entidades e pessoas — isso faz parte do que foi pago, não é um gasto a mais.`);
+    if(orc?.v!=null) ps.push(`Em <b>${E.ano}</b>, o governo federal pode gastar até <b>${extenso(orc.v)}</b>. Esse é o teto do ano (o “orçamento”).`);
+    if(pago?.v!=null){ let t = `De janeiro a ${ateMes}, já <b>pagou ${extenso(pago.v)}</b>`; if(orc?.v) t += ` — de cada R$ 100 autorizados, R$ ${Math.round(pago.v/orc.v*100)} já foram pagos`; t += `. Dividindo por todos os brasileiros, dá cerca de <b>${extenso(pago.v/POP_BR)} por pessoa</b>.`; if(pago.vr!=null) t += ` Comparado ao mesmo período de ${E.ano-1}, o governo pagou <span class="${pago.vr>=0?"seta-sobe":"seta-cai"} sobe">${pct(Math.abs(pago.vr))} ${pago.vr>=0?"a mais":"a menos"}</span>.`; ps.push(t); }
+    const a = A(E.ano); if(a && disp(E.ano,"exe")){ const top = agrupa(a.exe, fExe(E.ano), r=>r[3], 7)[0]; if(top){ const nome = D.dic.funcao[top.k]?.nome||""; ps.push(`A maior parte foi para <b>${esc(nome)}</b> (${extenso(top.v)})${/encargos/i.test(nome)?", que reúne principalmente o pagamento da dívida pública e repasses obrigatórios a estados e municípios":""}.`); } }
+    if(tra?.v!=null) ps.push(`O governo também <b>enviou ${extenso(tra.v)}</b> a estados, cidades, entidades e pessoas — isso faz parte do que foi pago, não é um gasto a mais.`);
   } else {
-    if(tra?.v!=null) ps.push(`De janeiro a ${ateMes} de ${E.ano}, ${esc(lugar)} recebeu <b>${cheio(tra.v)}</b> do governo federal em transferências${tra.vr!=null?` — <span class="${tra.vr>=0?"seta-sobe":"seta-cai"} sobe">${pct(Math.abs(tra.vr))} ${tra.vr>=0?"a mais":"a menos"}</span> que no mesmo período de ${E.ano-1}`:""}.`);
-    if(E.uf){ const u=D.ufs.find(x=>x.sigla===E.uf); if(tra?.v!=null) ps.push(`Isso dá cerca de <b>${cheio(tra.v/u.populacao)} por morador</b> do estado.`); const pr=D.convResumo?.porUF?.[E.uf]; if(pr) ps.push(`Há <b>${pr[0].toLocaleString("pt-BR")} projetos</b> com dinheiro federal no estado; ainda falta repassar <b>${comp(Math.max(0,pr[1]-pr[2]))}</b>.`); }
+    if(tra?.v!=null) ps.push(`De janeiro a ${ateMes} de ${E.ano}, ${esc(lugar)} recebeu <b>${extenso(tra.v)}</b> do governo federal em transferências${tra.vr!=null?` — <span class="${tra.vr>=0?"seta-sobe":"seta-cai"} sobe">${pct(Math.abs(tra.vr))} ${tra.vr>=0?"a mais":"a menos"}</span> que no mesmo período de ${E.ano-1}`:""}.`);
+    if(E.uf){ const u=D.ufs.find(x=>x.sigla===E.uf); if(tra?.v!=null) ps.push(`Isso dá cerca de <b>${extenso(tra.v/u.populacao)} por morador</b> do estado.`); const pr=D.convResumo?.porUF?.[E.uf]; if(pr) ps.push(`Há <b>${pr[0].toLocaleString("pt-BR")} projetos</b> com dinheiro federal no estado; ainda falta repassar <b>${extenso(Math.max(0,pr[1]-pr[2]))}</b>.`); }
   }
   ps.push(`<span class="muted">Clique num estado no mapa, ou aproxime para escolher uma cidade, para ver o que acontece lá.</span>`);
   return `<section class="cartao resumo-texto" aria-label="Resumo em palavras"><h2 class="rotulo" style="margin-bottom:8px">Resumo em palavras</h2>${ps.map(t=>`<p>${t}</p>`).join("")}</section>`;

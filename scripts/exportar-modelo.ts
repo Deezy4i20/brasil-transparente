@@ -115,6 +115,18 @@ for (const u of UFS) {
 const dirConv = join(DIR, "convenios");
 const convResumo = existsSync(join(dirConv, "resumo.json")) ? JSON.parse(readFileSync(join(dirConv, "resumo.json"), "utf8")) : null;
 
+/** Ligações emenda → convênio só dos convênios que aparecem no site, sem autor "Sem informação". */
+function emendasConvReduzido(): string {
+  const arq = join(dirConv, "emendas.json");
+  if (!existsSync(arq)) return JSON.stringify({ porConvenio: {} });
+  const todos = JSON.parse(readFileSync(arq, "utf8")).porConvenio as Record<string, string[][]>;
+  const usados = new Set<string>();
+  for (const f of readdirSync(dirConv)) if (/^[A-Z]{2}\.json$/.test(f)) for (const c of JSON.parse(readFileSync(join(dirConv, f), "utf8")).itens) usados.add(String(c[0]));
+  const out: Record<string, string[][]> = {};
+  for (const [k, v] of Object.entries(todos)) { if (!usados.has(k)) continue; const l = v.filter((e) => e[1] && !/sem informa/i.test(e[1])); if (l.length) out[k] = l; }
+  return JSON.stringify({ porConvenio: out });
+}
+
 const dados = {
   convResumo,
   modo: oficial ? "oficial" : "demonstracao",
@@ -146,7 +158,8 @@ const json = JSON.stringify(dados).replace(/</g, "\\u003c");
 writeFileSync(join(OUT, "brasil-transparente-modelo.html"), modelo.replace("/*__DADOS__*/null", json));
 if (existsSync(dirConv)) {
   mkdirSync(join(OUT, "dados", "convenios"), { recursive: true });
-  for (const f of readdirSync(dirConv)) writeFileSync(join(OUT, "dados", "convenios", f), readFileSync(join(dirConv, f)));
+  for (const f of readdirSync(dirConv)) if (f !== "emendas.json") writeFileSync(join(OUT, "dados", "convenios", f), readFileSync(join(dirConv, f)));
+  writeFileSync(join(OUT, "dados", "convenios", "emendas.json"), emendasConvReduzido());
 }
 console.log(`Modelo gerado: prototipo/brasil-transparente-modelo.html (${(json.length / 1e6).toFixed(1)} MB de dados)`);
 
@@ -175,7 +188,8 @@ ${readFileSync(join(OUT, "brasil-transparente-modelo.html"), "utf8")}
   writeFileSync(join(SITE, "index.html"), pagina);
   if (existsSync(dirConv)) {
     mkdirSync(join(SITE, "dados", "convenios"), { recursive: true });
-    for (const f of readdirSync(dirConv)) writeFileSync(join(SITE, "dados", "convenios", f), readFileSync(join(dirConv, f)));
+    for (const f of readdirSync(dirConv)) if (f !== "emendas.json") writeFileSync(join(SITE, "dados", "convenios", f), readFileSync(join(dirConv, f)));
+    writeFileSync(join(SITE, "dados", "convenios", "emendas.json"), emendasConvReduzido());
   }
   writeFileSync(join(SITE, ".nojekyll"), "");
   console.log("Site gerado: site/index.html");
