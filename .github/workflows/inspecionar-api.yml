@@ -25,7 +25,7 @@ jobs:
             n=$((n+1))
             code=$(curl -sSL -m 120 -A "Mozilla/5.0 brasil-transparente" -H "Accept: application/json" -o "out/r$n.body" -w "%{http_code} %{time_total}s %{size_download}B" "$U" || true)
             echo "$n $code $U" >> out/indice.txt
-            head -c 600000 "out/r$n.body" > "out/r$n.txt"; rm -f "out/r$n.body"
+            head -c 600000 "out/r$n.body" > "out/r$n.txt" 2>/dev/null || echo "(sem corpo)" > "out/r$n.txt"; rm -f "out/r$n.body"
             sleep 3
           done
           cat out/indice.txt
