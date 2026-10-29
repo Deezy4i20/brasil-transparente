@@ -1,683 +1,7 @@
 {
-  "geradoEm": "2026-10-29T08:30:50.855Z",
+  "geradoEm": "2026-10-29T10:15:40.203Z",
   "modo": "oficial",
   "conjuntos": [
-    {
-      "conjunto": "orcamento",
-      "ano": 2026,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Orçamento da Despesa — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/orcamento-despesa",
-        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603417-dicionario-de-dados-orcamento-da-despesa"
-      },
-      "arquivos": [
-        {
-          "nome": "orcamento-2026.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/orcamento-despesa/2026_OrcamentoDespesa.zip",
-          "periodo": "2026",
-          "baixadoEm": "2026-10-28T10:01:22.726Z",
-          "bytes": 817070,
-          "linhasLidas": 25348,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        }
-      ],
-      "mesesDisponiveis": [],
-      "processadoEm": "2026-10-28T10:01:22.742Z",
-      "avisos": [],
-      "linhasAgregadas": 5237
-    },
-    {
-      "conjunto": "execucao",
-      "ano": 2026,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Execução da Despesa — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/despesas-execucao",
-        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603453-dicionario-de-dados-execucao-da-despesa"
-      },
-      "arquivos": [
-        {
-          "nome": "execucao-202601.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202601_Despesas.zip",
-          "periodo": "202601",
-          "baixadoEm": "2026-10-28T10:02:24.241Z",
-          "bytes": 5185650,
-          "linhasLidas": 48519,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202602.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202602_Despesas.zip",
-          "periodo": "202602",
-          "baixadoEm": "2026-10-28T10:02:27.623Z",
-          "bytes": 5864685,
-          "linhasLidas": 54564,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202603.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202603_Despesas.zip",
-          "periodo": "202603",
-          "baixadoEm": "2026-10-28T10:02:31.433Z",
-          "bytes": 6746989,
-          "linhasLidas": 62101,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202604.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202604_Despesas.zip",
-          "periodo": "202604",
-          "baixadoEm": "2026-10-28T10:02:35.321Z",
-          "bytes": 6932116,
-          "linhasLidas": 64022,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202605.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202605_Despesas.zip",
-          "periodo": "202605",
-          "baixadoEm": "2026-10-28T10:02:39.443Z",
-          "bytes": 7328048,
-          "linhasLidas": 67691,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202606.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202606_Despesas.zip",
-          "periodo": "202606",
-          "baixadoEm": "2026-10-28T10:02:43.427Z",
-          "bytes": 7190637,
-          "linhasLidas": 66067,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202607.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202607_Despesas.zip",
-          "periodo": "202607",
-          "baixadoEm": "2026-10-28T10:02:47.399Z",
-          "bytes": 7099186,
-          "linhasLidas": 66083,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202608.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202608_Despesas.zip",
-          "periodo": "202608",
-          "baixadoEm": "2026-10-28T10:02:51.409Z",
-          "bytes": 7182272,
-          "linhasLidas": 66525,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202609.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202609_Despesas.zip",
-          "periodo": "202609",
-          "baixadoEm": "2026-10-28T10:02:55.472Z",
-          "bytes": 6657847,
-          "linhasLidas": 67732,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202610.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202610_Despesas.zip",
-          "periodo": "202610",
-          "baixadoEm": "2026-10-28T10:02:59.315Z",
-          "bytes": 6804989,
-          "linhasLidas": 63791,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        }
-      ],
-      "mesesDisponiveis": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ],
-      "processadoEm": "2026-10-28T10:02:59.464Z",
-      "avisos": [
-        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (421422).",
-        "221 linhas com nome de município sem correspondência na malha do IBGE."
-      ],
-      "linhasAgregadas": 77880
-    },
-    {
-      "conjunto": "transferencias",
-      "ano": 2026,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Recursos Transferidos — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/transferencias",
-        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603420-dicionario-de-dados-recursos-transferidos"
-      },
-      "arquivos": [
-        {
-          "nome": "transferencias-202601.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202601_Transferencias.zip",
-          "periodo": "202601",
-          "baixadoEm": "2026-10-28T10:03:49.780Z",
-          "bytes": 2484887,
-          "linhasLidas": 122528,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202602.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202602_Transferencias.zip",
-          "periodo": "202602",
-          "baixadoEm": "2026-10-28T10:03:55.162Z",
-          "bytes": 2242067,
-          "linhasLidas": 106663,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202603.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202603_Transferencias.zip",
-          "periodo": "202603",
-          "baixadoEm": "2026-10-28T10:04:01.167Z",
-          "bytes": 2643479,
-          "linhasLidas": 119844,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202604.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202604_Transferencias.zip",
-          "periodo": "202604",
-          "baixadoEm": "2026-10-28T10:04:10.443Z",
-          "bytes": 4233401,
-          "linhasLidas": 180836,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202605.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202605_Transferencias.zip",
-          "periodo": "202605",
-          "baixadoEm": "2026-10-28T10:04:22.873Z",
-          "bytes": 5929243,
-          "linhasLidas": 241394,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202606.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202606_Transferencias.zip",
-          "periodo": "202606",
-          "baixadoEm": "2026-10-28T10:04:30.180Z",
-          "bytes": 3338212,
-          "linhasLidas": 142515,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202607.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202607_Transferencias.zip",
-          "periodo": "202607",
-          "baixadoEm": "2026-10-28T10:04:37.413Z",
-          "bytes": 3094867,
-          "linhasLidas": 142644,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202608.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202608_Transferencias.zip",
-          "periodo": "202608",
-          "baixadoEm": "2026-10-28T10:04:44.768Z",
-          "bytes": 3248893,
-          "linhasLidas": 144357,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202609.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202609_Transferencias.zip",
-          "periodo": "202609",
-          "baixadoEm": "2026-10-28T10:04:56.713Z",
-          "bytes": 6198617,
-          "linhasLidas": 235146,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202610.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202610_Transferencias.zip",
-          "periodo": "202610",
-          "baixadoEm": "2026-10-28T10:05:06.223Z",
-          "bytes": 4733427,
-          "linhasLidas": 183502,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        }
-      ],
-      "mesesDisponiveis": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ],
-      "processadoEm": "2026-10-28T10:05:06.794Z",
-      "avisos": [
-        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (381), MU (6).",
-        "23069 linhas com nome de município sem correspondência na malha do IBGE."
-      ],
-      "linhasAgregadas": 459818
-    },
-    {
-      "conjunto": "emendas",
-      "ano": 2026,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Emendas Parlamentares — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
-        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
-      },
-      "arquivos": [
-        {
-          "nome": "emendas-UNICO.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/emendas-parlamentares/EmendasParlamentares.zip",
-          "periodo": "UNICO",
-          "baixadoEm": "2026-10-28T10:09:12.217Z",
-          "bytes": 32536836,
-          "linhasLidas": 94755,
-          "linhasDescartadas": 88993,
-          "motivosDescarte": {
-            "ano da emenda diferente do solicitado": 88993
-          }
-        }
-      ],
-      "mesesDisponiveis": [],
-      "processadoEm": "2026-10-28T10:09:12.398Z",
-      "avisos": [
-        "Linhas sem UF identificável classificadas como \"Localização não identificada\": Sem informação (586), Múltiplo (59)."
-      ],
-      "linhasAgregadas": 5762
-    },
-    {
-      "conjunto": "orcamento",
-      "ano": 2025,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Orçamento da Despesa — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/orcamento-despesa",
-        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603417-dicionario-de-dados-orcamento-da-despesa"
-      },
-      "arquivos": [
-        {
-          "nome": "orcamento-2025.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/orcamento-despesa/2025_OrcamentoDespesa.zip",
-          "periodo": "2025",
-          "baixadoEm": "2026-10-28T10:09:18.353Z",
-          "bytes": 809621,
-          "linhasLidas": 26160,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        }
-      ],
-      "mesesDisponiveis": [],
-      "processadoEm": "2026-10-28T10:09:18.364Z",
-      "avisos": [],
-      "linhasAgregadas": 5256
-    },
-    {
-      "conjunto": "execucao",
-      "ano": 2025,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Execução da Despesa — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/despesas-execucao",
-        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603453-dicionario-de-dados-execucao-da-despesa"
-      },
-      "arquivos": [
-        {
-          "nome": "execucao-202501.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202501_Despesas.zip",
-          "periodo": "202501",
-          "baixadoEm": "2026-10-28T10:10:30.530Z",
-          "bytes": 5171682,
-          "linhasLidas": 48873,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202502.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202502_Despesas.zip",
-          "periodo": "202502",
-          "baixadoEm": "2026-10-28T10:10:33.988Z",
-          "bytes": 5933338,
-          "linhasLidas": 55539,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202503.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202503_Despesas.zip",
-          "periodo": "202503",
-          "baixadoEm": "2026-10-28T10:10:37.546Z",
-          "bytes": 6119027,
-          "linhasLidas": 57465,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202504.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202504_Despesas.zip",
-          "periodo": "202504",
-          "baixadoEm": "2026-10-28T10:10:41.294Z",
-          "bytes": 6361682,
-          "linhasLidas": 59507,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202505.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202505_Despesas.zip",
-          "periodo": "202505",
-          "baixadoEm": "2026-10-28T10:10:45.135Z",
-          "bytes": 6631491,
-          "linhasLidas": 61737,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202506.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202506_Despesas.zip",
-          "periodo": "202506",
-          "baixadoEm": "2026-10-28T10:10:49.102Z",
-          "bytes": 6899890,
-          "linhasLidas": 64342,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202507.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202507_Despesas.zip",
-          "periodo": "202507",
-          "baixadoEm": "2026-10-28T10:10:53.234Z",
-          "bytes": 7247715,
-          "linhasLidas": 67015,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202508.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202508_Despesas.zip",
-          "periodo": "202508",
-          "baixadoEm": "2026-10-28T10:10:57.386Z",
-          "bytes": 7230039,
-          "linhasLidas": 67071,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202509.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202509_Despesas.zip",
-          "periodo": "202509",
-          "baixadoEm": "2026-10-28T10:11:01.733Z",
-          "bytes": 7620766,
-          "linhasLidas": 70228,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202510.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202510_Despesas.zip",
-          "periodo": "202510",
-          "baixadoEm": "2026-10-28T10:11:06.233Z",
-          "bytes": 7838033,
-          "linhasLidas": 71947,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202511.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202511_Despesas.zip",
-          "periodo": "202511",
-          "baixadoEm": "2026-10-28T10:11:10.817Z",
-          "bytes": 8133552,
-          "linhasLidas": 74382,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "execucao-202512.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202512_Despesas.zip",
-          "periodo": "202512",
-          "baixadoEm": "2026-10-28T10:11:16.611Z",
-          "bytes": 10513329,
-          "linhasLidas": 92907,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        }
-      ],
-      "mesesDisponiveis": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12
-      ],
-      "processadoEm": "2026-10-28T10:11:16.799Z",
-      "avisos": [
-        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (531103).",
-        "561 linhas com nome de município sem correspondência na malha do IBGE."
-      ],
-      "linhasAgregadas": 100171
-    },
-    {
-      "conjunto": "transferencias",
-      "ano": 2025,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Recursos Transferidos — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/transferencias",
-        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603420-dicionario-de-dados-recursos-transferidos"
-      },
-      "arquivos": [
-        {
-          "nome": "transferencias-202501.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202501_Transferencias.zip",
-          "periodo": "202501",
-          "baixadoEm": "2026-10-28T10:16:00.746Z",
-          "bytes": 2557613,
-          "linhasLidas": 127710,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202502.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202502_Transferencias.zip",
-          "periodo": "202502",
-          "baixadoEm": "2026-10-28T10:16:07.100Z",
-          "bytes": 2434949,
-          "linhasLidas": 114496,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202503.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202503_Transferencias.zip",
-          "periodo": "202503",
-          "baixadoEm": "2026-10-28T10:16:13.632Z",
-          "bytes": 2620155,
-          "linhasLidas": 120348,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202504.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202504_Transferencias.zip",
-          "periodo": "202504",
-          "baixadoEm": "2026-10-28T10:16:21.354Z",
-          "bytes": 3072003,
-          "linhasLidas": 141778,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202505.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202505_Transferencias.zip",
-          "periodo": "202505",
-          "baixadoEm": "2026-10-28T10:16:33.774Z",
-          "bytes": 5795364,
-          "linhasLidas": 220085,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202506.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202506_Transferencias.zip",
-          "periodo": "202506",
-          "baixadoEm": "2026-10-28T10:16:40.370Z",
-          "bytes": 2677035,
-          "linhasLidas": 121987,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202507.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202507_Transferencias.zip",
-          "periodo": "202507",
-          "baixadoEm": "2026-10-28T10:16:47.872Z",
-          "bytes": 3063462,
-          "linhasLidas": 136194,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202508.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202508_Transferencias.zip",
-          "periodo": "202508",
-          "baixadoEm": "2026-10-28T10:16:55.683Z",
-          "bytes": 3093378,
-          "linhasLidas": 141641,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202509.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202509_Transferencias.zip",
-          "periodo": "202509",
-          "baixadoEm": "2026-10-28T10:17:09.540Z",
-          "bytes": 6492205,
-          "linhasLidas": 252586,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202510.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202510_Transferencias.zip",
-          "periodo": "202510",
-          "baixadoEm": "2026-10-28T10:17:20.088Z",
-          "bytes": 4699882,
-          "linhasLidas": 192322,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202511.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202511_Transferencias.zip",
-          "periodo": "202511",
-          "baixadoEm": "2026-10-28T10:17:30.968Z",
-          "bytes": 4899547,
-          "linhasLidas": 200042,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        },
-        {
-          "nome": "transferencias-202512.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202512_Transferencias.zip",
-          "periodo": "202512",
-          "baixadoEm": "2026-10-28T10:17:43.397Z",
-          "bytes": 5482720,
-          "linhasLidas": 230734,
-          "linhasDescartadas": 0,
-          "motivosDescarte": {}
-        }
-      ],
-      "mesesDisponiveis": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12
-      ],
-      "processadoEm": "2026-10-28T10:17:43.952Z",
-      "avisos": [
-        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (456), MU (7).",
-        "28412 linhas com nome de município sem correspondência na malha do IBGE."
-      ],
-      "linhasAgregadas": 540376
-    },
-    {
-      "conjunto": "emendas",
-      "ano": 2025,
-      "origem": "oficial",
-      "fonte": {
-        "nome": "Emendas Parlamentares — Portal da Transparência (CGU)",
-        "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
-        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
-      },
-      "arquivos": [
-        {
-          "nome": "emendas-UNICO.zip",
-          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/emendas-parlamentares/EmendasParlamentares.zip",
-          "periodo": "UNICO",
-          "baixadoEm": "2026-10-28T10:18:06.041Z",
-          "bytes": 32536836,
-          "linhasLidas": 94755,
-          "linhasDescartadas": 88445,
-          "motivosDescarte": {
-            "ano da emenda diferente do solicitado": 88445
-          }
-        }
-      ],
-      "mesesDisponiveis": [],
-      "processadoEm": "2026-10-28T10:18:06.211Z",
-      "avisos": [
-        "Linhas sem UF identificável classificadas como \"Localização não identificada\": Sem informação (714), Múltiplo (66)."
-      ],
-      "linhasAgregadas": 6310
-    },
     {
       "conjunto": "convenios",
       "ano": 2026,
@@ -775,6 +99,682 @@
       "avisos": [
         "Inclui licitações (pregão, concorrência…) e contratações diretas (dispensa, inexigibilidade) publicadas no PNCP pela Lei 14.133. Processos pela lei antiga (8.666) não entram."
       ]
+    },
+    {
+      "conjunto": "orcamento",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Orçamento da Despesa — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/orcamento-despesa",
+        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603417-dicionario-de-dados-orcamento-da-despesa"
+      },
+      "arquivos": [
+        {
+          "nome": "orcamento-2026.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/orcamento-despesa/2026_OrcamentoDespesa.zip",
+          "periodo": "2026",
+          "baixadoEm": "2026-10-29T10:03:42.315Z",
+          "bytes": 817070,
+          "linhasLidas": 25348,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-29T10:03:42.334Z",
+      "avisos": [],
+      "linhasAgregadas": 5237
+    },
+    {
+      "conjunto": "execucao",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Execução da Despesa — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/despesas-execucao",
+        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603453-dicionario-de-dados-execucao-da-despesa"
+      },
+      "arquivos": [
+        {
+          "nome": "execucao-202601.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202601_Despesas.zip",
+          "periodo": "202601",
+          "baixadoEm": "2026-10-29T10:04:53.665Z",
+          "bytes": 5185650,
+          "linhasLidas": 48519,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202602.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202602_Despesas.zip",
+          "periodo": "202602",
+          "baixadoEm": "2026-10-29T10:04:55.804Z",
+          "bytes": 5864685,
+          "linhasLidas": 54564,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202603.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202603_Despesas.zip",
+          "periodo": "202603",
+          "baixadoEm": "2026-10-29T10:04:58.179Z",
+          "bytes": 6746989,
+          "linhasLidas": 62101,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202604.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202604_Despesas.zip",
+          "periodo": "202604",
+          "baixadoEm": "2026-10-29T10:05:00.654Z",
+          "bytes": 6932116,
+          "linhasLidas": 64022,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202605.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202605_Despesas.zip",
+          "periodo": "202605",
+          "baixadoEm": "2026-10-29T10:05:03.192Z",
+          "bytes": 7328048,
+          "linhasLidas": 67691,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202606.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202606_Despesas.zip",
+          "periodo": "202606",
+          "baixadoEm": "2026-10-29T10:05:05.739Z",
+          "bytes": 7190637,
+          "linhasLidas": 66067,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202607.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202607_Despesas.zip",
+          "periodo": "202607",
+          "baixadoEm": "2026-10-29T10:05:08.306Z",
+          "bytes": 7099186,
+          "linhasLidas": 66083,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202608.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202608_Despesas.zip",
+          "periodo": "202608",
+          "baixadoEm": "2026-10-29T10:05:11.241Z",
+          "bytes": 7182272,
+          "linhasLidas": 66525,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202609.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202609_Despesas.zip",
+          "periodo": "202609",
+          "baixadoEm": "2026-10-29T10:05:13.775Z",
+          "bytes": 6657847,
+          "linhasLidas": 67732,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202610.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202610_Despesas.zip",
+          "periodo": "202610",
+          "baixadoEm": "2026-10-29T10:05:16.297Z",
+          "bytes": 6947354,
+          "linhasLidas": 65012,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "processadoEm": "2026-10-29T10:05:16.428Z",
+      "avisos": [
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (422289).",
+        "221 linhas com nome de município sem correspondência na malha do IBGE."
+      ],
+      "linhasAgregadas": 78007
+    },
+    {
+      "conjunto": "transferencias",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Recursos Transferidos — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/transferencias",
+        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603420-dicionario-de-dados-recursos-transferidos"
+      },
+      "arquivos": [
+        {
+          "nome": "transferencias-202601.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202601_Transferencias.zip",
+          "periodo": "202601",
+          "baixadoEm": "2026-10-29T10:06:18.984Z",
+          "bytes": 2484887,
+          "linhasLidas": 122528,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202602.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202602_Transferencias.zip",
+          "periodo": "202602",
+          "baixadoEm": "2026-10-29T10:06:22.911Z",
+          "bytes": 2242067,
+          "linhasLidas": 106663,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202603.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202603_Transferencias.zip",
+          "periodo": "202603",
+          "baixadoEm": "2026-10-29T10:06:27.071Z",
+          "bytes": 2643479,
+          "linhasLidas": 119844,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202604.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202604_Transferencias.zip",
+          "periodo": "202604",
+          "baixadoEm": "2026-10-29T10:06:33.483Z",
+          "bytes": 4233401,
+          "linhasLidas": 180836,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202605.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202605_Transferencias.zip",
+          "periodo": "202605",
+          "baixadoEm": "2026-10-29T10:06:42.055Z",
+          "bytes": 5929243,
+          "linhasLidas": 241394,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202606.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202606_Transferencias.zip",
+          "periodo": "202606",
+          "baixadoEm": "2026-10-29T10:06:47.022Z",
+          "bytes": 3338212,
+          "linhasLidas": 142515,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202607.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202607_Transferencias.zip",
+          "periodo": "202607",
+          "baixadoEm": "2026-10-29T10:06:51.878Z",
+          "bytes": 3094867,
+          "linhasLidas": 142644,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202608.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202608_Transferencias.zip",
+          "periodo": "202608",
+          "baixadoEm": "2026-10-29T10:06:56.905Z",
+          "bytes": 3248893,
+          "linhasLidas": 144357,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202609.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202609_Transferencias.zip",
+          "periodo": "202609",
+          "baixadoEm": "2026-10-29T10:07:05.024Z",
+          "bytes": 6198621,
+          "linhasLidas": 235146,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202610.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202610_Transferencias.zip",
+          "periodo": "202610",
+          "baixadoEm": "2026-10-29T10:07:11.503Z",
+          "bytes": 4738197,
+          "linhasLidas": 183593,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "processadoEm": "2026-10-29T10:07:11.892Z",
+      "avisos": [
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (381), MU (6).",
+        "23071 linhas com nome de município sem correspondência na malha do IBGE."
+      ],
+      "linhasAgregadas": 459903
+    },
+    {
+      "conjunto": "emendas",
+      "ano": 2026,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Emendas Parlamentares — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
+        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
+      },
+      "arquivos": [
+        {
+          "nome": "emendas-UNICO.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/emendas-parlamentares/EmendasParlamentares.zip",
+          "periodo": "UNICO",
+          "baixadoEm": "2026-10-29T10:07:28.067Z",
+          "bytes": 32536768,
+          "linhasLidas": 94761,
+          "linhasDescartadas": 88993,
+          "motivosDescarte": {
+            "ano da emenda diferente do solicitado": 88993
+          }
+        }
+      ],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-29T10:07:28.253Z",
+      "avisos": [
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": Sem informação (587), Múltiplo (59)."
+      ],
+      "linhasAgregadas": 5768
+    },
+    {
+      "conjunto": "orcamento",
+      "ano": 2025,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Orçamento da Despesa — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/orcamento-despesa",
+        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603417-dicionario-de-dados-orcamento-da-despesa"
+      },
+      "arquivos": [
+        {
+          "nome": "orcamento-2025.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/orcamento-despesa/2025_OrcamentoDespesa.zip",
+          "periodo": "2025",
+          "baixadoEm": "2026-10-29T10:07:34.940Z",
+          "bytes": 809621,
+          "linhasLidas": 26160,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-29T10:07:34.950Z",
+      "avisos": [],
+      "linhasAgregadas": 5256
+    },
+    {
+      "conjunto": "execucao",
+      "ano": 2025,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Execução da Despesa — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/despesas-execucao",
+        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603453-dicionario-de-dados-execucao-da-despesa"
+      },
+      "arquivos": [
+        {
+          "nome": "execucao-202501.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202501_Despesas.zip",
+          "periodo": "202501",
+          "baixadoEm": "2026-10-29T10:12:33.266Z",
+          "bytes": 5171682,
+          "linhasLidas": 48873,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202502.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202502_Despesas.zip",
+          "periodo": "202502",
+          "baixadoEm": "2026-10-29T10:12:35.538Z",
+          "bytes": 5933338,
+          "linhasLidas": 55539,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202503.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202503_Despesas.zip",
+          "periodo": "202503",
+          "baixadoEm": "2026-10-29T10:12:37.861Z",
+          "bytes": 6119027,
+          "linhasLidas": 57465,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202504.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202504_Despesas.zip",
+          "periodo": "202504",
+          "baixadoEm": "2026-10-29T10:12:40.236Z",
+          "bytes": 6361682,
+          "linhasLidas": 59507,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202505.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202505_Despesas.zip",
+          "periodo": "202505",
+          "baixadoEm": "2026-10-29T10:12:42.670Z",
+          "bytes": 6631491,
+          "linhasLidas": 61737,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202506.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202506_Despesas.zip",
+          "periodo": "202506",
+          "baixadoEm": "2026-10-29T10:12:45.159Z",
+          "bytes": 6899890,
+          "linhasLidas": 64342,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202507.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202507_Despesas.zip",
+          "periodo": "202507",
+          "baixadoEm": "2026-10-29T10:12:47.794Z",
+          "bytes": 7247715,
+          "linhasLidas": 67015,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202508.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202508_Despesas.zip",
+          "periodo": "202508",
+          "baixadoEm": "2026-10-29T10:12:50.731Z",
+          "bytes": 7230039,
+          "linhasLidas": 67071,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202509.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202509_Despesas.zip",
+          "periodo": "202509",
+          "baixadoEm": "2026-10-29T10:12:53.522Z",
+          "bytes": 7620766,
+          "linhasLidas": 70228,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202510.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202510_Despesas.zip",
+          "periodo": "202510",
+          "baixadoEm": "2026-10-29T10:12:56.400Z",
+          "bytes": 7838033,
+          "linhasLidas": 71947,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202511.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202511_Despesas.zip",
+          "periodo": "202511",
+          "baixadoEm": "2026-10-29T10:12:59.398Z",
+          "bytes": 8133552,
+          "linhasLidas": 74382,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "execucao-202512.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/despesas-execucao/202512_Despesas.zip",
+          "periodo": "202512",
+          "baixadoEm": "2026-10-29T10:13:03.089Z",
+          "bytes": 10513329,
+          "linhasLidas": 92907,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "processadoEm": "2026-10-29T10:13:03.253Z",
+      "avisos": [
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (531103).",
+        "561 linhas com nome de município sem correspondência na malha do IBGE."
+      ],
+      "linhasAgregadas": 100171
+    },
+    {
+      "conjunto": "transferencias",
+      "ano": 2025,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Recursos Transferidos — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/transferencias",
+        "dicionario": "https://www.portaldatransparencia.gov.br/pagina-interna/603420-dicionario-de-dados-recursos-transferidos"
+      },
+      "arquivos": [
+        {
+          "nome": "transferencias-202501.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202501_Transferencias.zip",
+          "periodo": "202501",
+          "baixadoEm": "2026-10-29T10:14:18.234Z",
+          "bytes": 2557613,
+          "linhasLidas": 127710,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202502.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202502_Transferencias.zip",
+          "periodo": "202502",
+          "baixadoEm": "2026-10-29T10:14:22.531Z",
+          "bytes": 2434949,
+          "linhasLidas": 114496,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202503.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202503_Transferencias.zip",
+          "periodo": "202503",
+          "baixadoEm": "2026-10-29T10:14:26.702Z",
+          "bytes": 2620155,
+          "linhasLidas": 120348,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202504.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202504_Transferencias.zip",
+          "periodo": "202504",
+          "baixadoEm": "2026-10-29T10:14:31.566Z",
+          "bytes": 3072003,
+          "linhasLidas": 141778,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202505.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202505_Transferencias.zip",
+          "periodo": "202505",
+          "baixadoEm": "2026-10-29T10:14:39.138Z",
+          "bytes": 5795364,
+          "linhasLidas": 220085,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202506.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202506_Transferencias.zip",
+          "periodo": "202506",
+          "baixadoEm": "2026-10-29T10:14:43.401Z",
+          "bytes": 2677035,
+          "linhasLidas": 121987,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202507.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202507_Transferencias.zip",
+          "periodo": "202507",
+          "baixadoEm": "2026-10-29T10:14:48.186Z",
+          "bytes": 3063462,
+          "linhasLidas": 136194,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202508.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202508_Transferencias.zip",
+          "periodo": "202508",
+          "baixadoEm": "2026-10-29T10:14:53.194Z",
+          "bytes": 3093378,
+          "linhasLidas": 141641,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202509.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202509_Transferencias.zip",
+          "periodo": "202509",
+          "baixadoEm": "2026-10-29T10:15:01.866Z",
+          "bytes": 6492205,
+          "linhasLidas": 252586,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202510.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202510_Transferencias.zip",
+          "periodo": "202510",
+          "baixadoEm": "2026-10-29T10:15:08.546Z",
+          "bytes": 4699882,
+          "linhasLidas": 192322,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202511.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202511_Transferencias.zip",
+          "periodo": "202511",
+          "baixadoEm": "2026-10-29T10:15:15.579Z",
+          "bytes": 4899547,
+          "linhasLidas": 200042,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        },
+        {
+          "nome": "transferencias-202512.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/transferencias/202512_Transferencias.zip",
+          "periodo": "202512",
+          "baixadoEm": "2026-10-29T10:15:23.358Z",
+          "bytes": 5482720,
+          "linhasLidas": 230734,
+          "linhasDescartadas": 0,
+          "motivosDescarte": {}
+        }
+      ],
+      "mesesDisponiveis": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "processadoEm": "2026-10-29T10:15:23.810Z",
+      "avisos": [
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": (vazio) (456), MU (7).",
+        "28412 linhas com nome de município sem correspondência na malha do IBGE."
+      ],
+      "linhasAgregadas": 540376
+    },
+    {
+      "conjunto": "emendas",
+      "ano": 2025,
+      "origem": "oficial",
+      "fonte": {
+        "nome": "Emendas Parlamentares — Portal da Transparência (CGU)",
+        "url": "https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares",
+        "dicionario": "https://portaldatransparencia.gov.br/pagina-interna/603482-dicionario-de-dados-emendas-parlamentares"
+      },
+      "arquivos": [
+        {
+          "nome": "emendas-UNICO.zip",
+          "url": "https://dadosabertos-download.cgu.gov.br/PortalDaTransparencia/saida/emendas-parlamentares/EmendasParlamentares.zip",
+          "periodo": "UNICO",
+          "baixadoEm": "2026-10-29T10:15:39.963Z",
+          "bytes": 32536768,
+          "linhasLidas": 94761,
+          "linhasDescartadas": 88451,
+          "motivosDescarte": {
+            "ano da emenda diferente do solicitado": 88451
+          }
+        }
+      ],
+      "mesesDisponiveis": [],
+      "processadoEm": "2026-10-29T10:15:40.140Z",
+      "avisos": [
+        "Linhas sem UF identificável classificadas como \"Localização não identificada\": Sem informação (714), Múltiplo (66)."
+      ],
+      "linhasAgregadas": 6310
     }
   ]
 }
